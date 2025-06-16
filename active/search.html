@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <title>sebudaca | Search</title>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="icon" type="image/x-icon" href="/assets/js/icon/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+
+      body {
+        background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+        min-height: 100vh;
+        color: white;
+      }
+
+      .home-navbar {
+        transform: translateX(-50%);
+        width: 670px;
+        top: 1%;
+        margin-bottom: -10px;
+        margin-left: 50%;
+        background-color: #08080894;
+        border: 1px solid #ffffff21;
+        height: 35px;
+        color: #818181;
+        padding: 10px;
+        text-align: center;
+        font-size: 18px;
+        font-weight: bold;
+        z-index: 1001;
+        backdrop-filter: blur(5px);
+        border-radius: 25px;
+        position: fixed;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transition: transform 0.3s ease;
+      }
+
+      .home-navbar .favicon {
+        width: 24px;
+        height: 24px;
+        margin-right: -10px;
+        vertical-align: middle;
+      }
+
+      .home-navbar a {
+        color: #7c7c7c;
+        text-decoration: none;
+        padding: 8px 16px;
+        font-size: 14px;
+        font-weight: 300;
+        border-radius: 5px;
+        position: relative;
+        transition: all 0.3s ease;
+      }
+
+      .home-navbar a:hover {
+        color: #bbbbbb;
+        font-size: 16px;
+      }
+
+      .home-navbar a:active {
+        font-size: 12px;
+      }
+
+      .home-navbar i {
+        color: #ffffff; 
+        margin-right: -15px;
+        margin-left: 115px;
+      }
+
+      .navbar {
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #42424205;
+        backdrop-filter: blur(10px);
+        border: 1px solid #ffffff5b;
+        width: 900px;
+        max-width: 98vw;
+        display: block;
+        border-radius: 25px;
+        align-items: center;
+        overflow: hidden;
+        position: fixed;
+        z-index: 999;
+        animation: fadeIn 0.3s ease;
+        padding: 0.5em 1em;
+      }
+      .nav-buttons {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5em;
+      }
+      .nav-buttons li {
+        display: flex;
+        align-items: center;
+      }
+      .nav-buttons a {
+        color: #eceff4;
+        text-decoration: none;
+        padding: 0.4em 0.7em;
+        border-radius: 1em;
+        transition: background 0.15s, color 0.15s, font-size 0.15s;
+        font-size: 1.1em;
+        display: flex;
+        align-items: center;
+      }
+      .nav-buttons a:hover, .nav-buttons a.active {
+        background: #3b3b3bb7;
+        color: #fff;
+        font-size: 1.18em;
+      }
+      .nav-buttons a.disabled {
+        opacity: 0.5;
+        pointer-events: none;
+      }
+      .small-searchbar {
+        display: flex;
+        align-items: center;
+        background: #555555b2;
+        border-radius: 1.2em;
+        padding: 0.2em 0.7em;
+        min-width: 228px;
+        max-width: 320px;
+        margin: 0 0.5em;
+        position: relative;
+      }
+      .small-searchbar #lock-indicator {
+        position: absolute;
+        left: 0.9em;
+        top: 50%;
+        transform: translateY(-60%);
+        display: flex;
+        align-items: center;
+        z-index: 2;
+      }
+      .small-searchbar #lock-svg {
+        position: static;
+      }
+      .small-searchbar input {
+        background: transparent;
+        border: none;
+        color: #eceff4;
+        font-size: 1em;
+        width: 100%;
+        outline: none;
+        padding-left: 1.6em !important;
+      }
+      .small-searchbar svg {
+        position: absolute;
+        left: 0.7em;
+        color: #bfc9db;
+        font-size: 1em;
+        width: 1em;
+        height: 1em;
+      }
+      .shortcut-indicator-2 {
+        font-size: 0.8em;
+        color: #bfc9db;
+        margin-left: 0.5em;
+        white-space: nowrap;
+      }
+      .iframe-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        background: #222;
+      }
+      #cool-iframe {
+        width: 100vw;
+        height: 100vh;
+        border: none;
+        background: #222;
+        display: block;
+      }
+      @media (max-width: 1000px) {
+        .navbar {
+          width: 99vw;
+          min-width: 0;
+          padding: 0.2em 0.2em;
+        }
+        .small-searchbar {
+          min-width: 120px;
+          max-width: 180px;
+        }
+      }
+
+      /* New styles for the navigation controls */
+      .nav-controls {
+        position: fixed;
+        top: 70px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 10px;
+        z-index: 1000;
+      }
+
+      .nav-controls button {
+        background: #333;
+        color: #fff;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s, transform 0.3s;
+      }
+
+      .nav-controls button:hover {
+        background: #444;
+      }
+
+      .nav-controls button:active {
+        transform: scale(0.98);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar" style="display: block;">
+      <ul class="nav-buttons">
+        <li><a id="backIcon" href="#" class="disabled" title="Back"><i class="fa-solid fa-arrow-left"></i></a></li>
+        <li><a id="refreshIcon" href="#" title="Refresh"><i class="fa-solid fa-rotate-right"></i></a></li>
+        <li><a id="forwardIcon" href="#" class="disabled" title="Forward"><i class="fa-solid fa-arrow-right"></i></a></li>
+        <li><a id="fullscreenIcon" href="#" title="Fullscreen"><i class="fa-solid fa-expand"></i></a></li>
+        <li>
+          <div class="small-searchbar" style="position: relative;">
+            <span id="lock-indicator" title="Connection is secure">
+              <svg id="lock-svg" viewBox="0 0 24 24" width="16" height="16">
+                <path d="M17 11V7a5 5 0 0 0-10 0v4" stroke="#4caf50" stroke-width="2" fill="none"/>
+                <rect x="5" y="11" width="14" height="10" rx="2" stroke="#4caf50" stroke-width="2" fill="none"/>
+              </svg>
+            </span>
+            <input class="waves" type="text" id="searchInputt" placeholder="Search for a query or enter a URL..." autocomplete="off" style="padding-left: 40px;">
+            <span class="shortcut-indicator-2">Ctrl + S</span>
+          </div>
+        </li>
+        <li><a href="/index.html" title="Home"><i class="fa-solid fa-house"></i></a></li>
+        <li><a href="/apps.html" title="Apps"><i class="fa-solid fa-th"></i></a></li>
+        <li><a id="erudaIcon" href="#" title="Dev Tools"><i class="fa-solid fa-code"></i></a></li>
+      </ul>
+    </div>
+    <div class="iframe-container">
+      <iframe id="cool-iframe"></iframe>
+    </div>
+    <form id="uv-form" autocomplete="off">
+      <input id="uv-address" type="text" placeholder="Search or enter URL..." autocomplete="off" />
+      <button type="submit" style="display:none">Go</button>
+    </form>
+    <p id="uv-error"></p>
+    <pre id="uv-error-code"></pre>
+    <!-- Ultraviolet scripts first -->
+    <script src="uv/uv.bundle.js" defer></script>
+    <script src="uv/uv.config.js" defer></script>
+    <script src="register-sw.js" defer></script>
+    <script src="uv/uv.handler.js"></script>
+    <script src="/src/index.js"></script>
+    <script src="/assets/js/error.js"></script>
+    <script src="/assets/js/loading.js"></script>
+    <!-- Then your inline script above -->
+  <script>
+  // Get the encoded URL from the query string (?url=...)
+const params = new URLSearchParams(window.location.search);
+const encodedUrl = params.get('url');
+const iframe = document.getElementById('cool-iframe');
+
+if (!encodedUrl) {
+  document.body.insertAdjacentHTML('beforeend', '<p style="color:white;text-align:center;">No URL provided.</p>');
+} else {
+  const decodedUrl = decodeURIComponent(encodedUrl);
+  // Save to localStorage for next time
+  localStorage.setItem('lastUvUrl', decodedUrl);
+  // Set the iframe src
+  if (iframe) {
+    iframe.src = decodedUrl;
+    // Show error if iframe fails to load after 2 seconds
+    setTimeout(() => {
+      if (!iframe.contentWindow || iframe.contentDocument.body.innerHTML === "") {
+        document.body.insertAdjacentHTML('beforeend', '<p style="color:red;text-align:center;">This site does not allow embedding. Try another site or use a proxy.</p>');
+      }
+    }, 2000);
+  }
+}
+
+// Navbar button handlers
+document.getElementById('backIcon').onclick = (e) => {
+    e.preventDefault();
+    window.history.back();
+  };
+
+  document.getElementById('forwardIcon').onclick = (e) => {
+    e.preventDefault();
+    window.history.forward();
+  };
+
+  document.getElementById('refreshIcon').onclick = (e) => {
+    e.preventDefault();
+    // Option 1: Reload the whole page
+    window.location.reload();
+    // Option 2: Only reload the iframe (uncomment if you want this instead)
+    // document.getElementById('cool-iframe').src = document.getElementById('cool-iframe').src;
+  };
+
+  document.getElementById('fullscreenIcon').onclick = (e) => {
+    e.preventDefault();
+    const iframe = document.getElementById('cool-iframe');
+    if (iframe.requestFullscreen) {
+      iframe.requestFullscreen();
+    } else if (iframe.webkitRequestFullscreen) {
+      iframe.webkitRequestFullscreen();
+    } else if (iframe.msRequestFullscreen) {
+      iframe.msRequestFullscreen();
+    }
+  };
+
+// Set the small search bar to the last entered URL from localStorage
+const searchInput = document.getElementById('searchInputt');
+const lastUvUrl = localStorage.getItem('lastUvUrl');
+if (searchInput && lastUvUrl) {
+  searchInput.value = lastUvUrl;
+}
+
+// When the user presses Enter in the small search bar, navigate to the new URL
+searchInput.addEventListener('keydown', function(e) {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const newVal = searchInput.value.trim();
+    if (!newVal) return;
+
+    // Store the new value in localStorage
+    localStorage.setItem('lastUvUrl', newVal);
+
+    let url;
+    try {
+      url = new URL(newVal).toString();
+    } catch {
+      url = `https://duckduckgo.com/?q=${encodeURIComponent(newVal)}`;
+    }
+
+    const encoded = window.__uv$config.encodeUrl(url);
+    // Reload search.html with the new encoded URL
+    window.location.href = '/active/search.html?url=' + encoded;
+  }
+});
+
+// Navigation controls functions
+function goBack() {
+  window.history.back();
+}
+
+function goForward() {
+  window.history.forward();
+}
+
+function refreshPage() {
+  window.location.reload();
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    }
+  }
+}
+  </script>
+  </body>
+</html>

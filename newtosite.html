@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>sebudaca | Setup</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: #292929e0;
+      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      overflow: hidden;
+    }
+    .background-rays {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .god-rays {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 750px;
+    --stripes: repeating-linear-gradient(100deg, #ffffffcc 0%, #ffffffcc 7%, transparent 10%, transparent 12%, #ffffffcc 16%);
+    --rays: repeating-linear-gradient(100deg, #ffffffe6 10%, #646464e6 15%, #ffffffe6 20%, #e6e6e6e6 25%, #ffffffe6 30%);
+    background-image: var(--stripes), var(--rays);
+    background-size: 300%, 200%;
+    background-position: 50% 50%, 50% 50%;
+    mask-image: radial-gradient(ellipse at 100% 0%, transparent 40%, transparent 70%);
+    -webkit-mask-image: radial-gradient(ellipse at 100% 0%, white 40%, transparent 70%);
+    pointer-events: none;
+    z-index: -1;
+}
+
+.god-rays::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--stripes), var(--rays);
+    background-size: 200%, 100%;
+    animation: god-rays 7s linear infinite;
+    background-attachment: fixed;
+    mix-blend-mode: difference;
+}
+@keyframes god-rays {
+    0% {
+        background-position: 60% 50%, 40% 50%;
+    }
+    100% {
+        background-position: 0% 50%, 100% 50%;
+    }
+}
+    .setup-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      transition: background 0.6s cubic-bezier(.4,0,.2,1);
+      background: #5252524d;
+      position: relative;
+      z-index: 1;
+    }
+    .setup-panel {
+      background: #141414b9;
+      color: #eceff4;
+      border-radius: 1.2em;
+      box-shadow: 0 8px 32px #36363644;
+      padding: 2.5em 2.5em 2em 2.5em;
+      min-width: 320px;
+      max-width: 90vw;
+      text-align: center;
+      opacity: 1;
+      transform: translateY(0);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .setup-panel.fade-out {
+      opacity: 0;
+      transform: translateY(40px);
+      pointer-events: none;
+    }
+    .setup-panel.fade-in {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .setup-title {
+      font-size: 2em;
+      font-weight: 600;
+      margin-bottom: 0.5em;
+      letter-spacing: 0.01em;
+    }
+    .setup-desc {
+      font-size: 1.1em;
+      margin-bottom: 2em;
+      color: #8b8b8b;
+    }
+    .setup-btn {
+      background: #636262d8;
+      color: #fff;
+      border: none;
+      border-radius: 1em;
+      padding: 0.8em 2.2em;
+      font-size: 1.1em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 1em;
+      box-shadow: 0 2px 8px #a5a5a522;
+    }
+    .setup-btn:active {
+      background: #555555;
+    }
+    .fade-white {
+      position: fixed;
+      inset: 0;
+      background: #fff;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1000;
+      transition: opacity 0.7s cubic-bezier(.4,0,.2,1);
+    }
+    .fade-white.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+  </style>
+</head>
+<body>
+  <div class="background-rays">
+    <div class="god-rays"></div>
+  </div>
+  <div class="setup-container" id="setupContainer">
+    <div class="setup-panel fade-in" id="panel1">
+      <div class="setup-title"><i class="fa-solid fa-rocket"></i> Welcome to sebudaca</div>
+      <div class="setup-desc">Let's get you set up! Click Next to continue.</div>
+      <button class="setup-btn" id="next1">Next</button>
+    </div>
+    <div class="setup-panel" id="panel2" style="display:none;">
+      <div class="setup-title"><i class="fa-solid fa-user"></i> Choose a Nickname</div>
+      <div class="setup-desc">What should we call you?</div>
+      <input type="text" id="nickname" placeholder="Enter your nickname" style="padding:0.7em 1.2em;border-radius:1em;border:1px solid #5e81ac;background:#181c24;color:#eceff4;font-size:1.1em;outline:none;">
+      <button class="setup-btn" id="next2" disabled>Next</button>
+    </div>
+    <div class="setup-panel" id="panel3" style="display:none;">
+      <div class="setup-title"><i class="fa-solid fa-check-circle"></i> All Set!</div>
+      <div class="setup-desc">You're ready to explore sebudaca.<br>Click Finish to start using the site.</div>
+      <button class="setup-btn" id="finish">Finish</button>
+    </div>
+  </div>
+  <div class="fade-white" id="fadeWhite"></div>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script>
+    // Helper for smooth fade to white and next panel
+    function fadeToWhiteThen(nextPanelId, cb) {
+      const fade = document.getElementById('fadeWhite');
+      fade.classList.add('active');
+      setTimeout(() => {
+        document.querySelectorAll('.setup-panel').forEach(p => p.style.display = 'none');
+        document.getElementById(nextPanelId).style.display = '';
+        setTimeout(() => {
+          fade.classList.remove('active');
+          if (cb) cb();
+        }, 100); // slight delay for fade-in
+      }, 600); // match transition
+    }
+
+    // Panel 1 -> Panel 2
+    document.getElementById('next1').onclick = function() {
+      document.getElementById('panel1').classList.add('fade-out');
+      setTimeout(() => {
+        fadeToWhiteThen('panel2', () => {
+          document.getElementById('panel2').classList.add('fade-in');
+        });
+      }, 400);
+    };
+
+    // Enable Next only if nickname is entered
+    const nicknameInput = document.getElementById('nickname');
+    const next2Btn = document.getElementById('next2');
+    nicknameInput.addEventListener('input', function() {
+      next2Btn.disabled = !nicknameInput.value.trim();
+    });
+
+    // Panel 2 -> Panel 3
+    next2Btn.onclick = function() {
+      localStorage.setItem('userName', nicknameInput.value.trim());
+      document.getElementById('panel2').classList.remove('fade-in');
+      document.getElementById('panel2').classList.add('fade-out');
+      setTimeout(() => {
+        fadeToWhiteThen('panel3', () => {
+          document.getElementById('panel3').classList.add('fade-in');
+        });
+      }, 400);
+    };
+
+    // Finish button
+    document.getElementById('finish').onclick = function() {
+      document.getElementById('panel3').classList.remove('fade-in');
+      document.getElementById('panel3').classList.add('fade-out');
+      setTimeout(() => {
+        document.getElementById('fadeWhite').classList.add('active');
+        setTimeout(() => {
+          showFinalLoaderAndGoHome();
+        }, 700);
+      }, 400);
+    };
+
+    // Place this at the end of your <script> block, after the VPN/browser check logic
+    function showFinalLoaderAndGoHome() {
+      const finalLoader = document.getElementById("final-loader");
+      finalLoader.style.display = "flex";
+      // Wait for all images, fonts, and DOM to be ready (simulate with timeout for demo)
+      setTimeout(() => {
+        window.location.href = "index.html";
+      }, 2200); // Adjust time as needed for your real loading
+    }
+
+    // Always run the browser/VPN check and loading, even if user is already set up
+    document.addEventListener("DOMContentLoaded", function() {
+      const loader = document.getElementById("browser-check-loader");
+      const bar = document.getElementById("browser-check-bar");
+      const text = document.getElementById("browser-check-text");
+      const logs = document.getElementById("browser-check-logs");
+
+      function log(msg) {
+        logs.innerHTML += `<div>${msg}</div>`;
+      }
+
+      // Animate loading bar and logs (use your preferred timing)
+      setTimeout(() => { bar.style.width = "30%"; log("Checking for Tor Browser..."); }, 400);
+      setTimeout(() => { bar.style.width = "40%"; log("Updated to sebuda's proxy ip..."); }, 1100);
+      setTimeout(() => { bar.style.width = "45%"; log("Updating site to commit..."); }, 1800);
+      setTimeout(() => { bar.style.width = "50%"; log("Checking for Onion Browser..."); }, 2500);
+      setTimeout(() => { bar.style.width = "70%"; log("Checking for Brave..."); }, 3200);
+      setTimeout(() => { bar.style.width = "85%"; log("Checking for VPN/private browser..."); }, 3900);
+
+      function isPrivacyBrowser() {
+        const ua = navigator.userAgent.toLowerCase();
+        if (ua.includes("torbrowser") || ua.includes("tor browser")) { log("Detected Tor Browser."); return true; }
+        if (ua.includes("onionbrowser")) { log("Detected Onion Browser."); return true; }
+        if (navigator.brave) { log("Detected Brave."); return true; }
+        if (ua.includes("vpn") || ua.includes("privacy")) { log("Detected VPN/Privacy browser."); return true; }
+        if (navigator.userAgentData && navigator.userAgentData.brands) {
+          if (navigator.userAgentData.brands.some(b => b.brand.toLowerCase().includes("tor"))) {
+            log("Detected Tor in userAgentData."); return true;
+          }
+        }
+        if (ua.length < 40) { log("User agent too short, possible privacy browser."); return true; }
+        return false;
+      }
+
+      setTimeout(() => {
+        bar.style.width = "100%";
+        let isPrivate = isPrivacyBrowser();
+        if (isPrivate) {
+          text.textContent = "Sorry, privacy browsers or VPNs like Tor/Onion are not supported.";
+          logs.innerHTML += `<div style="color:#ff4d4f;margin-top:0.7em;">Please disable your privacy browser or VPN and reload the site.<br>If you believe this is a mistake, <a href="mailto:support@sebudaca.net" style="color:#fff;text-decoration:underline;">contact support</a>.</div>`;
+          bar.style.background = "#ff4d4f";
+          setTimeout(() => {
+            loader.style.opacity = "1";
+            loader.style.background = "#111";
+          }, 100);
+        } else {
+          log("Checking your IP for VPN/proxy...");
+          fetch("https://ipapi.co/json/")
+            .then(res => res.json())
+            .then(data => {
+              if (data.security && (data.security.vpn || data.security.proxy || data.security.tor)) {
+                log("Detected VPN/proxy/Tor IP.");
+                text.textContent = "Sorry, VPNs, proxies, or Tor exit nodes are not supported.";
+                logs.innerHTML += `<div style="color:#ff4d4f;margin-top:0.7em;">Please disable your VPN, proxy, or Tor and reload the site.<br>If you believe this is a mistake, <a href="mailto:support@sebudaca.net" style="color:#fff;text-decoration:underline;">contact support</a>.</div>`;
+                bar.style.background = "#ff4d4f";
+                setTimeout(() => {
+                  loader.style.opacity = "1";
+                  loader.style.background = "#111";
+                }, 100);
+              } else {
+                log("IP check passed. Welcome!");
+                loader.style.opacity = "0";
+                setTimeout(() => {
+                  loader.style.display = "none";
+                }, 900);
+              }
+            })
+            .catch(() => {
+              log("Could not check IP. Proceeding anyway.");
+              loader.style.opacity = "0";
+              setTimeout(() => {
+                loader.style.display = "none";
+                window.location.href = "index.html";
+              }, 900);
+            });
+        }
+      }, 4700); // Make sure this matches your last log step
+    });
+  </script>
+  
+  <!-- Loader HTML -->
+  
+<div id="browser-check-loader" style="position:fixed;inset:0;z-index:99999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s;">
+  <div style="color:#fff;font-size:1.5em;margin-bottom:1.5em;" id="browser-check-text">Checking your browser...</div>
+  <div style="width:320px;max-width:80vw;height:8px;background:#222;border-radius:4px;overflow:hidden;">
+    <div id="browser-check-bar" style="height:100%;width:0%;background:#fff;transition:width 1s;"></div>
+  </div>
+  <div id="browser-check-logs" style="color:#fff;margin-top:1.2em;font-size:1em;text-align:left;width:320px;max-width:80vw;min-height:2.5em;"></div>
+</div>
+<div id="final-loader" style="position:fixed;inset:0;z-index:99998;background:#000;display:none;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s;">
+  <div style="color:#fff;font-size:1.3em;margin-bottom:1.5em;">Loading sebudaca...</div>
+  <div style="display:flex;align-items:center;justify-content:center;">
+    <i class="fa-solid fa-spinner fa-spin" style="font-size:2.5em;color:#fff;"></i>
+  </div>
+</div>
+</body>
+</html>

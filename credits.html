@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <title>sebudaca | Credits</title>
+    <meta name="description" content="Credits and licenses for Ultraviolet and related projects." />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#434c5e" />
+    <link rel="shortcut icon" content="favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="/public/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png">
+    <link rel="stylesheet" href="index.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  </head>
+  <body>
+    <!-- Floating Navbar -->
+    <div class="navbar main-navbar">
+  <div class="main-navbar-title">
+    <img src="/assets/js/icon/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png" alt="sebudaca logo" class="main-navbar-logo" />
+    <span>sebudaca</span>
+  </div>
+  <ul class="nav-buttons">
+    <li><a href="index.html" title="Home"><i class="fa-solid fa-house"></i></a></li>
+    <li><a href="apps.html" title="Apps"><i class="fa-solid fa-th"></i></a></li>
+    <li><a href="credits.html" class="active" title="Credits"><i class="fa-solid fa-certificate"></i></a></li>
+    <li><a href="settings.html" title="Settings"><i class="fa-solid fa-gear"></i></a></li>
+  </ul>
+</div>
+
+    <div class="logo-wrapper header-center" style="margin-top: 90px;">
+      <h1>Credits & Licenses</h1>
+      <p style="color: #bfc9db; font-size: 1.1em; margin-top: 0.5em;">
+        Open source makes this project possible. Thank you to all contributors!
+      </p>
+    </div>
+
+    <div class="credits-list">
+      <div class="credit-card">
+        <h2>Ultraviolet-App</h2>
+        <a href="https://github.com/titaniumnetwork-dev/Ultraviolet-App" target="_blank">GitHub Homepage</a>
+        <pre>
+MIT License
+
+Copyright (c) 2022 Titanium Network
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+        </pre>
+      </div>
+      <div class="credit-card">
+        <h2>Ultraviolet</h2>
+        <a href="https://github.com/titaniumnetwork-dev/Ultraviolet" target="_blank">GitHub Homepage</a>
+        <pre>
+GNU AFFERO GENERAL PUBLIC LICENSE
+Version 3, 19 November 2007
+
+Copyright (C) 2007 Free Software Foundation, Inc.
+&lt;https://fsf.org/&gt;
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+
+See <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">full license text</a>.
+        </pre>
+      </div>
+          <div class="credits-list">
+      <div class="credit-card">
+        <h2>sebudadev</h2>
+        <a href="https://github.com/sebudadev" target="_blank">GitHub</a>
+        <pre>
+Copyright (c) 2025 sebuda
+
+Created by sebudadev and licensed under the GNU AFFERO GENERAL PUBLIC LICENSE
+
+Version 3, 19 November 2007
+
+Copyright (C) 2007 Free Software Foundation, Inc.
+
+We thank the following contributors for their work on this project:
+sebudadev, titaniumnetwork, and all other contributors. These contributors are not affliated with sebudadev and are not responsible for any issues that may arise from the use of this project.
+Everyone is permitted to copy and distribute verbatim copies
+of this license document, but changing it is not allowed.
+See <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank">full license text</a>.
+        </pre>
+      <!-- Add more credit cards as needed -->
+    </div>
+
+    <footer>
+      <a href="https://sebuda-dev.webflow.io">sebuda-dev</a>
+      <a href="https://guns.lol/sebuda">guns.lol</a>
+      <a href="https://github.com/sebudadev">GitHub</a>
+      <a href="credits.html" style="margin-left: auto">Credits</a>
+      <span>sebudaca &copy; net 2025</span>
+    </footer>
+    <script src="intro-anim.js"></script>
+          <script>
+  // Toast function (copy from your main JS)
+  function showToast(message, type = 'info', iconType = 'game') {
+    const toast = document.createElement('div');
+    toast.className = `toast show ${type}`;
+    const icons = {
+      success: '<i class="fa-solid fa-check-circle" style="margin-right: 8px;"></i>',
+      error:   '<i class="fa-solid fa-times-circle" style="margin-right: 8px;"></i>',
+      info:    '<i class="fa-solid fa-info-circle" style="margin-right: 8px;"></i>',
+      warning: '<i class="fa-solid fa-exclamation-triangle" style="margin-right: 8px;"></i>',
+      game:    '<i class="fa-solid fa-gamepad" style="margin-right: 8px;"></i>',
+      apps:    '<i class="fa-solid fa-th-large" style="margin-right: 8px;"></i>',
+      robot:   '<i class="fa-solid fa-robot" style="margin-right: 8px;"></i>',
+      wave:    '<i class="fa-solid fa-hand-peace" style="margin-right: 8px;"></i>',
+    };
+    toast.innerHTML = `${icons[iconType] || icons.game}${message}`;
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    toast.appendChild(progressBar);
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'toast-close';
+    closeBtn.innerHTML = '<i class="fa-solid fa-xmark" style="margin-left: 8px; font-size: 0.8em;"></i>';
+    closeBtn.addEventListener('click', () => {
+      toast.classList.add('hide');
+      setTimeout(() => toast.remove(), 500);
+    });
+    toast.appendChild(closeBtn);
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('hide');
+      setTimeout(() => toast.remove(), 500);
+    }, 3000);
+  }
+
+  // Show a toast when the games page loads
+  window.addEventListener('DOMContentLoaded', function() {
+    showToast("Welcome to the settings page!", "info", "warning");
+  });
+</script>
+  </body>
+</html>

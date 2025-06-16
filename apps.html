@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
+    <title>sebudaca | Apps</title>
+    <link rel="stylesheet" href="index.css" />
+    <link rel="icon" type="image/x-icon" href="/assets/js/icon/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+      .apps-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2em;
+        justify-content: center;
+        margin: 2em auto;
+        max-width: 900px;
+      }
+      .app-card {
+        background: rgba(82, 82, 82, 0.363);
+        border-radius: 1.2em;
+        box-shadow: 0 2px 12px rgba(248, 248, 248, 0.178);
+        padding: 1.5em 2em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 190px;
+        cursor: pointer;
+        transition: transform 0.15s, box-shadow 0.15s;
+        border: 1px solid #ced0d498;
+        text-align: center;
+      }
+      .app-card:hover {
+        transform: translateY(-6px) scale(1.04);
+        box-shadow: 0 6px 24px rgba(94,129,172,0.18);
+        background: #4e4e4e;
+      }
+      .app-card img {
+        width: 64px;
+        height: 64px;
+        border-radius: 1em;
+        margin-bottom: 1em;
+        background: #fff;
+        object-fit: contain;
+      }
+      .app-card-title {
+        color: #eceff4;
+        font-size: 1.1em;
+        font-weight: 600;
+        margin-bottom: 0.2em;
+      }
+      .apps-searchbar-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 2em auto 1em auto;
+        max-width: 400px;
+        width: 100%;
+        position: relative;
+      }
+      #apps-search {
+        flex: 1;
+        width: 100%;
+        padding: 0.7em 1.2em 0.7em 2.5em;
+        border-radius: 2em;
+        border: 1px solid #ced0d498;
+        background: #33333379;
+        color: #eceff4;
+        font-size: 1.08em;
+        outline: none;
+        transition: border 0.2s;
+        text-align: left;
+      }
+      #apps-search:focus {
+        border: 1px solid #8a8a8acc;
+      }
+      .apps-search-icon {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #bfc9db;
+        font-size: 1.15em;
+        pointer-events: none;
+        z-index: 2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar main-navbar">
+      <div class="main-navbar-title">
+        <img src="/assets/js/icon/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png" alt="sebudaca logo" class="main-navbar-logo" />
+        <span>sebudaca</span>
+      </div>
+      <ul class="nav-buttons">
+        <li><a href="index.html" title="Home"><i class="fa-solid fa-house"></i></a></li>
+        <li><a href="apps.html" class="active" title="Apps"><i class="fa-solid fa-th"></i></a></li>
+        <li><a href="settings.html" title="Settings"><i class="fa-solid fa-gear"></i></a></li>
+        <li>
+          <a href="ai.html" title="AI">
+            <i class="fa-solid fa-robot"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="logo-wrapper header-center" style="margin-top: 90px;">
+      <h1>Apps</h1>
+      <p style="color: #bfc9db; font-size: 1.1em; margin-top: 0.5em;">
+        Click an app to visit its website.
+      </p>
+    </div>
+
+    <div class="apps-searchbar-wrapper" style="position: relative;">
+      <span class="apps-search-icon">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </span>
+      <input
+        type="text"
+        id="apps-search"
+        placeholder="Search for an app or site..."
+        autocomplete="off"
+        style="padding-left: 2.5em;"
+      />
+    </div>
+
+    <div class="apps-container">
+      <div class="app-card" onclick="window.location.href=''">
+        <img src="https://duckduckgo.com/assets/logo_homepage.normal.v108.svg" alt="DuckDuckGo Logo" />
+        <div class="app-card-title">DuckDuckGo</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=wikipedia'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/63/Wikipedia-logo.png" alt="Wikipedia Logo" />
+        <div class="app-card-title">Wikipedia</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=spotify'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/19/Spotify_logo_without_text.svg" alt="Spotify Logo" />
+        <div class="app-card-title">Spotify</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=tiktok'">
+        <img src="https://upload.wikimedia.org/wikipedia/en/a/a9/TikTok_logo.svg" alt="TikTok Logo" />
+        <div class="app-card-title">TikTok</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=geforce'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/9/94/GeForce_Now_logo.svg" alt="GeForce Now Logo" />
+        <div class="app-card-title">GeForce Now</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=youtube'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Logo_2017.svg" alt="YouTube Logo" />
+        <div class="app-card-title">YouTube</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=google'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google Logo" />
+        <div class="app-card-title">Google</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=github'">
+        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub Logo" />
+        <div class="app-card-title">GitHub</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=discord'">
+        <img src="https://upload.wikimedia.org/wikipedia/fr/4/4f/Discord_Logo_sans_texte.svg" alt="Discord Logo" />
+        <div class="app-card-title">Discord</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=reddit'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/b/b4/Reddit_logo.svg" alt="Reddit Logo" />
+        <div class="app-card-title">Reddit</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=twitch'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/ce/Twitch_logo_2019.svg" alt="Twitch Logo" />
+        <div class="app-card-title">Twitch</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=x'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/ce/X_logo_2023.svg" alt="X Logo" />
+        <div class="app-card-title">X (Twitter)</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=steam'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/8/83/Steam_icon_logo.svg" alt="Steam Logo" />
+        <div class="app-card-title">Steam</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=facebook'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook Logo" />
+        <div class="app-card-title">Facebook</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=instagram'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram Logo" />
+        <div class="app-card-title">Instagram</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=pinterest'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Pinterest-logo.png" alt="Pinterest Logo" />
+        <div class="app-card-title">Pinterest</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=linkedin'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn Logo" />
+        <div class="app-card-title">LinkedIn</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=gmail'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.png" alt="Gmail Logo" />
+        <div class="app-card-title">Gmail</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=outlook'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Microsoft_Office_Outlook_%282018–present%29.svg" alt="Outlook Logo" />
+        <div class="app-card-title">Outlook</div>
+      </div>
+      <div class="app-card" onclick="window.location.href='search.html?site=amazon'">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon Logo" />
+        <div class="app-card-title">Amazon</div>
+      </div>
+    </div>
+
+    <script>
+      // Simple search/filter for app cards
+      const searchInput = document.getElementById('apps-search');
+      const appCards = Array.from(document.querySelectorAll('.app-card'));
+
+      function filterApps() {
+        const query = searchInput.value.trim().toLowerCase();
+        appCards.forEach(card => {
+          const title = card.querySelector('.app-card-title').textContent.toLowerCase();
+          const alt = card.querySelector('img').alt.toLowerCase();
+          if (title.includes(query) || alt.includes(query)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      searchInput.addEventListener('input', filterApps);
+    </script>
+      <script>
+  // Toast function (copy from your main JS)
+  function showToast(message, type = 'info', iconType = 'game') {
+    const toast = document.createElement('div');
+    toast.className = `toast show ${type}`;
+    const icons = {
+      success: '<i class="fa-solid fa-check-circle" style="margin-right: 8px;"></i>',
+      error:   '<i class="fa-solid fa-times-circle" style="margin-right: 8px;"></i>',
+      info:    '<i class="fa-solid fa-info-circle" style="margin-right: 8px;"></i>',
+      warning: '<i class="fa-solid fa-exclamation-triangle" style="margin-right: 8px;"></i>',
+      game:    '<i class="fa-solid fa-gamepad" style="margin-right: 8px;"></i>',
+      apps:    '<i class="fa-solid fa-th-large" style="margin-right: 8px;"></i>',
+      robot:   '<i class="fa-solid fa-robot" style="margin-right: 8px;"></i>',
+      wave:    '<i class="fa-solid fa-hand-peace" style="margin-right: 8px;"></i>',
+    };
+    toast.innerHTML = `${icons[iconType] || icons.game}${message}`;
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    toast.appendChild(progressBar);
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'toast-close';
+    closeBtn.innerHTML = '<i class="fa-solid fa-xmark" style="margin-left: 8px; font-size: 0.8em;"></i>';
+    closeBtn.addEventListener('click', () => {
+      toast.classList.add('hide');
+      setTimeout(() => toast.remove(), 500);
+    });
+    toast.appendChild(closeBtn);
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('hide');
+      setTimeout(() => toast.remove(), 500);
+    }, 3000);
+  }
+
+  // Show a toast when the games page loads
+  window.addEventListener('DOMContentLoaded', function() {
+    showToast("Welcome to the apps page!", "info", "apps");
+  });
+</script>
+<script>
+// Map site keys to real URLs
+const appUrls = {
+  duckduckgo: "https://duckduckgo.com/",
+  wikipedia: "https://wikipedia.org/",
+  spotify: "https://open.spotify.com/",
+  tiktok: "https://tiktok.com/",
+  geforce: "https://play.geforcenow.com/",
+  youtube: "https://youtube.com/",
+  google: "https://google.com/",
+  github: "https://github.com/",
+  discord: "https://discord.com/",
+  reddit: "https://reddit.com/",
+  twitch: "https://twitch.tv/",
+  x: "https://x.com/",
+  steam: "https://store.steampowered.com/",
+  facebook: "https://facebook.com/",
+  instagram: "https://instagram.com/",
+  pinterest: "https://pinterest.com/",
+  linkedin: "https://linkedin.com/",
+  gmail: "https://mail.google.com/",
+  outlook: "https://outlook.live.com/",
+  amazon: "https://amazon.com/"
+};
+
+// Attach click handlers to all app cards
+document.querySelectorAll('.app-card').forEach(card => {
+  const title = card.querySelector('.app-card-title').textContent.trim().toLowerCase();
+  // Find the key in the mapping
+  let key = Object.keys(appUrls).find(k => title.includes(k));
+  // Special cases for ambiguous names
+  if (!key) {
+    if (title.includes('x (twitter)')) key = 'x';
+    if (title.includes('geforce')) key = 'geforce';
+  }
+  if (key) {
+    card.onclick = () => {
+      const url = encodeURIComponent(appUrls[key]);
+      window.location.href = `active/search.html?url=${url}`;
+    };
+  } else {
+    card.onclick = null; // No action if not mapped
+  }
+});
+</script>
+  </body>
+</html>

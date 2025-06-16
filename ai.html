@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>sebuda AI</title>
+      
+      <meta property="og:title" content="sebuda AI">
+      <meta property="og:description" content="sebuda AI is a powerful AI-powered platform that provides a wide range of services.">
+      <meta property="og:image" content="/assets/images/icons/favicon.ico">
+      <meta name="theme-color" content="#b6b6b6">
+      <meta name="msapplication-TileColor" content="#b6b6b6">
+      
+      <link rel="icon" type="image/x-icon" href="/assets/js/icon/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png">
+
+      <link rel="stylesheet" href="/ai.css">
+      <link rel="stylesheet" href="/sebuai.css"
+      
+      <!-- ============================ -->
+      <!-- DO 𝗡𝗢𝗧 REMOVE THESE LIBRARIES!! -->
+      <!-- ☆ These libraries are required for syntax highlighting, icons, loading animations, and analytics ☆ -->
+      <!-- Removing them WILL, without a doubt, cause issues ˙◠˙ -->
+      <!-- ============================ -->
+
+      <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/vs2015.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css">
+      <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-WGJ2192JZY"></script>
+      <script>
+         window.dataLayer = window.dataLayer || [];
+         function gtag(){dataLayer.push(arguments);}
+         gtag('js', new Date());
+         gtag('config', 'G-WGJ2192JZY');
+      </script>
+   </head>
+   <body>
+      <script src="/ai.js" defer></script>
+      
+      <div class="chat-container">
+         <div class="chat-header">
+            sebuda AI <span class="version"><i class="fas fa-flask"></i> beta</span>
+         </div>
+         
+         <div class="branding">
+            <img src="/assets/js/icon/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png" alt="sebuda AI Logo">
+            <div></div>
+         </div>
+         
+         <div class="chat-options">
+            <div class="option">
+               <label for="modelSelector"></label>
+               <div class="selector" id="modelSelector">
+                  <div class="selector-selected">Llama 3.1 8B Instant</div>
+                  <div class="selector-options">
+                     <div data-value="llama-3.1-8b-instant">Llama 3.1 8B Instant</div>
+                     <div data-value="llama-3.3-70b-versatile">Llama 3.3 70B Versatile</div>
+                     <div data-value="deepseek-r1-distill-llama-70b">Deepseek R1 Distill Llama 70B</div>
+                     <div data-value="gemma2-9b-it">Gemma2 9B IT</div>
+                  </div>
+               </div>
+            </div>
+         </div>
+         
+         <div class="chat-body" id="chatBody"></div>
+         <div class="suggestions-container" id="suggestionsContainer"></div>
+         
+         <div class="chat-input">
+            <input type="text" id="aiInput" placeholder="Ask anything!" autocomplete="off">
+            <input type="file" id="imageUpload" accept="image/*" style="display:none;">
+            <button id="sendMsg"><i class="fas fa-arrow-up"></i></button>
+         </div>
+      </div>
+      
+      <div class="social-icons">
+         <a href="" target="_blank"><i class="fab fa-github"></i></a>
+         <a href="https://discord.gg/pwrXWDpr6w" target="_blank"><i class="fab fa-discord"></i></a>
+      </div>
+   <script defer src="https://static.cloudflareinsights.com/beacon.min.js/vcd15cbe7772f49c399c6a5babf22c1241717689176015" integrity="sha512-ZpsOmlRQV6y907TI0dKBHq9Md29nnaEIPlkf84rnaERnq6zvWvPUqr2ft8M1aS28oN72PdrCzSjY4U6VaAw1EQ==" data-cf-beacon='{"rayId":"9490e82c8b68dd92","version":"2025.5.0","r":1,"token":"4e7568250b954e8aab6b5dcd99e2c828","serverTiming":{"name":{"cfExtPri":true,"cfEdge":true,"cfOrigin":true,"cfL4":true,"cfSpeedBrain":true,"cfCacheStatus":true}}}' crossorigin="anonymous"></script>
+    <script>
+  // Toast function (copy from your main JS)
+  function showToast(message, type = 'info', iconType = 'game') {
+    const toast = document.createElement('div');
+    toast.className = `toast show ${type}`;
+    const icons = {
+      success: '<i class="fa-solid fa-check-circle" style="margin-right: 8px;"></i>',
+      error:   '<i class="fa-solid fa-times-circle" style="margin-right: 8px;"></i>',
+      info:    '<i class="fa-solid fa-info-circle" style="margin-right: 8px;"></i>',
+      warning: '<i class="fa-solid fa-exclamation-triangle" style="margin-right: 8px;"></i>',
+      game:    '<i class="fa-solid fa-gamepad" style="margin-right: 8px;"></i>',
+      apps:    '<i class="fa-solid fa-th-large" style="margin-right: 8px;"></i>',
+      robot:   '<i class="fa-solid fa-robot" style="margin-right: 8px;"></i>',
+      wave:    '<i class="fa-solid fa-hand-peace" style="margin-right: 8px;"></i>',
+    };
+    toast.innerHTML = `${icons[iconType] || icons.game}${message}`;
+    const progressBar = document.createElement('div');
+    progressBar.className = 'progress-bar';
+    toast.appendChild(progressBar);
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'toast-close';
+    closeBtn.innerHTML = '<i class="fa-solid fa-xmark" style="margin-left: 8px; font-size: 0.8em;"></i>';
+    closeBtn.addEventListener('click', () => {
+      toast.classList.add('hide');
+      setTimeout(() => toast.remove(), 500);
+    });
+    toast.appendChild(closeBtn);
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('hide');
+      setTimeout(() => toast.remove(), 500);
+    }, 3000);
+  }
+
+  // Show a toast when the games page loads
+  window.addEventListener('DOMContentLoaded', function() {
+    showToast("Use Jailbreak if you're ready to talk about anything.", "info", "warning");
+  });
+</script>
+<<<<<<< HEAD
+<script>
+// Prevent inspect element and send Discord webhook if attempted
+(function() {
+  // Discord webhook URL (replace with your own)
+  const WEBHOOK_URL = "https://discord.com/api/webhooks/1379290880397021204/yeKBG24__YemcjSSpOMf5hZ8_DdDw5jocu3FKGzmR8LPKULxiaHIaxh163zWHcDKhLYi";
+
+  // Show warning toast or alert
+  function showInspectWarning() {
+    alert("Inspect Element is disabled for security reasons.");
+  }
+
+  // Send webhook with basic info
+  function sendWebhook(reason) {
+    fetch(WEBHOOK_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: `Inspect Element attempt detected!\nReason: ${reason}\nUser Agent: ${navigator.userAgent}\nPage: ${window.location.href}`
+      })
+    });
+  }
+
+  // Block F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+U, right-click
+  document.addEventListener("keydown", function(e) {
+    if (
+      e.key === "F12" ||
+      (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "C" || e.key === "J")) ||
+      (e.ctrlKey && e.key === "U")
+    ) {
+      e.preventDefault();
+      showInspectWarning();
+      sendWebhook("Keydown: " + e.key);
+      return false;
+    }
+  });
+
+  // Block right-click
+  document.addEventListener("contextmenu", function(e) {
+    e.preventDefault();
+    showInspectWarning();
+    sendWebhook("Right-click");
+    return false;
+  });
+
+  // Block DevTools open via resize (optional, not 100% reliable)
+  let threshold = 160;
+  setInterval(function() {
+    if (
+      window.outerWidth - window.innerWidth > threshold ||
+      window.outerHeight - window.innerHeight > threshold
+    ) {
+      showInspectWarning();
+      sendWebhook("DevTools opened (resize detected)");
+    }
+  }, 1000);
+})();
+</script>
+=======
+>>>>>>> 3854eac (Update all project files)
+</body>
+</html>
+
