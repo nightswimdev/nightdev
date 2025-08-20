@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-    <title>sebudaca | Apps</title>
+    <title>nightdev | Apps</title>
     <link rel="stylesheet" href="index.css" />
-    <link rel="icon" type="image/x-icon" href="/assets/js/icon/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png">
+    <link rel="icon" type="image/x-icon" href="/assets/js/icon/Untitled design (14)-Picsart-BackgroundRemover.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
       .apps-container {
@@ -17,9 +17,9 @@
         max-width: 900px;
       }
       .app-card {
-        background: rgba(82, 82, 82, 0.363);
+        background: rgba(26, 26, 26, 0.205);
         border-radius: 1.2em;
-        box-shadow: 0 2px 12px rgba(248, 248, 248, 0.178);
+        box-shadow: 0 2px 12px rgba(163, 5, 5, 0.178);
         padding: 1.5em 2em;
         display: flex;
         flex-direction: column;
@@ -27,13 +27,13 @@
         width: 190px;
         cursor: pointer;
         transition: transform 0.15s, box-shadow 0.15s;
-        border: 1px solid #ced0d498;
+        border: 1px solid #480bd898;
         text-align: center;
       }
       .app-card:hover {
         transform: translateY(-6px) scale(1.04);
-        box-shadow: 0 6px 24px rgba(94,129,172,0.18);
-        background: #4e4e4e;
+        box-shadow: 0 6px 24px rgba(76, 42, 156, 0.18);
+        background: #4949493d;
       }
       .app-card img {
         width: 64px;
@@ -89,8 +89,8 @@
   <body>
     <div class="navbar main-navbar">
       <div class="main-navbar-title">
-        <img src="/assets/js/icon/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png" alt="sebudaca logo" class="main-navbar-logo" />
-        <span>sebudaca</span>
+        <img src="/assets/js/icon/Untitled design (14)-Picsart-BackgroundRemover.png" alt="nightdev logo" class="main-navbar-logo" />
+        <span>nightdev</span>
       </div>
       <ul class="nav-buttons">
         <li><a href="index.html" title="Home"><i class="fa-solid fa-house"></i></a></li>
@@ -291,25 +291,47 @@ const appUrls = {
   amazon: "https://amazon.com/"
 };
 
-// Attach click handlers to all app cards
+// Attach click handlers to all app cards and navigate to active/search.html?url=<encoded>
 document.querySelectorAll('.app-card').forEach(card => {
-  const title = card.querySelector('.app-card-title').textContent.trim().toLowerCase();
-  // Find the key in the mapping
-  let key = Object.keys(appUrls).find(k => title.includes(k));
-  // Special cases for ambiguous names
-  if (!key) {
-    if (title.includes('x (twitter)')) key = 'x';
-    if (title.includes('geforce')) key = 'geforce';
-  }
-  if (key) {
-    card.onclick = () => {
-      const url = encodeURIComponent(appUrls[key]);
-      window.location.href = `active/search.html?url=${url}`;
-    };
-  } else {
-    card.onclick = null; // No action if not mapped
-  }
+  // prefer data-key if present, otherwise derive from title text
+  const dataKey = card.getAttribute('data-key');
+  let key = dataKey || card.querySelector('.app-card-title').textContent.trim().toLowerCase();
+  // normalize some common display titles to keys
+  if (key.includes('duckduckgo')) key = 'duckduckgo';
+  if (key.includes('wikipedia')) key = 'wikipedia';
+  if (key.includes('spotify')) key = 'spotify';
+  if (key.includes('tiktok')) key = 'tiktok';
+  if (key.includes('geforce')) key = 'geforce';
+  if (key.includes('youtube')) key = 'youtube';
+  if (key.includes('google')) key = 'google';
+  if (key.includes('github')) key = 'github';
+  if (key.includes('discord')) key = 'discord';
+  if (key.includes('reddit')) key = 'reddit';
+  if (key.includes('twitch')) key = 'twitch';
+  if (key.includes('x')) key = 'x';
+  if (key.includes('steam')) key = 'steam';
+  if (key.includes('facebook')) key = 'facebook';
+  if (key.includes('instagram')) key = 'instagram';
+  if (key.includes('pinterest')) key = 'pinterest';
+  if (key.includes('linkedin')) key = 'linkedin';
+  if (key.includes('gmail')) key = 'gmail';
+  if (key.includes('outlook')) key = 'outlook';
+  if (key.includes('amazon')) key = 'amazon';
+
+  const target = appUrls[key];
+  if (!target) return; // nothing mapped
+
+  // remove any inline onclick to avoid duplicate behavior
+  card.removeAttribute('onclick');
+
+  card.addEventListener('click', () => {
+    // ensure full URL (add https:// if missing)
+    const url = /^https?:\/\//i.test(target) ? target : 'https://' + target;
+    // navigate from apps.html (root) to active/search.html
+    window.location.href = 'active/search.html?url=' + encodeURIComponent(url);
+  });
 });
 </script>
+<script src="/settings.js"></script>
   </body>
 </html>

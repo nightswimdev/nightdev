@@ -2,274 +2,224 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>sebudaca | Settings</title>
+  <title>nightdev | Settings</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="index.css">
-  <link rel="icon" type="image/x-icon" href="/assets/js/icon/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png">
+  <!-- added: Font Awesome for the navbar icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="icon" type="image/x-icon" href="/assets/js/icon/Untitled design (14)-Picsart-BackgroundRemover.png">
   <style>
-    body {
-      background: #23242a;
-      color: #eceff4;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    .settings-container {
-      max-width: 540px;
-      margin: 120px auto 0 auto;
-      background: rgba(40,44,52,0.97);
-      border-radius: 1.5em;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-      padding: 2em 2.5em;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 1.5em;
-      font-size: 2em;
-      font-weight: 700;
-      letter-spacing: 0.03em;
-    }
-    .setting-group {
-      margin-bottom: 2em;
-    }
-    .setting-label {
-      font-weight: 600;
-      margin-bottom: 0.5em;
-      display: block;
-    }
-    .setting-desc {
-      color: #bfc9db;
-      font-size: 0.98em;
-      margin-bottom: 0.7em;
-    }
-    .setting-actions {
-      margin-top: 0.7em;
-    }
-    .input-short {
-      width: 80px;
-      padding: 0.4em 0.7em;
-      border-radius: 0.7em;
-      border: none;
-      background: #434c5e;
-      color: #eceff4;
-      font-size: 1em;
-      margin-right: 0.5em;
-    }
-    .btn {
-      background: #5e81ac;
-      color: #fff;
-      border: none;
-      border-radius: 0.7em;
-      padding: 0.5em 1.2em;
-      font-size: 1em;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .btn:hover {
-      background: #81a1c1;
-    }
-    .proxy-list {
-      background: #2e3440;
-      border-radius: 0.7em;
-      padding: 1em;
-      margin-top: 0.5em;
-      font-size: 0.98em;
-      color: #bfc9db;
-    }
-    .navbar-title {
-      color: #fff;
-      font-weight: 700;
-      font-size: 1.15em;
-      letter-spacing: 0.03em;
-    }
-    .floating-navbar {
-      position: fixed;
-      top: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(40, 44, 52, 0.97);
-      border-radius: 2em;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-      padding: 0.5em 2em;
-      display: flex;
-      align-items: center;
-      gap: 2em;
-      z-index: 1000;
-      backdrop-filter: blur(8px);
-      width: max-content;
-      min-width: 340px;
-    }
-    .navbar-brand {
-      display: flex;
-      align-items: center;
-      gap: 0.7em;
-      margin-right: 1.5em;
-    }
-    .navbar-logo {
-      height: 32px;
-      width: 32px;
-      border-radius: 50%;
-      object-fit: cover;
-      background: #2e3440;
-    }
-    .nav-buttons {
-      display: flex;
-      align-items: center;
-      gap: 0.7em;
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-    .nav-buttons li {
-      display: flex;
-      align-items: center;
-    }
-    .nav-buttons a {
-      color: #eceff4;
-      text-decoration: none;
-      padding: 0.4em 0.7em;
-      border-radius: 1em;
-      transition: background 0.15s;
-      font-size: 1.1em;
-      display: flex;
-      align-items: center;
-    }
-    .nav-buttons a:hover, .nav-buttons a.active {
-      background: #5e81ac;
-    }
-    .nav-buttons a.disabled {
-      opacity: 0.5;
-      pointer-events: none;
-    }
+    body { background: #23242a; color: #eceff4; font-family: 'Segoe UI', Arial, sans-serif; margin:0; padding:0; }
+    .settings-container { max-width:640px; margin:120px auto; background:rgba(40,44,52,0.97); border-radius:1em; box-shadow:0 6px 30px rgba(0,0,0,0.2); padding:2em; }
+    h1 { text-align:center; margin-bottom:1rem; font-size:1.8rem; }
+    .setting-group { margin-bottom:1.25rem; }
+    .setting-label { display:block; font-weight:700; margin-bottom:0.35rem; }
+    .setting-desc { color:#bfc9db; font-size:0.95rem; margin-bottom:0.6rem; }
+    .setting-actions { display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; }
+    .input-short { padding:0.45em 0.7em; border-radius:0.6em; border:none; background:#434c5e; color:#eceff4; }
+    .btn { background:#5e81ac; color:#fff; border:none; border-radius:0.7em; padding:0.45em 0.9em; cursor:pointer; }
+    .btn.secondary { background:#4c566a; }
+    .proxy-list { background:#2e3440; border-radius:0.6em; padding:0.8em; margin-top:0.6em; color:#bfc9db; font-size:0.95rem; }
+    .row { display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; }
+    label.switch { display:flex; align-items:center; gap:0.6rem; cursor:pointer; }
+    select.input-short { height:36px; }
   </style>
 </head>
 <body>
-  <nav class="floating-navbar">
-    <div class="navbar-brand">
-      <img src="/assets/js/icon/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png" alt="sebudaca logo" class="navbar-logo" />
-      <span class="navbar-title">sebudaca</span>
+  <!-- moved navbar here so icons/styles load correctly -->
+  <div class="navbar main-navbar">
+    <div class="main-navbar-title">
+      <img src="assets/js/icon/Untitled design (14)-Picsart-BackgroundRemover.png" alt="nightdev logo" class="main-navbar-logo" />
+      <span>nightdev</span>
     </div>
     <ul class="nav-buttons">
-      <li><a href="index.html" title="Home"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 12l9-9 9 9" stroke="#eceff4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 21V9h6v12" stroke="#eceff4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a></li>
-      <li><a href="apps.html" title="Apps"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="2" stroke="#eceff4" stroke-width="2"/><rect x="14" y="3" width="7" height="7" rx="2" stroke="#eceff4" stroke-width="2"/><rect x="14" y="14" width="7" height="7" rx="2" stroke="#eceff4" stroke-width="2"/><rect x="3" y="14" width="7" height="7" rx="2" stroke="#eceff4" stroke-width="2"/></svg></a></li>
-      <li><a href="settings.html" title="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="#eceff4" stroke-width="2"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 9 3.09V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" stroke="#eceff4" stroke-width="2" fill="none"/></svg></a></li>
+      <li><a href="index.html" title="Home"><i class="fa-solid fa-house"></i></a></li>
+      <li><a href="apps.html" title="Apps"><i class="fa-solid fa-th"></i></a></li>
+      <li><a href="settings.html" class="active" title="Settings"><i class="fa-solid fa-gear"></i></a></li>
+      <li>
+        <a href="ai.html" title="AI">
+          <i class="fa-solid fa-robot"></i>
+        </a>
+      </li>
     </ul>
-  </nav>
-  <div class="settings-container">
+  </div>
+
+  <div class="settings-container" id="settingsContainer">
     <h1>Settings</h1>
+
+    <!-- 1) Panic Key -->
     <div class="setting-group">
       <span class="setting-label">Panic Key</span>
-      <div class="setting-desc">Set a key to instantly hide this site (opens about:blank in the same tab).</div>
+      <div class="setting-desc">Quickly hide the site by pressing this key (opens about:blank in same tab).</div>
       <div class="setting-actions">
-        <input type="text" id="panicKey" class="input-short" maxlength="1" placeholder="Key" autocomplete="off">
-        <button class="btn" onclick="setPanicKey()">Set</button>
-        <span id="panicKeyStatus" style="margin-left:1em;color:#a3be8c;"></span>
+        <input id="panicKey" class="input-short" maxlength="1" placeholder="Key" autocomplete="off">
+        <button class="btn" id="setPanicBtn">Set</button>
+        <span id="panicKeyStatus" style="color:#a3be8c;"></span>
       </div>
     </div>
+
+    <!-- 2) Default Search Engine -->
+    <div class="setting-group">
+      <span class="setting-label">Default Search Engine</span>
+      <div class="setting-desc">Choose the engine used for plain searches (domains still open directly).</div>
+      <div class="setting-actions">
+        <select id="defaultEngine" class="input-short">
+          <option value="https://duckduckgo.com">DuckDuckGo</option>
+          <option value="https://www.google.com">Google</option>
+          <option value="https://www.bing.com">Bing</option>
+        </select>
+        <button class="btn" id="setEngineBtn">Save</button>
+        <span id="engineStatus" style="color:#a3be8c;"></span>
+      </div>
+    </div>
+
+    <!-- 3) about:blank Cloak -->
     <div class="setting-group">
       <span class="setting-label">about:blank Cloak</span>
-      <div class="setting-desc">Open this site in a disguised about:blank tab (URL will show about:blank, but your site will be loaded in a new tab).</div>
+      <div class="setting-desc">Open the site in a new about:blank tab (site content loaded inside an iframe).</div>
       <div class="setting-actions">
-        <button class="btn" onclick="openAboutBlank()">Open in about:blank</button>
+        <button class="btn" id="aboutBlankBtn">Open in about:blank</button>
+        <button class="btn secondary" id="testCloakBtn">Test</button>
       </div>
     </div>
+
+    <!-- 4) Proxy Features -->
     <div class="setting-group">
       <span class="setting-label">Proxy Features</span>
-      <div class="setting-desc">Ultraviolet Proxy is enabled. You can change the proxy prefix below (advanced users):</div>
-      <div class="setting-actions">
-        <input type="text" id="proxyPrefix" class="input-short" placeholder="/service/" autocomplete="off">
-        <button class="btn" onclick="setProxyPrefix()">Set Prefix</button>
-        <span id="proxyPrefixStatus" style="margin-left:1em;color:#a3be8c;"></span>
+      <div class="setting-desc">Change the proxy prefix or bare server used by the Ultraviolet frontend (advanced).</div>
+      <div class="setting-actions row">
+        <input id="proxyPrefix" class="input-short" placeholder="/service/" autocomplete="off">
+        <input id="proxyBare" class="input-short" placeholder="https://mybare.example/bare/" autocomplete="off" style="min-width:220px;">
+        <button class="btn" id="setProxyBtn">Set</button>
+        <span id="proxyPrefixStatus" style="color:#a3be8c;"></span>
       </div>
       <div class="proxy-list">
         <b>Current Prefix:</b> <span id="currentPrefix"></span><br>
         <b>Bare Server:</b> <span id="bareServer"></span>
       </div>
     </div>
+
+    <!-- 5) Hide Navbar When Searching -->
     <div class="setting-group">
       <span class="setting-label">Hide Navbar When Searching</span>
-      <div class="setting-desc">
-        When enabled, the navbar will automatically hide while you are using the search bar for a cleaner look.
-      </div>
+      <div class="setting-desc">When enabled, the navbar hides while using the search bar for a cleaner interface.</div>
       <div class="setting-actions">
-        <label style="display:flex;align-items:center;gap:0.5em;">
-          <input type="checkbox" id="hideNavbarOnSearch" style="accent-color:#5e81ac;">
-          <span>Enable</span>
-        </label>
-        <span id="hideNavbarStatus" style="margin-left:1em;color:#a3be8c;"></span>
+        <label class="switch"><input type="checkbox" id="hideNavbarOnSearch"><span>Enable</span></label>
+        <span id="hideNavbarStatus" style="color:#a3be8c;"></span>
       </div>
     </div>
+
   </div>
+
   <script>
-    // Panic Key logic
-    function setPanicKey() {
-      const key = document.getElementById('panicKey').value.trim().toLowerCase();
-      if (!key) return;
-      localStorage.setItem('panicKey', key);
-      document.getElementById('panicKeyStatus').textContent = `Set to "${key.toUpperCase()}"`;
-    }
-    document.addEventListener('keydown', function(e) {
-      const panicKey = localStorage.getItem('panicKey');
-      if (panicKey && e.key.toLowerCase() === panicKey) {
-        // Open about:blank in the same tab
-        window.open('about:blank', '_self');
-      }
-    });
+    // Persistence helpers
+    function setLocal(key, value){ localStorage.setItem(key, value); }
+    function getLocal(key, def){ const v = localStorage.getItem(key); return v === null ? def : v; }
 
-    // about:blank cloak logic
-    function openAboutBlank() {
-      const win = window.open('about:blank', '_blank');
-      if (win) {
-        const iframe = win.document.createElement('iframe');
-        iframe.style.position = 'fixed';
-        iframe.style.top = '0';
-        iframe.style.left = '0';
-        iframe.style.width = '100vw';
-        iframe.style.height = '100vh';
-        iframe.style.border = 'none';
-        iframe.style.margin = '0';
-        iframe.style.padding = '0';
-        iframe.style.zIndex = '9999';
-        iframe.src = window.location.href;
-        win.document.body.style.margin = '0';
-        win.document.body.style.padding = '0';
-        win.document.body.appendChild(iframe);
-        win.document.title = "about:blank";
-      } else {
-        alert("Popup blocked! Please allow popups for this site.");
-      }
-    }
-
-    // Proxy prefix logic
-    function setProxyPrefix() {
-      const prefix = document.getElementById('proxyPrefix').value.trim();
-      if (prefix) {
-        localStorage.setItem('uvPrefix', prefix);
-        document.getElementById('proxyPrefixStatus').textContent = `Prefix set to "${prefix}"`;
-        updateProxyInfo();
-      }
-    }
-    function updateProxyInfo() {
-      const prefix = localStorage.getItem('uvPrefix') || (window.__uv$config && window.__uv$config.prefix) || '/service/';
-      document.getElementById('currentPrefix').textContent = prefix;
-      document.getElementById('bareServer').textContent = (window.__uv$config && window.__uv$config.bare) || '/bare/';
-    }
-    updateProxyInfo();
-
-    // Hide Navbar When Searching setting
-    (function() {
-      const checkbox = document.getElementById('hideNavbarOnSearch');
-      const status = document.getElementById('hideNavbarStatus');
-      // Load setting
-      const saved = localStorage.getItem('hideNavbarOnSearch') === 'true';
-      checkbox.checked = saved;
-      status.textContent = saved ? "Enabled" : "Disabled";
-      checkbox.addEventListener('change', function() {
-        localStorage.setItem('hideNavbarOnSearch', checkbox.checked ? 'true' : 'false');
-        status.textContent = checkbox.checked ? "Enabled" : "Disabled";
+    // Panic key
+    (function(){
+      const panicInput = document.getElementById('panicKey');
+      const status = document.getElementById('panicKeyStatus');
+      const btn = document.getElementById('setPanicBtn');
+      panicInput.value = getLocal('panicKey','');
+      status.textContent = panicInput.value ? `Set to "${panicInput.value.toUpperCase()}"` : '';
+      btn.addEventListener('click', () => {
+        const k = panicInput.value.trim().toLowerCase();
+        if(!k){ status.textContent = ''; localStorage.removeItem('panicKey'); return; }
+        setLocal('panicKey', k);
+        status.textContent = `Set to "${k.toUpperCase()}"`;
+      });
+      document.addEventListener('keydown', function(e){
+        const pk = getLocal('panicKey','');
+        if(pk && e.key.toLowerCase() === pk) window.open('about:blank','_self');
       });
     })();
+
+    // Default engine
+    (function(){
+      const sel = document.getElementById('defaultEngine');
+      const btn = document.getElementById('setEngineBtn');
+      const status = document.getElementById('engineStatus');
+      sel.value = getLocal('defaultEngine','https://duckduckgo.com');
+      status.textContent = 'Saved';
+      btn.addEventListener('click', () => {
+        setLocal('defaultEngine', sel.value);
+        status.textContent = 'Saved';
+        setTimeout(()=> status.textContent = '', 1800);
+      });
+    })();
+
+    // about:blank cloak
+    document.getElementById('aboutBlankBtn').addEventListener('click', function(){
+      const win = window.open('about:blank','_blank');
+      if(!win){ alert('Popup blocked. Allow popups and try again.'); return; }
+      const iframe = win.document.createElement('iframe');
+      iframe.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;border:none;margin:0;';
+      iframe.src = window.location.href;
+      win.document.body.style.margin = '0';
+      win.document.body.appendChild(iframe);
+      win.document.title = "about:blank";
+    });
+    document.getElementById('testCloakBtn').addEventListener('click', function(){
+      alert('Opens a test about:blank tab with current site loaded inside. If popup blocked, allow popups.');
+      document.getElementById('aboutBlankBtn').click();
+    });
+
+    // Proxy prefix and bare
+    (function(){
+      const prefixIn = document.getElementById('proxyPrefix');
+      const bareIn = document.getElementById('proxyBare');
+      const setBtn = document.getElementById('setProxyBtn');
+      const status = document.getElementById('proxyPrefixStatus');
+      const currentPrefix = document.getElementById('currentPrefix');
+      const bareServer = document.getElementById('bareServer');
+
+      function updateProxyInfo(){
+        const storedPrefix = getLocal('uvPrefix', '');
+        const prefix = storedPrefix || (window.__uv && window.__uv.config && window.__uv.config.prefix) || (window.__uv$config && window.__uv$config.prefix) || '/service/';
+        const storedBare = getLocal('uvBare', '');
+        const bare = storedBare || (window.__uv && window.__uv.config && window.__uv.config.bare) || (window.__uv$config && window.__uv$config.bare) || '/bare/';
+        currentPrefix.textContent = prefix;
+        bareServer.textContent = bare;
+        prefixIn.value = storedPrefix || '';
+        bareIn.value = storedBare || '';
+      }
+      updateProxyInfo();
+
+      setBtn.addEventListener('click', function(){
+        const p = prefixIn.value.trim();
+        const b = bareIn.value.trim();
+        if(p) setLocal('uvPrefix', p); else localStorage.removeItem('uvPrefix');
+        if(b) setLocal('uvBare', b); else localStorage.removeItem('uvBare');
+        status.textContent = 'Saved';
+        updateProxyInfo();
+        setTimeout(()=> status.textContent = '', 1800);
+      });
+    })();
+
+    // Hide navbar setting
+    (function(){
+      const chk = document.getElementById('hideNavbarOnSearch');
+      const stat = document.getElementById('hideNavbarStatus');
+      const saved = getLocal('hideNavbarOnSearch','false') === 'true';
+      chk.checked = saved;
+      stat.textContent = saved ? 'Enabled' : 'Disabled';
+      chk.addEventListener('change', function(){
+        setLocal('hideNavbarOnSearch', chk.checked ? 'true' : 'false');
+        stat.textContent = chk.checked ? 'Enabled' : 'Disabled';
+      });
+    })();
+
+    // initialize view values that depend on uv config
+    (function(){
+      // small delay to allow uv.config to appear if present
+      setTimeout(()=> {
+        try { document.getElementById('currentPrefix').textContent = localStorage.getItem('uvPrefix') || (window.__uv$config && window.__uv$config.prefix) || document.getElementById('currentPrefix').textContent; }
+        catch(e){}
+      }, 200);
+    })();
   </script>
+
   <script src="intro-anim.js"></script>
 </body>
 </html>

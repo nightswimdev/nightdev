@@ -9,7 +9,7 @@ html, body {
 body {
   font-family: "Roboto", Arial, Helvetica, sans-serif;
   margin: 0px;
-  background: #0c0c0c;
+  background: #141414;
   display: flex;
   flex-direction: column;
   min-height: 2px;
@@ -359,9 +359,9 @@ footer span {
   top: 22px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #36266e94;
+  background-color: #42424205;
   backdrop-filter: blur(10px);
-  border: 1.5px solid #3928855b;
+  border: 1.5px solid #ffffff5b;
   width: 670px;
   max-width: 98vw;
   border-radius: 25px;
@@ -372,7 +372,7 @@ footer span {
   animation: fadeIn 0.3s ease;
   padding: 0.5em 1.5em;
   font-size: 1em;
-  box-shadow: 0 4px 24px 0 #381e742c;
+  box-shadow: 0 4px 24px 0 #96969622;
   display: flex;
   justify-content: space-between;
 }
@@ -394,7 +394,7 @@ footer span {
 }
 
 .main-navbar .nav-buttons a {
-  color: #ffffff;
+  color: #eceff4;
   text-decoration: none;
   padding: 0.4em 1em;
   border-radius: 1em;

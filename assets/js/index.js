@@ -72,9 +72,9 @@ function getGreeting() {
     const hour = now.getHours();
     const timeGreetings = [];
     const generalGreetings = [
-        { text: 'Welcome aboard', icon: '<i class="fa-solid fa-rocket"></i>' },
+        { text: 'let’s do ts, start with something', icon: '<i class="fa-solid fa-rocket"></i>' },
         { text: 'Let’s do something great', icon: '<i class="fa-solid fa-lightbulb"></i>' },
-        { text: 'Hope you enjoy sebudaca', icon: '<i class="fa-solid fa-heart"></i>' },
+        { text: 'Hope you enjoy nightdev', icon: '<i class="fa-solid fa-heart"></i>' },
         { text: 'Time to explore', icon: '<i class="fa-solid fa-compass"></i>' },
         { text: 'Let’s roll', icon: '<i class="fa-solid fa-dice"></i>' },
         { text: 'The adventure continues', icon: '<i class="fa-solid fa-map"></i>' }
@@ -189,6 +189,6 @@ if (address) {
 
 const userName = localStorage.getItem('userName');
 if (userName && userName.trim()) {
-    showToast("Welcome to sebudaca!", "success", "wave");
+    showToast("Welcome to nightdev.", "success", "wave");
     updateGreeting(userName);
 }

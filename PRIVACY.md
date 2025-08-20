@@ -1,14 +1,14 @@
-# Tide Proxy - Privacy Policy
+# nightdev - Privacy Policy
 
-**Last Updated: [June 12th, 2025]**
+**Last Updated: June 12th, 2025**
 
-At **Tide**, your privacy is important to us. This Privacy Policy outlines what information we collect, how it is used, and your rights regarding your data.
+At **nightdev**, your privacy is important. This Privacy Policy explains what information we may collect, how it is used, and your rights regarding your data.
 
 ---
 
 ## 1. Information We Collect
 
-Tide is designed to collect **minimal information**. We may log the following for security and performance purposes:
+nightdev is designed to collect **minimal information**. We may log the following for security and performance purposes:
 
 - Basic usage statistics (e.g., page loads, server errors).
 - IP addresses may be temporarily logged to detect and prevent abuse (e.g., spam, DDoS).
@@ -16,7 +16,7 @@ Tide is designed to collect **minimal information**. We may log the following fo
 
 We **do not** collect:
 
-- Personal information such as name, email, or account data.
+- Personal information such as name, email, or account data (unless you provide it explicitly).
 - Browsing history beyond what is needed for real-time proxy operation.
 - Login credentials, passwords, or form data.
 
@@ -27,8 +27,8 @@ We **do not** collect:
 The limited data we collect is used only to:
 
 - Monitor server health and performance.
-- Prevent abuse of the Service.
-- Improve the functionality of Tide.
+- Prevent abuse of the service.
+- Improve nightdev functionality.
 
 We do **not** sell, rent, or share user data with third parties.
 
@@ -36,37 +36,37 @@ We do **not** sell, rent, or share user data with third parties.
 
 ## 3. Cookies & Tracking
 
-Tide does **not use tracking cookies** or third-party analytics.
+nightdev does **not use tracking cookies** or third‑party analytics by default.
 
 ---
 
 ## 4. Data Retention
 
-- Any temporary data is deleted regularly.
-- Abuse logs (if collected) are kept only as long as necessary for protection and mitigation.
+- Temporary data is deleted regularly.
+- Abuse logs (if collected) are retained only as long as necessary for protection and mitigation.
 
 ---
 
 ## 5. Third-Party Links
 
-Tide may allow users to access external websites. We are **not responsible** for the content or privacy practices of these third-party sites.
+nightdev may allow access to external websites. We are **not responsible** for the content or privacy practices of third‑party sites.
 
 ---
 
 ## 6. Children’s Privacy
 
-Tide is not specifically directed at children under 13. If you are under the age of 13, use the Service with the supervision and permission of a parent or guardian.
+nightdev is not directed at children under 13. If you are under 13, use the service only with parental or guardian supervision.
 
 ---
 
 ## 7. Changes to This Policy
 
-We may update this Privacy Policy at any time. Continued use of Tide indicates acceptance of the latest version.
+We may update this Privacy Policy at any time. Continued use of nightdev indicates acceptance of the latest version.
 
 ---
 
 ## 8. Contact
 
-If you have questions or concerns about this Privacy Policy, please contact the Tide administration team.
+If you have questions or concerns about this Privacy Policy, contact the nightdev administration team.
 
 ---

@@ -1,6 +1,6 @@
   function runStealthMode() {
-    const title = "Google";
-    const icon = "https://www.duckduckgo.com/favicon.ico";
+    const title = "Home";
+    const icon = "https://classroom.google.com/favicon.ico";
     const src = window.location.href;
 
     const popup = window.open("about:blank", "_blank");
@@ -36,7 +36,7 @@
     `);
     popup.document.close();
 
-    window.location.href = "https://www.duckduckgo.com";
+    window.location.href = "https://classroom.google.com";
   }
 
   window.onload = function () {
@@ -88,7 +88,6 @@
 
     window.location.href = proxyUrl;
   });
-  
 
   function generateSearchUrl(query) {
     try {
@@ -96,7 +95,7 @@
       return url.toString();
     } catch {
       try {
-        const url = new URL(`https://${input}`);
+        const url = new URL(`https://${query}`);
         if (url.hostname.includes('.')) return url.toString();
       } catch {}
     }

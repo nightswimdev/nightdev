@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no" />
-    <title>sebudaca | Search</title>
+    <title>nightdev | Search</title>
     <link rel="stylesheet" href="index.css" />
-    <link rel="icon" type="image/x-icon" href="/assets/js/icon/globe-with-meridians-emoji-1024x1024-nntfxojt (1).png">
+    <link rel="icon" type="image/x-icon" href="/assets/js/icon/Untitled design (14)-Picsart-BackgroundRemover.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
       * {
@@ -82,9 +82,9 @@
         top: 20px;
         left: 50%;
         transform: translateX(-50%);
-        background-color: #42424205;
+        background-color: #40296b3b;
         backdrop-filter: blur(10px);
-        border: 1px solid #ffffff5b;
+        border: 1px solid #36216e80;
         width: 900px;
         max-width: 98vw;
         display: block;
@@ -121,8 +121,8 @@
         align-items: center;
       }
       .nav-buttons a:hover, .nav-buttons a.active {
-        background: #3b3b3bb7;
-        color: #fff;
+        background: #c4c4c4b7;
+        color: #242424;
         font-size: 1.18em;
       }
       .nav-buttons a.disabled {
@@ -132,7 +132,7 @@
       .small-searchbar {
         display: flex;
         align-items: center;
-        background: #555555b2;
+        background: #0000007c;
         border-radius: 1.2em;
         padding: 0.2em 0.7em;
         min-width: 228px;
@@ -186,7 +186,7 @@
       }
       #cool-iframe {
         width: 100vw;
-        height: 100vh;
+        height: 100vh; /* changed to full viewport to remove bottom gap */
         border: none;
         background: #222;
         display: block;
@@ -234,7 +234,7 @@
       }
     </style>
   </head>
-  <body>
+  <body style="background:#222;">
     <div class="navbar" style="display: block;">
       <ul class="nav-buttons">
         <li><a id="backIcon" href="#" class="disabled" title="Back"><i class="fa-solid fa-arrow-left"></i></a></li>
@@ -258,131 +258,115 @@
         <li><a id="erudaIcon" href="#" title="Dev Tools"><i class="fa-solid fa-code"></i></a></li>
       </ul>
     </div>
-    <div class="iframe-container">
-      <iframe id="cool-iframe"></iframe>
-    </div>
-    <form id="uv-form" autocomplete="off">
-      <input id="uv-address" type="text" placeholder="Search or enter URL..." autocomplete="off" />
-      <button type="submit" style="display:none">Go</button>
-    </form>
-    <p id="uv-error"></p>
-    <pre id="uv-error-code"></pre>
+
+    <!-- iframe: now full height (no extra space below) -->
+    <iframe id="cool-iframe"></iframe>
+
     <!-- Ultraviolet scripts first -->
-    <script src="uv/uv.bundle.js" defer></script>
-    <script src="uv/uv.config.js" defer></script>
-    <script src="register-sw.js" defer></script>
-    <script src="uv/uv.handler.js"></script>
-    <script src="/src/index.js"></script>
-    <script src="/assets/js/error.js"></script>
-    <script src="/assets/js/loading.js"></script>
-    <!-- Then your inline script above -->
-  <script>
-  // Get the encoded URL from the query string (?url=...)
-const params = new URLSearchParams(window.location.search);
-const encodedUrl = params.get('url');
-const iframe = document.getElementById('cool-iframe');
+    <script src="/active/uv/uv.bundle.js"></script>
+    <script src="/active/uv/uv.config.js"></script>
+    <script src="/active/uv/uv.handler.js"></script>
 
-if (!encodedUrl) {
-  document.body.insertAdjacentHTML('beforeend', '<p style="color:white;text-align:center;">No URL provided.</p>');
-} else {
-  const decodedUrl = decodeURIComponent(encodedUrl);
-  // Save to localStorage for next time
-  localStorage.setItem('lastUvUrl', decodedUrl);
-  // Set the iframe src
-  if (iframe) {
-    iframe.src = decodedUrl;
-    // Show error if iframe fails to load after 2 seconds
-    setTimeout(() => {
-      if (!iframe.contentWindow || iframe.contentDocument.body.innerHTML === "") {
-        document.body.insertAdjacentHTML('beforeend', '<p style="color:red;text-align:center;">This site does not allow embedding. Try another site or use a proxy.</p>');
+    <script>
+    // consolidated script (replaces duplicated/removed blocks)
+    document.addEventListener('DOMContentLoaded', async () => {
+      const iframe = document.getElementById('cool-iframe');
+
+      function isValidHttpUrl(string) {
+        try { const u = new URL(string); return u.protocol === 'http:' || u.protocol === 'https:'; }
+        catch { return false; }
       }
-    }, 2000);
-  }
-}
 
-// Navbar button handlers
-document.getElementById('backIcon').onclick = (e) => {
-    e.preventDefault();
-    window.history.back();
-  };
+      function buildUrl(input) {
+        // Normalize input and convert bare domains -> https, treat empty as duckduckgo homepage
+        if (input == null || input.trim() === '') return 'https://duckduckgo.com';
+        input = decodeURIComponent(input.trim());
+        if (/^[\w-]+\.[\w.-]+(?:\/.*)?$/.test(input) && !/^https?:\/\//i.test(input)) {
+          input = 'https://' + input;
+        }
+        if (isValidHttpUrl(input)) return input;
+        return 'https://duckduckgo.com/?q=' + encodeURIComponent(input);
+      }
 
-  document.getElementById('forwardIcon').onclick = (e) => {
-    e.preventDefault();
-    window.history.forward();
-  };
+      const params = new URLSearchParams(window.location.search);
+      const userInput = params.get('url');
+      const finalUrl = buildUrl(userInput);
 
-  document.getElementById('refreshIcon').onclick = (e) => {
-    e.preventDefault();
-    // Option 1: Reload the whole page
-    window.location.reload();
-    // Option 2: Only reload the iframe (uncomment if you want this instead)
-    // document.getElementById('cool-iframe').src = document.getElementById('cool-iframe').src;
-  };
+      // always have a default (duckduckgo) instead of aborting
+      if (!finalUrl) {
+        console.error('No URL provided, falling back to duckduckgo.');
+      }
 
-  document.getElementById('fullscreenIcon').onclick = (e) => {
-    e.preventDefault();
-    const iframe = document.getElementById('cool-iframe');
-    if (iframe.requestFullscreen) {
-      iframe.requestFullscreen();
-    } else if (iframe.webkitRequestFullscreen) {
-      iframe.webkitRequestFullscreen();
-    } else if (iframe.msRequestFullscreen) {
-      iframe.msRequestFullscreen();
-    }
-  };
+      // wait for Ultraviolet config/encodeUrl to be available
+      let tries = 0;
+      while ((typeof window.__uv$config === 'undefined' || typeof window.__uv$config.encodeUrl !== 'function') && tries < 50) {
+        await new Promise(r => setTimeout(r, 100));
+        tries++;
+      }
 
-// Set the small search bar to the last entered URL from localStorage
-const searchInput = document.getElementById('searchInputt');
-const lastUvUrl = localStorage.getItem('lastUvUrl');
-if (searchInput && lastUvUrl) {
-  searchInput.value = lastUvUrl;
-}
+      if (typeof window.__uv$config === 'undefined' || typeof window.__uv$config.encodeUrl !== 'function') {
+        console.error('Proxy config not ready. Reload the page.', window.__uv$config);
+        // still attempt to load duckduckgo directly if proxy not ready
+        iframe.src = 'https://duckduckgo.com';
+        return;
+      }
 
-// When the user presses Enter in the small search bar, navigate to the new URL
-searchInput.addEventListener('keydown', function(e) {
-  if (e.key === "Enter") {
-    e.preventDefault();
-    const newVal = searchInput.value.trim();
-    if (!newVal) return;
+      try {
+        new URL(finalUrl); // sanity check
+        iframe.src = window.__uv$config.prefix + window.__uv$config.encodeUrl(finalUrl);
+        localStorage.setItem('lastUvUrl', finalUrl);
+      } catch (err) {
+        console.error('Invalid URL:', finalUrl, err);
+        // fallback to duckduckgo homepage
+        try { iframe.src = window.__uv$config.prefix + window.__uv$config.encodeUrl('https://duckduckgo.com'); }
+        catch { iframe.src = 'https://duckduckgo.com'; }
+      }
 
-    // Store the new value in localStorage
-    localStorage.setItem('lastUvUrl', newVal);
+      // navbar handlers
+      const backBtn = document.getElementById('backIcon');
+      const forwardBtn = document.getElementById('forwardIcon');
+      const refreshBtn = document.getElementById('refreshIcon');
+      const fullscreenBtn = document.getElementById('fullscreenIcon');
 
-    let url;
-    try {
-      url = new URL(newVal).toString();
-    } catch {
-      url = `https://duckduckgo.com/?q=${encodeURIComponent(newVal)}`;
-    }
+      if (backBtn) backBtn.addEventListener('click', e => { e.preventDefault(); window.history.back(); });
+      if (forwardBtn) forwardBtn.addEventListener('click', e => { e.preventDefault(); window.history.forward(); });
+      if (refreshBtn) refreshBtn.addEventListener('click', e => { e.preventDefault(); iframe.src = iframe.src; });
+      if (fullscreenBtn) fullscreenBtn.addEventListener('click', e => {
+        e.preventDefault();
+        if (iframe.requestFullscreen) iframe.requestFullscreen();
+      });
 
-    const encoded = window.__uv$config.encodeUrl(url);
-    // Reload search.html with the new encoded URL
-    window.location.href = '/active/search.html?url=' + encoded;
-  }
-});
+      // small search bar (top navbar) behavior
+      const searchInput = document.getElementById('searchInputt');
+      if (searchInput) {
+        const lastUvUrl = localStorage.getItem('lastUvUrl');
+        if (lastUvUrl) searchInput.value = lastUvUrl;
 
-// Navigation controls functions
-function goBack() {
-  window.history.back();
-}
+        searchInput.addEventListener('keydown', function(e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const newVal = searchInput.value.trim();
+            if (!newVal) return;
+            localStorage.setItem('lastUvUrl', newVal);
 
-function goForward() {
-  window.history.forward();
-}
+            let url;
+            try { url = new URL(newVal).toString(); }
+            catch { url = `https://duckduckgo.com/?q=${encodeURIComponent(newVal)}`; }
 
-function refreshPage() {
-  window.location.reload();
-}
+            // navigate to same page with proper query param (will be normalized by this script)
+            window.location.href = '/active/search.html?url=' + encodeURIComponent(url);
+          }
+        });
+      }
 
-function toggleFullscreen() {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    }
-  }
-}
-  </script>
+      // eruda init (do not attach to iframe)
+      if (typeof eruda !== 'undefined') {
+        try { eruda.init(); } catch (e) { /* ignore eruda attach errors */ }
+      }
+    });
+    </script>
+
+    <!-- optionally load eruda; safe init is handled above -->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
   </body>
 </html>

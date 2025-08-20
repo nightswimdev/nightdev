@@ -1,60 +1,62 @@
-# 🌐 sebudaca v1.0 (Medies Edition)
+# nightdev — Underground Edition v1.0
 
-**A gateway to global media, for modern times.**  
-Created by the sebuda.dev Team.
+**A dark gateway to the web.**  
+Welcome to nightdev — a low-profile, minimalist proxy built for discreet browsing and a shadowy aesthetic.
 
 ---
 
-> sebudaca connects you to the world — explore **medies** without borders.  
+> Slip into the underground. nightdev gives you quiet access to the web — stripped, private, and built for night usage.
 
-## 🌍 Overview
+## Overview
 
-sebudaca is a sleek, minimalist web proxy designed for seamless access to global media. Whether you want to explore international content or enjoy a distraction-free UI, sebudaca is your passport. Built with modern aesthetics and frequent updates, it’s more than a tool—it’s your media hub.
+nightdev is a compact, static web proxy and launcher with a moody, low-light UI. It’s designed for private, distraction‑free exploration of content across the net — think dimmed tones, subtle animations, and a focus on privacy-first behaviors.
 
-Join the journey and **explore the globe with sebudaca.** 🌐
+## What’s New in v1.0 — Underground Edition
 
-## 🆕 What’s New in v1.0 (Medies Edition)
+- 🌑 Dark, low-contrast theme optimized for night use  
+- 🕶️ Cloak mode: open in about:blank with iframe loading for stealth browsing  
+- ⚡ Performance & memory improvements for lightweight devices  
+- 🔗 Proxy prefix/bare server controls for advanced routing  
+- 🧭 Sidebar and quick-access widgets tuned for minimal exposure
 
-- 🌐 Globe-inspired theme for worldwide access  
-- ⚡ Performance improvements  
-- 🎬 New media and entertainment options  
-- 🧭 Sidebar widget system (Time, Navigation, Media)  
-- 💫 Updated globe gradients and transition effects  
-- 🪄 Easter eggs and more
+## Features
 
-## ✨ Features
+- 🖤 Night-first UI — muted palettes, soft glows, and less attention  
+- 🔒 Privacy-minded defaults — minimal telemetry, no tracking cookies by default  
+- 🧭 Built-in proxy controls — adjust uv prefix/bare for custom setups  
+- 🕯️ Cloak & Panic tools — about:blank cloak and panic key to quickly hide the site  
+- 📦 Static & portable — runs anywhere static sites are hosted
 
-- 🌏 **Global UI** – Clean, centered, and universal.  
-- 🛠️ **Customizable** – Themes, globe gradients, and animations.  
-- 🎬 **Built-in Media** – Access movies, music, and more.  
-- 🧭 **Modular Sidebar** – Time, navigation, and quick access.  
-- 🌐 **Unblocked Access** – Bypass restrictions with ease.  
-- 📦 **No Backend Required** – Simple, static, and fast.  
+## Tech Stack
 
-## 🚀 Tech Stack
+- HTML5 / CSS3 (dark design system)  
+- Vanilla JavaScript — small footprint, no trackers  
+- Deploy on: GitHub Pages, Vercel, Netlify, or any static host
 
-- `HTML5` / `CSS3`  
-- `JavaScript` (Vanilla)  
-- Hosted on: `Vercel`, `Netlify`, `GitHub Pages`
+## Navigation
 
-## 🧭 Navigation
+- Home (index.html)  
+- Apps (apps.html)  
+- AI (ai.html)  
+- Settings (settings.html) — contains cloak, panic key, proxy controls
 
-- `Home` 🏠
-- `Apps` 📱
-- `AI` 🤖
-- `Credits` 💬  
-- `Settings` ⚙️
-
-All accessible via the animated sidebar.
-
-## 🛠️ Setup
+## Quick Start
 
 ```bash
-# Clone the repo
-git clone https://github.com/sebudadev/sebudaca.git
+# clone the repo
+git clone https://github.com/your-org/nightdev.git
 
-# Navigate to the directory
-cd sebudaca
-
-# Open index.html in your browser or deploy using any static host
+# open locally
+cd nightdev
+start index.html   # Windows: opens default browser
 ```
+
+## Security & Privacy Notes
+
+- nightdev ships with conservative defaults; IPs and basic usage may be logged for abuse protection.  
+- Use cloak/about:blank and the panic key for an extra layer of on-screen discretion.  
+- This is a static frontend; if you deploy with a proxy backend, review backend logging and policies.
+
+---
+
+Built for shadows. Use responsibly.
