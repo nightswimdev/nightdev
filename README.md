@@ -1,6 +1,6 @@
 # nightdev 🌒
 
-**nightdev** is a sleek and modern dark web proxy designed for privacy, speed, and minimalism. With a clean interface and powerful backend, NightDev makes anonymous browsing simple and seamless.
+**nightdev** is a sleek and modern dark web proxy designed for privacy, speed, and minimalism. With a clean interface and powerful backend, nightdev makes anonymous browsing simple and seamless.
 
 ---
 
