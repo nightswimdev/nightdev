@@ -16,14 +16,20 @@
       <link rel="stylesheet" href="/ai.css">
       <link rel="stylesheet" href="/sebuai.css"
 
+      <!-- ============================ -->
+      <!-- DO 𝗡𝗢𝗧 REMOVE THESE LIBRARIES!! -->
+      <!-- ☆ These libraries are required for syntax highlighting, icons, loading animations, and analytics ☆ -->
+      <!-- Removing them WILL, without a doubt, cause issues ˙◠˙ -->
+      <!-- ============================ -->
+
       <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.23.0/themes/prism-tomorrow.min.css">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/vs2015.min.css">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.css">
-      <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script><style type="text/css" id="operaUserStyle"></style>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-WGJ2192JZY"></script>
+      <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-WGJ2192JZY"></script>
       <script>
          window.dataLayer = window.dataLayer || [];
          function gtag(){dataLayer.push(arguments);}
@@ -66,7 +72,7 @@
          <div class="chat-input">
             <input type="text" id="aiInput" placeholder="Ask anything!" autocomplete="off">
             <input type="file" id="imageUpload" accept="image/*" style="display:none;">
-            <button id="sendMsg"><i class="fas fa-arrow-up"></i></button>
+            <button id="sendMsg"><i class="fa-arrow-up"></i></button>
          </div>
       </div>
       </div>
@@ -109,63 +115,6 @@
   window.addEventListener('DOMContentLoaded', function() {
     showToast("Use Jailbreak if you're ready to talk about anything.", "info", "warning");
   });
-</script>
-<script>
-// Prevent inspect element and send Discord webhook if attempted
-(function() {
-  // Discord webhook URL (replace with your own)
-  const WEBHOOK_URL = "https://discord.com/api/webhooks/1379290880397021204/yeKBG24__YemcjSSpOMf5hZ8_DdDw5jocu3FKGzmR8LPKULxiaHIaxh163zWHcDKhLYi";
-
-  // Show warning toast or alert
-  function showInspectWarning() {
-    alert("Inspect Element is disabled for security reasons.");
-  }
-
-  // Send webhook with basic info
-  function sendWebhook(reason) {
-    fetch(WEBHOOK_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        content: `Inspect Element attempt detected!\nReason: ${reason}\nUser Agent: ${navigator.userAgent}\nPage: ${window.location.href}`
-      })
-    });
-  }
-
-  // Block F12, Ctrl+Shift+I, Ctrl+Shift+C, Ctrl+U, right-click
-  document.addEventListener("keydown", function(e) {
-    if (
-      e.key === "F12" ||
-      (e.ctrlKey && e.shiftKey && (e.key === "I" || e.key === "C" || e.key === "J")) ||
-      (e.ctrlKey && e.key === "U")
-    ) {
-      e.preventDefault();
-      showInspectWarning();
-      sendWebhook("Keydown: " + e.key);
-      return false;
-    }
-  });
-
-  // Block right-click
-  document.addEventListener("contextmenu", function(e) {
-    e.preventDefault();
-    showInspectWarning();
-    sendWebhook("Right-click");
-    return false;
-  });
-
-  // Block DevTools open via resize (optional, not 100% reliable)
-  let threshold = 160;
-  setInterval(function() {
-    if (
-      window.outerWidth - window.innerWidth > threshold ||
-      window.outerHeight - window.innerHeight > threshold
-    ) {
-      showInspectWarning();
-      sendWebhook("DevTools opened (resize detected)");
-    }
-  }, 1000);
-})();
 </script>
 </body>
 </html>
