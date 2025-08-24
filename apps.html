@@ -89,13 +89,16 @@
   <body>
     <!-- Main Navbar (bigger, centered, with brand) -->
     <div class="navbar main-navbar">
+      <div class="navbar-light-border"></div>
+      <div class="navbar-light-inset-bg"></div>
+      <div class="navbar-light"></div>
       <div class="main-navbar-title">
         <img src="assets/js/icon/Untitled design (14)-Picsart-BackgroundRemover.png" alt="nightdev logo" class="main-navbar-logo" />
         <span>nightdev</span>
       </div>
       <ul class="nav-buttons">
-        <li><a href="index.html" class="active" title="Home"><i class="fa-solid fa-house"></i></a></li>
-        <li><a href="apps.html" title="Apps"><i class="fa-solid fa-th"></i></a></li>
+        <li><a href="index.html" title="Home"><i class="fa-solid fa-house"></i></a></li>
+        <li><a href="apps.html" class="active" title="Apps"><i class="fa-solid fa-th"></i></a></li>
         <li><a href="settings.html" title="Settings"><i class="fa-solid fa-gear"></i></a></li>
         <li><a href="movies.html" title="Movies"><i class="fa-solid fa-film"></i></a></li>
         <li>
@@ -127,7 +130,7 @@
     </div>
 
     <div class="apps-container">
-      <div class="app-card" onclick="window.location.href=''">
+      <div class="app-card" data-key="duckduckgo">
         <img src="https://duckduckgo.com/assets/logo_homepage.normal.v108.svg" alt="DuckDuckGo Logo" />
         <div class="app-card-title">DuckDuckGo</div>
       </div>
@@ -195,17 +198,17 @@
         <img src="https://upload.wikimedia.org/wikipedia/de/f/f4/SoundCloud_-_Logo.svg" alt="soundcloud Logo" />
         <div class="app-card-title">Soundcloud</div>
       </div>
-      <div class="app-card" onclick="window.location.href='search.html?site=nowgg'">
-        <img src="https://static.wikia.nocookie.net/logopedia/images/7/75/Now.gg_Stacked.svg/revision/latest?cb=20240416130846" alt="now.gg Logo" />
-        <div class="app-card-title">now.gg</div>
+      <div class="app-card" onclick="window.location.href='search.html?site=slitherio'">
+        <img src="/assets/js/icon/IMG_9068.png" alt="slitherio Logo" />
+        <div class="app-card-title">slither io</div>
       </div>
       <div class="app-card" onclick="window.location.href='search.html?site=snapchat'">
         <img src="https://upload.wikimedia.org/wikipedia/it/c/c4/Snapchat_logo.svg" alt="Snapchat Logo" />
         <div class="app-card-title">Snapchat
         </div>
       </div>
-      <div class="app-card" onclick="window.location.href='search.html?site=jiloviral'">
-        <img src="" alt="JiloViral Logo" />
+      <div class="app-card" data-key="jiloviral">
+        <img src="https://via.placeholder.com/64x64/333333/ffffff?text=JV" alt="JiloViral Logo" />
         <div class="app-card-title">JiloViral</div>
       </div>
     </div>
@@ -289,7 +292,7 @@ const appUrls = {
   instagram: "https://instagram.com/",
   cashapp: "https://cash.app/",
   soundcloud: "https://soundcloud.com/",
-  nowgg: "https://now.gg/",
+  slitherio: "https://slither.io/",
   snapchat: "https://snapchat.com/",
   jiloviral: "https://jiloviral.com/"
 };
@@ -300,7 +303,7 @@ document.querySelectorAll('.app-card').forEach(card => {
   const dataKey = card.getAttribute('data-key');
   let key = dataKey || card.querySelector('.app-card-title').textContent.trim().toLowerCase();
   // normalize some common display titles to keys
-  if (key.includes('duckduckgo')) key = 'duckduckgo';
+  if (key === 'duckduckgo' || key.includes('duckduckgo')) key = 'duckduckgo';
   if (key.includes('wikipedia')) key = 'wikipedia';
   if (key.includes('spotify')) key = 'spotify';
   if (key.includes('tiktok')) key = 'tiktok';
@@ -332,6 +335,171 @@ document.querySelectorAll('.app-card').forEach(card => {
     const url = /^https?:\/\//i.test(target) ? target : 'https://' + target;
     // navigate from apps.html (root) to active/search.html
     window.location.href = 'active/search.html?url=' + encodeURIComponent(url);
+  });
+});
+</script>
+<script>
+// Light following effect for search bar - exact implementation from example
+document.addEventListener('DOMContentLoaded', function() {
+  const searchBar = document.querySelector('.search-bar');
+  const lightBg = searchBar.querySelector('.light');
+  const lightBorder = searchBar.querySelector('.light-border');
+  const lightSize = 300;
+
+  let targetX = 0, targetY = 0;
+  let currentX = 0, currentY = 0;
+  let lastX = 0, lastY = 0;
+  let velocityX = 0, velocityY = 0;
+  let raf;
+
+  function animate() {
+    currentX += (targetX - currentX) * 0.15;
+    currentY += (targetY - currentY) * 0.15;
+
+    const elasticX = Math.min(Math.max(velocityX * 0.5, -20), 20);
+    const elasticY = Math.min(Math.max(velocityY * 0.5, -20), 20);
+
+    const bgX = `${currentX - lightSize / 2 + elasticX}px`;
+    const bgY = `${currentY - lightSize / 2 + elasticY}px`;
+
+    lightBg.style.setProperty('--bg-x', bgX);
+    lightBg.style.setProperty('--bg-y', bgY);
+    lightBorder.style.setProperty('--bg-x', bgX);
+    lightBorder.style.setProperty('--bg-y', bgY);
+
+    raf = requestAnimationFrame(animate);
+  }
+
+  searchBar.addEventListener('mouseenter', () => {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(animate);
+
+    lightBg.style.opacity = 1;
+    lightBorder.style.opacity = 1;
+    lightBg.style.transition = "opacity 0.4s ease, transform 0.4s ease, filter 0.6s ease";
+    lightBorder.style.transition = "opacity 0.4s ease, transform 0.4s ease, filter 0.6s ease";
+
+    lightBg.style.transform = "scale(1.15)";
+    lightBg.style.filter = "blur(20px)";
+    lightBorder.style.transform = "scale(1.1)";
+    lightBorder.style.filter = "blur(6px)";
+
+    setTimeout(() => {
+      lightBg.style.transform = "scale(1)";
+      lightBg.style.filter = "blur(12px)";
+      lightBorder.style.transform = "scale(1)";
+      lightBorder.style.filter = "blur(4px)";
+    }, 300);
+  });
+
+  searchBar.addEventListener('mouseleave', () => {
+    cancelAnimationFrame(raf);
+
+    lightBg.style.transition = "opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease";
+    lightBorder.style.transition = "opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease";
+
+    lightBg.style.opacity = 0;
+    lightBorder.style.opacity = 0;
+    lightBg.style.transform = "scale(0.95)";
+    lightBorder.style.transform = "scale(0.95)";
+    lightBg.style.filter = "blur(30px)";
+    lightBorder.style.filter = "blur(12px)";
+  });
+
+  searchBar.addEventListener('mousemove', (e) => {
+    const rect = searchBar.getBoundingClientRect();
+    targetX = e.clientX - rect.left;
+    targetY = e.clientY - rect.top;
+
+    velocityX = targetX - lastX;
+    velocityY = targetY - lastY;
+    lastX = targetX;
+    lastY = targetY;
+
+    const glowStrength = Math.min(1.2, 0.8 + targetX / rect.width * 0.4);
+    lightBg.style.transform = `scale(${glowStrength})`;
+  });
+});
+
+// Light following effect for navbar - exact same implementation
+document.addEventListener('DOMContentLoaded', function() {
+  const navbar = document.querySelector('.main-navbar');
+  const navbarLightBg = navbar.querySelector('.navbar-light');
+  const navbarLightBorder = navbar.querySelector('.navbar-light-border');
+  const lightSize = 300;
+
+  let navbarTargetX = 0, navbarTargetY = 0;
+  let navbarCurrentX = 0, navbarCurrentY = 0;
+  let navbarLastX = 0, navbarLastY = 0;
+  let navbarVelocityX = 0, navbarVelocityY = 0;
+  let navbarRaf;
+
+  function navbarAnimate() {
+    navbarCurrentX += (navbarTargetX - navbarCurrentX) * 0.15;
+    navbarCurrentY += (navbarTargetY - navbarCurrentY) * 0.15;
+
+    const elasticX = Math.min(Math.max(navbarVelocityX * 0.5, -20), 20);
+    const elasticY = Math.min(Math.max(navbarVelocityY * 0.5, -20), 20);
+
+    const bgX = `${navbarCurrentX - lightSize / 2 + elasticX}px`;
+    const bgY = `${navbarCurrentY - lightSize / 2 + elasticY}px`;
+
+    navbarLightBg.style.setProperty('--navbar-bg-x', bgX);
+    navbarLightBg.style.setProperty('--navbar-bg-y', bgY);
+    navbarLightBorder.style.setProperty('--navbar-bg-x', bgX);
+    navbarLightBorder.style.setProperty('--navbar-bg-y', bgY);
+
+    navbarRaf = requestAnimationFrame(navbarAnimate);
+  }
+
+  navbar.addEventListener('mouseenter', () => {
+    cancelAnimationFrame(navbarRaf);
+    navbarRaf = requestAnimationFrame(navbarAnimate);
+
+    navbarLightBg.style.opacity = 1;
+    navbarLightBorder.style.opacity = 1;
+    navbarLightBg.style.transition = "opacity 0.4s ease, transform 0.4s ease, filter 0.6s ease";
+    navbarLightBorder.style.transition = "opacity 0.4s ease, transform 0.4s ease, filter 0.6s ease";
+
+    navbarLightBg.style.transform = "scale(1.15)";
+    navbarLightBg.style.filter = "blur(20px)";
+    navbarLightBorder.style.transform = "scale(1.1)";
+    navbarLightBorder.style.filter = "blur(6px)";
+
+    setTimeout(() => {
+      navbarLightBg.style.transform = "scale(1)";
+      navbarLightBg.style.filter = "blur(12px)";
+      navbarLightBorder.style.transform = "scale(1)";
+      navbarLightBorder.style.filter = "blur(4px)";
+    }, 300);
+  });
+
+  navbar.addEventListener('mouseleave', () => {
+    cancelAnimationFrame(navbarRaf);
+
+    navbarLightBg.style.transition = "opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease";
+    navbarLightBorder.style.transition = "opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease";
+
+    navbarLightBg.style.opacity = 0;
+    navbarLightBorder.style.opacity = 0;
+    navbarLightBg.style.transform = "scale(0.95)";
+    navbarLightBorder.style.transform = "scale(0.95)";
+    navbarLightBg.style.filter = "blur(30px)";
+    navbarLightBorder.style.filter = "blur(12px)";
+  });
+
+  navbar.addEventListener('mousemove', (e) => {
+    const rect = navbar.getBoundingClientRect();
+    navbarTargetX = e.clientX - rect.left;
+    navbarTargetY = e.clientY - rect.top;
+
+    navbarVelocityX = navbarTargetX - navbarLastX;
+    navbarVelocityY = navbarTargetY - navbarLastY;
+    navbarLastX = navbarTargetX;
+    navbarLastY = navbarTargetY;
+
+    const glowStrength = Math.min(1.2, 0.8 + navbarTargetX / rect.width * 0.4);
+    navbarLightBg.style.transform = `scale(${glowStrength})`;
   });
 });
 </script>

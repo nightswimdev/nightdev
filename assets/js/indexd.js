@@ -40,20 +40,21 @@
   }
 
   window.onload = function () {
-    document.getElementById('loader').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
-
+    // Remove loader/content references as these elements don't exist in index.html
+    
     const stealth = JSON.parse(localStorage.getItem("stealthModeEnabled")) || false;
     const checkbox = document.getElementById("blankMode");
-    checkbox.checked = stealth;
+    if (checkbox) {
+      checkbox.checked = stealth;
 
-    if (stealth) runStealthMode();
+      if (stealth) runStealthMode();
 
-    checkbox.addEventListener("change", function () {
-      const isChecked = checkbox.checked;
-      localStorage.setItem("stealthModeEnabled", JSON.stringify(isChecked));
-      if (isChecked) runStealthMode();
-    });
+      checkbox.addEventListener("change", function () {
+        const isChecked = checkbox.checked;
+        localStorage.setItem("stealthModeEnabled", JSON.stringify(isChecked));
+        if (isChecked) runStealthMode();
+      });
+    }
   };
 
   document.querySelectorAll('a').forEach(function (link) {
@@ -61,43 +62,16 @@
       var gameName = link.textContent;
       console.log("Loading " + gameName + "...");
 
-      document.getElementById('loader').style.display = 'block';
-      document.getElementById('content').style.display = 'none';
-
+      // Remove loader/content references as these elements don't exist in index.html
       var iframe = document.getElementById('gameFrame');
       if (iframe) {
         iframe.onload = function () {
-          document.getElementById('loader').style.display = 'none';
-          document.getElementById('content').style.display = 'block';
+          // Game loaded
         };
       }
     });
   });
 
-  document.getElementById('searchForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-    let query = document.getElementById('urlInput').value.trim();
-    if (!query) return;
 
-    const rawUrl = generateSearchUrl(query);
-    const encoded = __uv$config.encodeUrl(rawUrl);
-    const proxyUrl = __uv$config.prefix + encoded;
 
-    document.getElementById('loader').style.display = 'block';
-    document.getElementById('content').style.display = 'none';
 
-    window.location.href = proxyUrl;
-  });
-
-  function generateSearchUrl(query) {
-    try {
-      const url = new URL(query);
-      return url.toString();
-    } catch {
-      try {
-        const url = new URL(`https://${query}`);
-        if (url.hostname.includes('.')) return url.toString();
-      } catch {}
-    }
-    return `https://duckduckgo.com/search?q=${encodeURIComponent(query)}&source=web`;
-  }

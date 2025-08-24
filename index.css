@@ -9,10 +9,43 @@ html, body {
 body {
   font-family: "Roboto", Arial, Helvetica, sans-serif;
   margin: 0px;
-  background: #0c0c0c;
+  background-color: #050505;
+  background-image:
+    radial-gradient(circle at 50% 50%, #05050580 0%, rgb(5, 5, 5) 80%),
+    linear-gradient(#1b1b1b 1px, transparent 1px),
+    linear-gradient(to right, #1b1b1b 1px, #050505 1px);
+  background-size: 100% 100%, 20px 20px, 20px 20px;
   display: flex;
   flex-direction: column;
-  min-height: 2px;
+  min-height: 100vh;
+  color: #e0e0e0;
+  overflow-x: hidden;
+  animation: fadeIn 0.4s ease;
+  scroll-behavior: smooth;
+  position: relative;
+  z-index: 1;
+}
+
+::selection {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #000000;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4e4e4e;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #6b6b6b;
 }
 
 .fa-magnifying-glass {
@@ -166,18 +199,24 @@ footer span {
   max-width: 90vw;
   padding: 0.7em 1.2em;
   border-radius: 20px;
-  border: 1px solid #e9e5e585;
-  background: rgba(54, 54, 54, 0.459);
-  color: #eceff4;
+  border: transparent;
+  background: transparent;
+  color: #e0e0e0;
   font-size: 1.0em;
   outline: none;
   margin-bottom: 0.5em;
-  transition: border 0.2s;
+  transition: all 0.15s ease;
   text-align: left;
+  position: relative;
+  z-index: 3;
 }
 
 #uv-address:focus {
-  border: 1px solid #c9c9c9;
+  border: transparent;
+}
+
+#uv-address::placeholder {
+  color: #ffffff69;
 }
 
 .credit {
@@ -359,9 +398,9 @@ footer span {
   top: 22px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: #36266e94;
+  background-color: transparent;
   backdrop-filter: blur(10px);
-  border: 1.5px solid #3928855b;
+  border: transparent;
   width: 670px;
   max-width: 98vw;
   border-radius: 25px;
@@ -467,47 +506,61 @@ footer span {
   }
 }
 
+/* Navbar Light Effects */
+.navbar-light-border {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 25px; 
+  opacity: 0;
+  transition: opacity 400ms ease;
+  z-index: 1;
+  background-image: radial-gradient(circle at center, rgba(211 211 211 / 0.8), rgba(211 211 211 / 0) 60%);
+  background-position: var(--navbar-bg-x) var(--navbar-bg-y);
+  background-repeat: no-repeat;
+  background-size: 300px 300px;
+}
+
+.navbar-light {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 25px; 
+  opacity: 0; 
+  transition: opacity 400ms ease;
+  z-index: 10;
+  background-image: radial-gradient(circle at center, rgba(211, 211, 211, 0.13), rgba(211 211 211 / 0) 60%);
+  background-position: var(--navbar-bg-x) var(--navbar-bg-y);
+  background-repeat: no-repeat;
+  background-size: 300px 300px;
+}
+
+.navbar-light-inset-bg {
+  position: absolute;
+  inset: 0.8px; 
+  border-radius: 24px; 
+  background-color: #0e0e0e;
+  transition: background-color 0.15s ease;
+  z-index: 2;
+}
+
+.main-navbar:hover .navbar-light-inset-bg {
+  background-color: #161616;
+}
+
+/* Ensure navbar content stays on top */
+.main-navbar-title,
+.nav-buttons {
+  position: relative;
+  z-index: 20;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
-/* God Rays: faster, more visible, more dynamic like usewaves.site */
-.god-rays {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 750px;
-    --stripes: repeating-linear-gradient(100deg, #ffffffcc 0%, #ffffffcc 7%, transparent 10%, transparent 12%, #ffffffcc 16%);
-    --rays: repeating-linear-gradient(100deg, #ffffffe6 10%, #e6e6e6e6 15%, #ffffffe6 20%, #e6e6e6e6 25%, #ffffffe6 30%);
-    background-image: var(--stripes), var(--rays);
-    background-size: 300%, 200%;
-    background-position: 50% 50%, 50% 50%;
-    mask-image: radial-gradient(ellipse at 100% 0%, transparent 40%, transparent 70%);
-    -webkit-mask-image: radial-gradient(ellipse at 100% 0%, white 40%, transparent 70%);
-    pointer-events: none;
-    z-index: -1;
-}
 
-.god-rays::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-image: var(--stripes), var(--rays);
-    background-size: 200%, 100%;
-    animation: god-rays 7s linear infinite;
-    background-attachment: fixed;
-    mix-blend-mode: difference;
-}
-@keyframes god-rays {
-    0% {
-        background-position: 60% 50%, 40% 50%;
-    }
-    100% {
-        background-position: 0% 50%, 100% 50%;
-    }
-}
 
 /* Center the main content (search bar, logo, desc, music player) */
 .main-content {
@@ -533,6 +586,86 @@ footer span {
   font-size: 1.15em;
   pointer-events: none;
   z-index: 2;
+}
+
+/* Light following effect for search bar */
+.search-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.light-border {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 20px; 
+  opacity: 0;
+  transition: opacity 400ms ease;
+  z-index: 1;
+  background-image: radial-gradient(circle at center, rgba(211 211 211 / 0.8), rgba(211 211 211 / 0) 60%);
+  background-position: var(--bg-x) var(--bg-y);
+  background-repeat: no-repeat;
+  background-size: 300px 300px;
+}
+
+.light {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 20px; 
+  opacity: 0; 
+  transition: opacity 400ms ease;
+  z-index: 10;
+  background-image: radial-gradient(circle at center, rgba(211, 211, 211, 0.13), rgba(211 211 211 / 0) 60%);
+  background-position: var(--bg-x) var(--bg-y);
+  background-repeat: no-repeat;
+  background-size: 300px 300px;
+}
+
+.light-inset-bg {
+  position: absolute;
+  inset: 0.8px; 
+  border-radius: 19px; 
+  background-color: #0e0e0e;
+  transition: background-color 0.15s ease;
+  z-index: 2;
+}
+
+.search-bar:hover .light-inset-bg,
+.search-bar:focus-within .light-inset-bg {
+  background-color: #161616;
+}
+
+/* Ensure input stays on top and properly styled */
+#uv-address {
+  position: relative;
+  z-index: 3;
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  max-width: 500px;
+  padding: 1em 2.5em 1em 2.5em;
+  font-size: 1.1em;
+  color: #e0e0e0;
+  font-family: "Roboto", Arial, Helvetica, sans-serif;
+  border-radius: 20px;
+  text-align: left;
+}
+
+#uv-address::placeholder {
+  color: #888;
+  opacity: 1;
+}
+
+/* Ensure search bar form is properly centered */
+#uv-form {
+  width: 100%;
+  max-width: 500px;
+  margin: 1em auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 /* Toast base styles - boxy and top right, slightly down from top */
@@ -655,7 +788,8 @@ footer span {
 }
 
 
-/* Make sure your main-content fills the available space */
+
+/* Make sure your main-content fills the available space and is perfectly centered */
 .main-content {
   flex: 1 0 auto;
   display: flex;
@@ -664,10 +798,11 @@ footer span {
   justify-content: center;
   text-align: center;
   min-height: calc(100vh - 120px - 80px); /* adjust as needed */
-  margin-top: 0.1px;
-  margin-bottom: 0;
-  padding-bottom: 0;
+  margin: 0 auto;
+  padding: 2em 1em;
   box-sizing: border-box;
+  width: 100%;
+  max-width: 800px; /* Constrain maximum width for better centering */
 }
 
 /* Footer should stay at the bottom */
@@ -687,11 +822,53 @@ footer {
 
 /* Remove extra margin from .logo-wrapper and .desc if needed */
 .logo-wrapper.header-center {
+  margin-bottom: 1em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 100%;
+}
+
+.logo-wrapper.header-center img.logo {
+  max-width: 120px;
+  height: auto;
   margin-bottom: 0.5em;
 }
+
+.logo-wrapper.header-center h1 {
+  margin: 0;
+  font-size: 2.5em;
+  font-weight: 400;
+  color: #ffffff;
+  text-align: center;
+}
+
 .desc {
-  margin-top: 0;
-  margin-bottom: 0.7em;
+  margin: 0 auto 1.5em auto;
+  text-align: center;
+  width: 100%;
+  max-width: 600px;
+}
+
+.desc p {
+  margin: 0;
+  font-size: 1.2em;
+  color: #bfc9db;
+  line-height: 1.4;
+}
+
+/* Ensure greeting is centered */
+#greeting {
+  margin: 1em auto 0.5em auto !important;
+  text-align: center !important;
+  font-size: 1.18em !important;
+  color: #bfc9db !important;
+  font-weight: 500 !important;
+  opacity: 0 !important;
+  transition: opacity 0.4s !important;
+  width: 100%;
+  max-width: 600px;
 }
 
 /* NProgress custom styles */

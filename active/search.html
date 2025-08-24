@@ -82,10 +82,10 @@
         top: 20px;
         left: 50%;
         transform: translateX(-50%);
-        background-color: #40296b3b;
+        background-color: transparent;
         backdrop-filter: blur(10px);
-        border: 1px solid #36216e80;
-        width: 900px;
+        border: transparent;
+        width: 1100px;
         max-width: 98vw;
         display: block;
         border-radius: 25px;
@@ -96,7 +96,53 @@
         animation: fadeIn 0.3s ease;
         padding: 0.5em 1em;
       }
+
+      /* Navbar Light Effects */
+      .navbar-light-border {
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        border-radius: 25px; 
+        opacity: 0;
+        transition: opacity 400ms ease;
+        z-index: 1;
+        background-image: radial-gradient(circle at center, rgba(211 211 211 / 0.8), rgba(211 211 211 / 0) 60%);
+        background-position: var(--navbar-bg-x) var(--navbar-bg-y);
+        background-repeat: no-repeat;
+        background-size: 300px 300px;
+      }
+
+      .navbar-light {
+        pointer-events: none;
+        position: absolute;
+        inset: 0;
+        border-radius: 25px; 
+        opacity: 0; 
+        transition: opacity 400ms ease;
+        z-index: 10;
+        background-image: radial-gradient(circle at center, rgba(211, 211, 211, 0.13), rgba(211 211 211 / 0) 60%);
+        background-position: var(--navbar-bg-x) var(--navbar-bg-y);
+        background-repeat: no-repeat;
+        background-size: 300px 300px;
+      }
+
+      .navbar-light-inset-bg {
+        position: absolute;
+        inset: 0.8px; 
+        border-radius: 24px; 
+        background-color: #0e0e0e;
+        transition: background-color 0.15s ease;
+        z-index: 2;
+      }
+
+      .navbar:hover .navbar-light-inset-bg {
+        background-color: #161616;
+      }
+
+      /* Ensure navbar content stays on top */
       .nav-buttons {
+        position: relative;
+        z-index: 20;
         list-style: none;
         margin: 0;
         padding: 0;
@@ -129,52 +175,176 @@
         opacity: 0.5;
         pointer-events: none;
       }
-      .small-searchbar {
-        display: flex;
-        align-items: center;
-        background: #0000007c;
-        border-radius: 1.2em;
-        padding: 0.2em 0.7em;
-        min-width: 228px;
-        max-width: 320px;
-        margin: 0 0.5em;
-        position: relative;
-      }
-      .small-searchbar #lock-indicator {
-        position: absolute;
-        left: 0.9em;
-        top: 50%;
-        transform: translateY(-60%);
-        display: flex;
-        align-items: center;
-        z-index: 2;
-      }
-      .small-searchbar #lock-svg {
-        position: static;
-      }
-      .small-searchbar input {
-        background: transparent;
-        border: none;
-        color: #eceff4;
-        font-size: 1em;
-        width: 100%;
-        outline: none;
-        padding-left: 1.6em !important;
-      }
-      .small-searchbar svg {
-        position: absolute;
-        left: 0.7em;
-        color: #bfc9db;
-        font-size: 1em;
-        width: 1em;
-        height: 1em;
-      }
-      .shortcut-indicator-2 {
-        font-size: 0.8em;
-        color: #bfc9db;
-        margin-left: 0.5em;
-        white-space: nowrap;
-      }
+      .spin {
+    animation: spin 0.15s ease-in-out;
+    transform: rotate(720deg);
+    transform-origin: center;
+}
+
+.small-searchbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 700px;
+}
+
+.small-searchbar input[type=text] {
+    padding: 16px;
+    width: 90%;
+    background-color: #00000000;
+    border: none;
+    border-radius: 25px;
+    color: #b9b9b9;
+    font-size: 15px;
+    text-align: left;
+    text-indent: 0.5em;
+    outline: none;
+    transition: all 0.15s ease;
+}
+ 
+.small-searchbar input[type=text]:focus,
+.small-searchbar input[type=text]:hover {
+    background-color: #ffffff0a;
+}
+
+.small-searchbar input[type=text]::placeholder {
+    color: #818181;
+}
+
+.shortcut-indicator,
+.shortcut-indicator-2,
+.shortcut-indicator-3 {
+    font-size: 12px;
+    font-weight: 500;
+    color: #000000;
+    background-color: #c4c4c4;
+    padding: 2px 6px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    animation: fadeIn 0.15s ease;
+    position: absolute;
+    z-index: 4;
+}
+
+.shortcut-indicator {
+    top: 50%;
+    left: 50%;
+    transform: translate(calc(-50% + 230px), -50%);
+}
+
+.shortcut-indicator-2 {
+    top: 50%;
+    left: 50%;
+    transform: translate(calc(-50% + 300px), -50%);
+}
+
+.shortcut-indicator-3 {
+  top: 50%;
+  left: 50%;
+  transform: translate(calc(-50% + 195px), -50%);
+}
+
+.shortcut-indicator:hover,
+.shortcut-indicator-2:hover,
+.shortcut-indicator-3:hover {
+    background-color: #ffffff;
+}
+
+.arrow-mode {
+   display: inline-block;
+   margin-left: 17px;
+   transition: all 0.15s ease;
+   animation: fadeIn 0.15s ease;
+}
+
+.escape-mode {
+   margin-left: 17px;
+   transition: all 0.15s ease;
+   animation: fadeIn 0.15s ease;
+}
+
+#lockIcon {
+    position: absolute;
+    left: 54px;
+    top: 50%;
+    font-size: 18px;
+    transform: translateY(-50%);
+    color: #b9b9b9;
+}
+
+.search-container {
+    position: relative;
+    margin-top: 40vh;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 90%;
+    z-index: 20;
+}
+
+.search-title {
+    font-size: 60px;
+    font-weight: 500;
+    text-align: center;
+    display: inline-block;
+    background: linear-gradient(-45deg, #8d8d8d, #ffffff);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    cursor: default;
+    transition: all 0.15s ease;
+}
+
+.search-title span {
+    display: inline-block;
+    opacity: 0;
+    background: inherit;
+    color: transparent;
+    transform: translateY(4rem);
+    animation: fadeSlideIn 0.6s forwards;
+}
+
+.search-version {
+    font-size: 20px;
+    color: #ffffff;
+    margin-bottom: -40px;
+    margin-right: -255px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+    transform: rotate(33deg);
+    animation: fadeUp 0.6s forwards;
+}
+
+.search-bar {
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    margin: 0 auto;
+    position: relative;
+    width: 577px;
+    max-width: 100%;
+}
+
+.search-bar input[type=text] {
+    padding: 16px 16px 16px 40px;
+    z-index: 3;
+    width: 550px;
+    border-radius: 25px;
+    color: #e0e0e0;
+    font-size: 15px;
+    border: transparent;
+    background-color: transparent; 
+    text-indent: 0.5em;
+    outline: none;
+    transition: all 0.15s ease;
+    position: relative;
+}
+
+.search-bar input[type=text]::placeholder {
+    color: #ffffff69;
+}
       .iframe-container {
         position: fixed;
         top: 0;
@@ -232,42 +402,119 @@
       .nav-controls button:active {
         transform: scale(0.98);
       }
+
+      /* Loading Line */
+      .loading-line {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        z-index: 9999;
+        background: transparent;
+      }
+
+      .loading-line .progress-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #292929, #f7f7f7, #666666);
+        background-size: 200% 100%;
+        animation: loadingProgress 2s ease-in-out, shimmer 1.1s ease-in-out infinite;
+        border-radius: 0 3px 3px 0;
+        box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+      }
+
+      @keyframes loadingProgress {
+        0% { width: 0%; }
+        20% { width: 25%; }
+        40% { width: 50%; }
+        60% { width: 65%; }
+        80% { width: 80%; }
+        95% { width: 90%; }
+        100% { width: 95%; }
+      }
+
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+
+      .loading-line.hide {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
     </style>
   </head>
-  <body style="background:#222;">
-    <div class="navbar" style="display: block;">
-      <ul class="nav-buttons">
-        <li><a id="backIcon" href="#" class="disabled" title="Back"><i class="fa-solid fa-arrow-left"></i></a></li>
-        <li><a id="refreshIcon" href="#" title="Refresh"><i class="fa-solid fa-rotate-right"></i></a></li>
-        <li><a id="forwardIcon" href="#" class="disabled" title="Forward"><i class="fa-solid fa-arrow-right"></i></a></li>
-        <li><a id="fullscreenIcon" href="#" title="Fullscreen"><i class="fa-solid fa-expand"></i></a></li>
-        <li>
-          <div class="small-searchbar" style="position: relative;">
-            <span id="lock-indicator" title="Connection is secure">
-              <svg id="lock-svg" viewBox="0 0 24 24" width="16" height="16">
-                <path d="M17 11V7a5 5 0 0 0-10 0v4" stroke="#4caf50" stroke-width="2" fill="none"/>
-                <rect x="5" y="11" width="14" height="10" rx="2" stroke="#4caf50" stroke-width="2" fill="none"/>
-              </svg>
-            </span>
-            <input class="waves" type="text" id="searchInputt" placeholder="Search for a query or enter a URL..." autocomplete="off" style="padding-left: 40px;">
-            <span class="shortcut-indicator-2">Ctrl + S</span>
-          </div>
-        </li>
-        <li><a href="/index.html" title="Home"><i class="fa-solid fa-house"></i></a></li>
-        <li><a href="/apps.html" title="Apps"><i class="fa-solid fa-th"></i></a></li>
-        <li><a id="erudaIcon" href="#" title="Dev Tools"><i class="fa-solid fa-code"></i></a></li>
-      </ul>
+  <body style="background:#000000;">
+    <!-- Loading Line -->
+    <div id="loadingLine" class="loading-line">
+      <div class="progress-bar"></div>
     </div>
 
+    <div class="navbar" style="display: block;" bis_skin_checked="1">
+      <div class="navbar-light-border"></div>
+      <div class="navbar-light-inset-bg"></div>
+      <div class="navbar-light"></div>
+    <ul class="nav-buttons">
+      <li><a id="backIcon" href="#" class="disabled"><i class="fa-solid fa-arrow-left"></i></a></li>
+      <li><a id="refreshIcon" href="#"><i class="fa-solid fa-rotate-right"></i></a></li>
+      <li><a id="forwardIcon" href="#" class="disabled"><i class="fa-solid fa-arrow-right"></i></a></li>
+      <li>
+        <div class="small-searchbar" style="position:relative" bis_skin_checked="1">
+          <i id="lockIcon" class="fa-solid fa-lock"></i>
+          <input class="waves" type="text" id="searchInputt" placeholder="Search for a query or enter a URL..." autocomplete="off" style="padding-left:40px">
+          <span class="shortcut-indicator-2" data-original="Ctrl + E">Ctrl + E</span>
+        </div>
+      </li>
+      <li><a id="fullscreenIcon" href="#"><i class="fa-solid fa-expand"></i></a></li>
+      <li><a href="/index.html"><i class="fa-solid fa-house"></i></a></li>
+      <li><a id="erudaIcon" href="#"><i class="fa-solid fa-code"></i></a></li>
+    </ul>
+  </div>
     <!-- iframe: now full height (no extra space below) -->
     <iframe id="cool-iframe"></iframe>
 
-    <!-- Ultraviolet scripts first -->
+    <!-- Settings script first -->
+    <script src="../settings.js"></script>
+    
+    <!-- Ultraviolet scripts -->
     <script src="/active/uv/uv.bundle.js"></script>
     <script src="/active/uv/uv.config.js"></script>
     <script src="/active/uv/uv.handler.js"></script>
+    
+    <!-- Search functionality -->
+    <script src="search.js"></script>
 
     <script>
+    // Loading line control
+    const loadingLine = document.getElementById('loadingLine');
+    const progressBar = loadingLine.querySelector('.progress-bar');
+    
+    // Function to show loading line
+    function showLoadingLine() {
+      loadingLine.style.display = 'block';
+      loadingLine.classList.remove('hide');
+      progressBar.style.width = '0%';
+      progressBar.style.animation = 'loadingProgress 3s ease-out forwards, shimmer 1.1s ease-in-out infinite';
+    }
+    
+    // Function to hide loading line
+    function hideLoadingLine() {
+      progressBar.style.width = '100%';
+      setTimeout(() => {
+        loadingLine.classList.add('hide');
+        setTimeout(() => {
+          loadingLine.style.display = 'none';
+          progressBar.style.animation = '';
+        }, 300);
+      }, 200);
+    }
+    
+    // Hide loading line when main page is fully loaded
+    window.addEventListener('load', () => {
+      setTimeout(hideLoadingLine, 500);
+    });
+
     // consolidated script (replaces duplicated/removed blocks)
     document.addEventListener('DOMContentLoaded', async () => {
       const iframe = document.getElementById('cool-iframe');
@@ -278,19 +525,65 @@
       }
 
       function buildUrl(input) {
-        // Normalize input and convert bare domains -> https, treat empty as duckduckgo homepage
-        if (input == null || input.trim() === '') return 'https://duckduckgo.com';
+        // Normalize input and convert bare domains -> https, treat empty as default search engine homepage
+        if (input == null || input.trim() === '') {
+          // Get user's preferred search engine, fallback to DuckDuckGo
+          const defaultEngine = (typeof window.getSavedSettings === 'function' && window.getSavedSettings().defaultEngine) || 
+                               localStorage.getItem('defaultEngine') || 
+                               'https://duckduckgo.com';
+          return defaultEngine;
+        }
         input = decodeURIComponent(input.trim());
         if (/^[\w-]+\.[\w.-]+(?:\/.*)?$/.test(input) && !/^https?:\/\//i.test(input)) {
           input = 'https://' + input;
         }
         if (isValidHttpUrl(input)) return input;
-        return 'https://duckduckgo.com/?q=' + encodeURIComponent(input);
+        
+        // Use user's preferred search engine for search queries
+        const defaultEngine = (typeof window.getSavedSettings === 'function' && window.getSavedSettings().defaultEngine) || 
+                             localStorage.getItem('defaultEngine') || 
+                             'https://duckduckgo.com';
+        
+        // Create search URL based on the engine
+        if (defaultEngine.includes('google.com')) {
+          return 'https://www.google.com/search?q=' + encodeURIComponent(input);
+        } else if (defaultEngine.includes('bing.com')) {
+          return 'https://www.bing.com/search?q=' + encodeURIComponent(input);
+        } else {
+          // Default to DuckDuckGo format
+          return 'https://duckduckgo.com/?q=' + encodeURIComponent(input);
+        }
       }
 
       const params = new URLSearchParams(window.location.search);
       const userInput = params.get('url');
+      const searchTerm = params.get('search'); // Get the original search term
       const finalUrl = buildUrl(userInput);
+
+      // Use the original search term if available, otherwise extract from URL
+      let displayTerm = '';
+      if (searchTerm) {
+        // Use the original search term passed from index.html
+        displayTerm = decodeURIComponent(searchTerm);
+      } else if (userInput) {
+        const decodedInput = decodeURIComponent(userInput.trim());
+        
+        // Check if it's a DuckDuckGo search URL and extract the search term
+        if (decodedInput.includes('duckduckgo.com/?q=')) {
+          const searchMatch = decodedInput.match(/[?&]q=([^&]*)/);
+          if (searchMatch) {
+            displayTerm = decodeURIComponent(searchMatch[1]);
+          }
+        }
+        // If it's a direct URL, show the URL
+        else if (decodedInput.startsWith('http')) {
+          displayTerm = decodedInput;
+        }
+        // Otherwise, show the original input
+        else {
+          displayTerm = decodedInput;
+        }
+      }
 
       // always have a default (duckduckgo) instead of aborting
       if (!finalUrl) {
@@ -314,7 +607,12 @@
       try {
         new URL(finalUrl); // sanity check
         iframe.src = window.__uv$config.prefix + window.__uv$config.encodeUrl(finalUrl);
-        localStorage.setItem('lastUvUrl', finalUrl);
+        // Store the display term (original search) instead of the final URL
+        if (displayTerm) {
+          localStorage.setItem('lastUvUrl', displayTerm);
+        } else {
+          localStorage.setItem('lastUvUrl', finalUrl);
+        }
       } catch (err) {
         console.error('Invalid URL:', finalUrl, err);
         // fallback to duckduckgo homepage
@@ -328,9 +626,202 @@
       const refreshBtn = document.getElementById('refreshIcon');
       const fullscreenBtn = document.getElementById('fullscreenIcon');
 
-      if (backBtn) backBtn.addEventListener('click', e => { e.preventDefault(); window.history.back(); });
-      if (forwardBtn) forwardBtn.addEventListener('click', e => { e.preventDefault(); window.history.forward(); });
-      if (refreshBtn) refreshBtn.addEventListener('click', e => { e.preventDefault(); iframe.src = iframe.src; });
+      if (backBtn) backBtn.addEventListener('click', e => { 
+        e.preventDefault(); 
+        if (backBtn.classList.contains('disabled')) return;
+        
+        // Add click animation and show loading
+        backBtn.querySelector('i').classList.add('spin');
+        setTimeout(() => backBtn.querySelector('i').classList.remove('spin'), 150);
+        showLoadingLine();
+        
+        try {
+          iframe.contentWindow.history.back();
+        } catch (err) {
+          console.log('Cannot access iframe history, using window history');
+          window.history.back();
+        }
+      });
+      
+      if (forwardBtn) forwardBtn.addEventListener('click', e => { 
+        e.preventDefault(); 
+        if (forwardBtn.classList.contains('disabled')) return;
+        
+        // Add click animation and show loading
+        forwardBtn.querySelector('i').classList.add('spin');
+        setTimeout(() => forwardBtn.querySelector('i').classList.remove('spin'), 150);
+        showLoadingLine();
+        
+        try {
+          iframe.contentWindow.history.forward();
+        } catch (err) {
+          console.log('Cannot access iframe history, using window history');
+          window.history.forward();
+        }
+      });
+
+      // Function to update navigation button states
+      function updateNavigationButtons() {
+        try {
+          // Enable buttons by default since we can't reliably check iframe history
+          if (backBtn) backBtn.classList.remove('disabled');
+          if (forwardBtn) forwardBtn.classList.remove('disabled');
+        } catch (err) {
+          // Keep buttons enabled if we can't check
+        }
+      }
+
+      // Function to update lock icon based on site security
+      function updateLockIcon() {
+        const lockIcon = document.getElementById('lockIcon');
+        if (!lockIcon) return;
+
+        try {
+          // Get the current URL from multiple sources
+          let currentUrl = '';
+          
+          // First, try to get URL from the search input (most reliable for user's perspective)
+          const searchInput = document.getElementById('searchInputt');
+          if (searchInput && searchInput.value.trim()) {
+            let inputValue = searchInput.value.trim();
+            
+            // If it looks like a URL, use it directly
+            if (inputValue.startsWith('http://') || inputValue.startsWith('https://')) {
+              currentUrl = inputValue;
+            } else if (inputValue.includes('.') && !inputValue.includes(' ')) {
+              // Looks like a domain, assume https
+              currentUrl = 'https://' + inputValue;
+            } else {
+              // It's a search query, check what search engine we're using
+              const defaultEngine = (typeof window.getSavedSettings === 'function' && window.getSavedSettings().defaultEngine) || 
+                                   localStorage.getItem('defaultEngine') || 
+                                   'https://duckduckgo.com';
+              currentUrl = defaultEngine; // Use the search engine's security
+            }
+          }
+          
+          // Fallback: try to decode from iframe src if no search input
+          if (!currentUrl && iframe.src) {
+            if (iframe.src.includes(window.__uv$config?.prefix)) {
+              try {
+                const encodedUrl = iframe.src.replace(window.__uv$config.prefix, '');
+                if (window.__uv$config.decodeUrl) {
+                  currentUrl = window.__uv$config.decodeUrl(encodedUrl);
+                } else {
+                  // Manual decode attempt
+                  currentUrl = decodeURIComponent(encodedUrl);
+                }
+              } catch (e) {
+                console.log('Could not decode proxy URL:', e);
+                currentUrl = iframe.src;
+              }
+            } else {
+              currentUrl = iframe.src;
+            }
+          }
+
+          // Final fallback: use the original URL from page params
+          if (!currentUrl) {
+            const params = new URLSearchParams(window.location.search);
+            const userInput = params.get('url');
+            if (userInput) {
+              currentUrl = decodeURIComponent(userInput);
+            }
+          }
+
+          console.log('Lock icon checking URL:', currentUrl); // Debug log
+
+          // Check if URL is secure (HTTPS)
+          const isSecure = currentUrl.startsWith('https://');
+          const isInsecure = currentUrl.startsWith('http://');
+          
+          // Update lock icon
+          if (isSecure) {
+            lockIcon.className = 'fa-solid fa-lock'; // Closed lock for secure
+            lockIcon.style.color = '#4ade80'; // Green for secure
+            lockIcon.title = 'Secure connection (HTTPS)';
+          } else if (isInsecure) {
+            lockIcon.className = 'fa-solid fa-lock-open'; // Open lock for insecure
+            lockIcon.style.color = '#f87171'; // Red for insecure
+            lockIcon.title = 'Insecure connection (HTTP)';
+          } else {
+            lockIcon.className = 'fa-solid fa-lock'; // Default closed lock
+            lockIcon.style.color = '#b9b9b9'; // Gray for unknown/local
+            lockIcon.title = 'Connection status unknown';
+          }
+        } catch (err) {
+          console.log('Could not update lock icon:', err);
+          // Default to closed lock with gray color
+          const lockIcon = document.getElementById('lockIcon');
+          if (lockIcon) {
+            lockIcon.className = 'fa-solid fa-lock';
+            lockIcon.style.color = '#b9b9b9';
+            lockIcon.title = 'Connection status unknown';
+          }
+        }
+      }
+
+      // Show loading line when iframe starts loading
+      iframe.addEventListener('loadstart', () => {
+        showLoadingLine();
+      });
+      
+      // Hide loading line when iframe finishes loading
+      iframe.addEventListener('load', () => {
+        updateNavigationButtons();
+        updateLockIcon();
+        hideLoadingLine();
+      });
+      
+      // Update lock icon immediately when page loads
+      updateLockIcon();
+      
+      // Global keyboard shortcuts
+      document.addEventListener('keydown', function(e) {
+        // Ctrl+E to focus search bar (handle both lowercase and uppercase)
+        if (e.ctrlKey && (e.key === 'e' || e.key === 'E')) {
+          e.preventDefault();
+          // Try to focus the main search input first
+          const searchInput = document.getElementById('searchInputt');
+          const uvAddress = document.getElementById('uv-address');
+          
+          if (searchInput) {
+            searchInput.focus();
+            searchInput.select(); // Select all text for easy replacement
+          } else if (uvAddress) {
+            uvAddress.focus();
+            uvAddress.select(); // Select all text for easy replacement
+          }
+        }
+      });
+      
+      // Handle loading errors
+      iframe.addEventListener('error', () => {
+        hideLoadingLine();
+      });
+
+      // Also update lock icon when URL changes in search bar
+      const searchInputForLock = document.getElementById('searchInputt');
+      if (searchInputForLock) {
+        searchInputForLock.addEventListener('input', () => {
+          updateLockIcon(); // Update immediately as user types
+        });
+        searchInputForLock.addEventListener('blur', () => {
+          updateLockIcon(); // Update when user finishes editing
+        });
+        searchInputForLock.addEventListener('focus', () => {
+          updateLockIcon(); // Update when user focuses on input
+        });
+      }
+      if (refreshBtn) refreshBtn.addEventListener('click', e => { 
+        e.preventDefault(); 
+        // Add spin animation and show loading
+        refreshBtn.querySelector('i').classList.add('spin');
+        setTimeout(() => refreshBtn.querySelector('i').classList.remove('spin'), 150);
+        showLoadingLine();
+        // Refresh iframe
+        iframe.src = iframe.src; 
+      });
       if (fullscreenBtn) fullscreenBtn.addEventListener('click', e => {
         e.preventDefault();
         if (iframe.requestFullscreen) iframe.requestFullscreen();
@@ -353,6 +844,38 @@
             try { url = new URL(newVal).toString(); }
             catch { url = `https://duckduckgo.com/?q=${encodeURIComponent(newVal)}`; }
 
+            // Update lock icon before navigation
+            updateLockIcon();
+            
+            // Show loading line before navigation
+            showLoadingLine();
+            
+            // navigate to same page with proper query param (will be normalized by this script)
+            window.location.href = '/active/search.html?url=' + encodeURIComponent(url);
+          }
+        });
+      }
+
+            // small search bar (top navbar) behavior - alternative input handling
+      const uvaddress = document.getElementById('uv-address');
+      if (uvaddress) {
+        const lastUvUrl = localStorage.getItem('lastUvUrl');
+        if (lastUvUrl) uvaddress.value = lastUvUrl;
+
+        uvaddress.addEventListener('keydown', function(e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            const newVal = uvaddress.value.trim();
+            if (!newVal) return;
+            localStorage.setItem('lastUvUrl', newVal);
+
+            let url;
+            try { url = new URL(newVal).toString(); }
+            catch { url = `https://duckduckgo.com/?q=${encodeURIComponent(newVal)}`; }
+
+            // Show loading line before navigation
+            showLoadingLine();
+            
             // navigate to same page with proper query param (will be normalized by this script)
             window.location.href = '/active/search.html?url=' + encodeURIComponent(url);
           }
@@ -363,6 +886,86 @@
       if (typeof eruda !== 'undefined') {
         try { eruda.init(); } catch (e) { /* ignore eruda attach errors */ }
       }
+
+      // Light following effect for navbar
+      const navbar = document.querySelector('.navbar');
+      const navbarLightBg = navbar.querySelector('.navbar-light');
+      const navbarLightBorder = navbar.querySelector('.navbar-light-border');
+      const lightSize = 300;
+
+      let navbarTargetX = 0, navbarTargetY = 0;
+      let navbarCurrentX = 0, navbarCurrentY = 0;
+      let navbarLastX = 0, navbarLastY = 0;
+      let navbarVelocityX = 0, navbarVelocityY = 0;
+      let navbarRaf;
+
+      function navbarAnimate() {
+        navbarCurrentX += (navbarTargetX - navbarCurrentX) * 0.15;
+        navbarCurrentY += (navbarTargetY - navbarCurrentY) * 0.15;
+
+        const elasticX = Math.min(Math.max(navbarVelocityX * 0.5, -20), 20);
+        const elasticY = Math.min(Math.max(navbarVelocityY * 0.5, -20), 20);
+
+        const bgX = `${navbarCurrentX - lightSize / 2 + elasticX}px`;
+        const bgY = `${navbarCurrentY - lightSize / 2 + elasticY}px`;
+
+        navbarLightBg.style.setProperty('--navbar-bg-x', bgX);
+        navbarLightBg.style.setProperty('--navbar-bg-y', bgY);
+        navbarLightBorder.style.setProperty('--navbar-bg-x', bgX);
+        navbarLightBorder.style.setProperty('--navbar-bg-y', bgY);
+
+        navbarRaf = requestAnimationFrame(navbarAnimate);
+      }
+
+      navbar.addEventListener('mouseenter', () => {
+        cancelAnimationFrame(navbarRaf);
+        navbarRaf = requestAnimationFrame(navbarAnimate);
+
+        navbarLightBg.style.opacity = 1;
+        navbarLightBorder.style.opacity = 1;
+        navbarLightBg.style.transition = "opacity 0.4s ease, transform 0.4s ease, filter 0.6s ease";
+        navbarLightBorder.style.transition = "opacity 0.4s ease, transform 0.4s ease, filter 0.6s ease";
+
+        navbarLightBg.style.transform = "scale(1.15)";
+        navbarLightBg.style.filter = "blur(20px)";
+        navbarLightBorder.style.transform = "scale(1.1)";
+        navbarLightBorder.style.filter = "blur(6px)";
+
+        setTimeout(() => {
+          navbarLightBg.style.transform = "scale(1)";
+          navbarLightBg.style.filter = "blur(12px)";
+          navbarLightBorder.style.transform = "scale(1)";
+          navbarLightBorder.style.filter = "blur(4px)";
+        }, 300);
+      });
+
+      navbar.addEventListener('mouseleave', () => {
+        cancelAnimationFrame(navbarRaf);
+
+        navbarLightBg.style.transition = "opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease";
+        navbarLightBorder.style.transition = "opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease";
+
+        navbarLightBg.style.opacity = 0;
+        navbarLightBorder.style.opacity = 0;
+        navbarLightBg.style.transform = "scale(0.95)";
+        navbarLightBorder.style.transform = "scale(0.95)";
+        navbarLightBg.style.filter = "blur(30px)";
+        navbarLightBorder.style.filter = "blur(12px)";
+      });
+
+      navbar.addEventListener('mousemove', (e) => {
+        const rect = navbar.getBoundingClientRect();
+        navbarTargetX = e.clientX - rect.left;
+        navbarTargetY = e.clientY - rect.top;
+
+        navbarVelocityX = navbarTargetX - navbarLastX;
+        navbarVelocityY = navbarTargetY - navbarLastY;
+        navbarLastX = navbarTargetX;
+        navbarLastY = navbarTargetY;
+
+        const glowStrength = Math.min(1.2, 0.8 + navbarTargetX / rect.width * 0.4);
+        navbarLightBg.style.transform = `scale(${glowStrength})`;
+      });
     });
     </script>
 
