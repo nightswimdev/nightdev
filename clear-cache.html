@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clear Cache - nightdev</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: #4CAF50; }
+        .error { background: #f44336; }
+        .info { background: #2196F3; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>nightdev Cache Cleaner</h1>
+        <p>Use this page to clear service worker cache and fix CORS issues.</p>
+        
+        <button onclick="clearServiceWorkers()">Clear Service Workers</button>
+        <button onclick="clearAllCache()">Clear All Cache</button>
+        <button onclick="testBareServers()">Test Bare Servers</button>
+        <button onclick="testServiceWorker()">Test Service Worker</button>
+        <button onclick="goHome()">Back to Home</button>
+        
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function showStatus(message, type = 'info') {
+            const status = document.getElementById('status');
+            status.innerHTML = `<div class="status ${type}">${message}</div>`;
+        }
+
+        async function clearServiceWorkers() {
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    await registration.unregister();
+                }
+                showStatus(`Cleared ${registrations.length} service worker(s). Please refresh the page.`, 'success');
+            } catch (error) {
+                showStatus(`Error clearing service workers: ${error.message}`, 'error');
+            }
+        }
+
+        async function clearAllCache() {
+            try {
+                // Clear service workers
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    await registration.unregister();
+                }
+
+                // Clear cache storage
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(cacheNames.map(name => caches.delete(name)));
+                }
+
+                // Clear localStorage
+                localStorage.clear();
+                sessionStorage.clear();
+
+                showStatus('All cache cleared! Please refresh the page and try again.', 'success');
+            } catch (error) {
+                showStatus(`Error clearing cache: ${error.message}`, 'error');
+            }
+        }
+
+        async function testBareServers() {
+            const bareServers = [
+                'https://bare.benrogo.net/',
+                'https://uv.holy.how/bare/',
+                'https://bare.shuttle.rip/',
+                'https://bare.deno.dev/'
+            ];
+
+            showStatus('Testing bare servers...', 'info');
+            let results = '<h3>Bare Server Test Results:</h3>';
+
+            for (const server of bareServers) {
+                try {
+                    const response = await fetch(server, {
+                        method: 'GET',
+                        headers: {
+                            'x-bare-url': 'https://example.com/',
+                            'x-bare-headers': JSON.stringify({})
+                        }
+                    });
+                    const working = response.ok || response.status === 400;
+                    results += `<p>${server}: ${working ? '✓ Working' : '✗ Failed'}</p>`;
+                } catch (error) {
+                    results += `<p>${server}: ✗ Failed (${error.message})</p>`;
+                }
+            }
+
+            showStatus(results, 'info');
+        }
+
+        async function testServiceWorker() {
+            try {
+                showStatus('Testing service worker registration...', 'info');
+                
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                let results = '<h3>Service Worker Status:</h3>';
+                
+                if (registrations.length === 0) {
+                    results += '<p>❌ No service workers registered</p>';
+                } else {
+                    registrations.forEach((reg, index) => {
+                        results += `<p>✓ Service Worker ${index + 1}:</p>`;
+                        results += `<p>&nbsp;&nbsp;Scope: ${reg.scope}</p>`;
+                        results += `<p>&nbsp;&nbsp;State: ${reg.active ? reg.active.state : 'inactive'}</p>`;
+                    });
+                }
+                
+                // Test if the proxy path is working
+                const testUrl = '/active/go/';
+                try {
+                    const response = await fetch(testUrl, { method: 'HEAD' });
+                    results += `<p>Proxy path test: ${response.status === 404 ? '✓ Service worker intercepting' : '❌ Not intercepting'}</p>`;
+                } catch (error) {
+                    results += `<p>Proxy path test: ❌ Error - ${error.message}</p>`;
+                }
+                
+                showStatus(results, 'info');
+            } catch (error) {
+                showStatus(`Error testing service worker: ${error.message}`, 'error');
+            }
+        }
+
+        function goHome() {
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>

@@ -273,6 +273,97 @@
     color: #b9b9b9;
 }
 
+/* Search Suggestions Styles */
+.suggestions-container {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    margin-top: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    display: none;
+}
+
+.suggestion-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #2a2a2a;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover,
+.suggestion-item.selected {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+.suggestion-icon {
+    width: 16px;
+    height: 16px;
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.suggestion-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.suggestion-title {
+    color: #e0e0e0;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.suggestion-url {
+    color: #888;
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.suggestion-type {
+    color: #666;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+/* Scrollbar styling for suggestions */
+.suggestions-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.suggestions-container::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.suggestions-container::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 3px;
+}
+
+.suggestions-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
 .search-container {
     position: relative;
     margin-top: 40vh;
@@ -464,6 +555,7 @@
           <i id="lockIcon" class="fa-solid fa-lock"></i>
           <input class="waves" type="text" id="searchInputt" placeholder="Search for a query or enter a URL..." autocomplete="off" style="padding-left:40px">
           <span class="shortcut-indicator-2" data-original="Ctrl + E">Ctrl + E</span>
+          <div id="suggestions-container" class="suggestions-container"></div>
         </div>
       </li>
       <li><a id="fullscreenIcon" href="#"><i class="fa-solid fa-expand"></i></a></li>
@@ -481,6 +573,9 @@
     <script src="/active/uv/uv.bundle.js"></script>
     <script src="/active/uv/uv.config.js"></script>
     <script src="/active/uv/uv.handler.js"></script>
+    
+    <!-- Service worker registration -->
+    <script src="../assets/js/register.js"></script>
     
     <!-- Search functionality -->
     <script src="search.js"></script>
@@ -827,14 +922,343 @@
         if (iframe.requestFullscreen) iframe.requestFullscreen();
       });
 
+      // Search Suggestions System
+      class SearchSuggestions {
+        constructor(inputElement, containerElement) {
+          this.input = inputElement;
+          this.container = containerElement;
+          this.suggestions = [];
+          this.selectedIndex = -1;
+          this.isVisible = false;
+          
+          this.init();
+        }
+        
+        init() {
+          this.input.addEventListener('input', (e) => this.handleInput(e));
+          this.input.addEventListener('keydown', (e) => this.handleKeydown(e));
+          this.input.addEventListener('focus', (e) => this.handleFocus(e));
+          this.input.addEventListener('blur', (e) => this.handleBlur(e));
+          
+          // Close suggestions when clicking outside
+          document.addEventListener('click', (e) => {
+            if (!this.input.contains(e.target) && !this.container.contains(e.target)) {
+              this.hideSuggestions();
+            }
+          });
+        }
+        
+        async handleInput(e) {
+          const query = e.target.value.trim();
+          
+          if (query.length === 0) {
+            this.hideSuggestions();
+            return;
+          }
+          
+          if (query.length >= 1) {
+            const suggestions = await this.generateSuggestions(query);
+            this.showSuggestions(suggestions);
+          }
+        }
+        
+        handleFocus(e) {
+          const query = e.target.value.trim();
+          if (query.length >= 1) {
+            this.generateSuggestions(query).then(suggestions => {
+              this.showSuggestions(suggestions);
+            });
+          }
+        }
+        
+        handleBlur(e) {
+          // Delay hiding to allow clicking on suggestions
+          setTimeout(() => {
+            if (!this.container.matches(':hover')) {
+              this.hideSuggestions();
+            }
+          }, 150);
+        }
+        
+        handleKeydown(e) {
+          if (!this.isVisible) return;
+          
+          switch (e.key) {
+            case 'ArrowDown':
+              e.preventDefault();
+              this.selectedIndex = Math.min(this.selectedIndex + 1, this.suggestions.length - 1);
+              this.updateSelection();
+              break;
+              
+            case 'ArrowUp':
+              e.preventDefault();
+              this.selectedIndex = Math.max(this.selectedIndex - 1, -1);
+              this.updateSelection();
+              break;
+              
+            case 'Enter':
+              if (this.selectedIndex >= 0) {
+                e.preventDefault();
+                e.stopPropagation();
+                this.selectSuggestion(this.suggestions[this.selectedIndex]);
+              }
+              break;
+              
+            case 'Escape':
+              e.preventDefault();
+              this.hideSuggestions();
+              break;
+          }
+        }
+        
+        async generateSuggestions(query) {
+          const suggestions = [];
+          const lowerQuery = query.toLowerCase();
+          
+          // Check if it looks like a URL or domain
+          const isUrl = /^https?:\/\//.test(query);
+          const isDomain = /^[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.([a-zA-Z]{2,}|[a-zA-Z]{2,}\.[a-zA-Z]{2,})/.test(query);
+          
+          if (isUrl) {
+            // If it's already a URL, suggest the URL itself
+            suggestions.push({
+              title: query,
+              url: query,
+              type: 'url',
+              icon: 'fa-solid fa-link'
+            });
+          } else if (isDomain) {
+            // If it looks like a domain, suggest common paths
+            const domain = query.includes('/') ? query.split('/')[0] : query;
+            const baseDomain = domain.startsWith('www.') ? domain : `www.${domain}`;
+            
+            suggestions.push({
+              title: `https://${baseDomain}`,
+              url: `https://${baseDomain}`,
+              type: 'website',
+              icon: 'fa-solid fa-globe'
+            });
+            
+            // Add common subpaths for popular domains
+            const commonPaths = this.getCommonPaths(domain);
+            commonPaths.forEach(path => {
+              suggestions.push({
+                title: `${domain}${path.path}`,
+                url: `https://${baseDomain}${path.path}`,
+                type: path.type,
+                icon: path.icon
+              });
+            });
+          } else {
+            // Generate search suggestions for different engines
+            const searchEngines = [
+              { name: 'DuckDuckGo', url: 'https://duckduckgo.com/?q=', icon: 'fa-solid fa-search' },
+              { name: 'Google', url: 'https://www.google.com/search?q=', icon: 'fa-brands fa-google' },
+              { name: 'Bing', url: 'https://www.bing.com/search?q=', icon: 'fa-brands fa-microsoft' },
+              { name: 'YouTube', url: 'https://www.youtube.com/results?search_query=', icon: 'fa-brands fa-youtube' }
+            ];
+            
+            searchEngines.forEach(engine => {
+              suggestions.push({
+                title: `Search "${query}" on ${engine.name}`,
+                url: engine.url + encodeURIComponent(query),
+                type: 'search',
+                icon: engine.icon
+              });
+            });
+            
+            // Add popular website suggestions based on query
+            const websiteSuggestions = this.getWebsiteSuggestions(lowerQuery);
+            suggestions.push(...websiteSuggestions);
+          }
+          
+          return suggestions.slice(0, 8); // Limit to 8 suggestions
+        }
+        
+        getCommonPaths(domain) {
+          const paths = [];
+          const lowerDomain = domain.toLowerCase();
+          
+          // Gaming sites
+          if (lowerDomain.includes('y8')) {
+            paths.push(
+              { path: '/games', type: 'games', icon: 'fa-solid fa-gamepad' },
+              { path: '/apps', type: 'apps', icon: 'fa-solid fa-mobile-screen' },
+              { path: '/multiplayer', type: 'multiplayer', icon: 'fa-solid fa-users' }
+            );
+          } else if (lowerDomain.includes('coolmath')) {
+            paths.push(
+              { path: '/games', type: 'games', icon: 'fa-solid fa-gamepad' },
+              { path: '/0-papas-games', type: 'games', icon: 'fa-solid fa-pizza-slice' },
+              { path: '/0-skill-games', type: 'games', icon: 'fa-solid fa-target' }
+            );
+          } else if (lowerDomain.includes('github')) {
+            paths.push(
+              { path: '/trending', type: 'trending', icon: 'fa-solid fa-fire' },
+              { path: '/explore', type: 'explore', icon: 'fa-solid fa-compass' },
+              { path: '/marketplace', type: 'marketplace', icon: 'fa-solid fa-store' }
+            );
+          } else if (lowerDomain.includes('youtube')) {
+            paths.push(
+              { path: '/trending', type: 'trending', icon: 'fa-solid fa-fire' },
+              { path: '/gaming', type: 'gaming', icon: 'fa-solid fa-gamepad' },
+              { path: '/music', type: 'music', icon: 'fa-solid fa-music' }
+            );
+          } else if (lowerDomain.includes('reddit')) {
+            paths.push(
+              { path: '/r/popular', type: 'popular', icon: 'fa-solid fa-fire' },
+              { path: '/r/all', type: 'all', icon: 'fa-solid fa-globe' },
+              { path: '/r/gaming', type: 'gaming', icon: 'fa-solid fa-gamepad' }
+            );
+          } else {
+            // Generic common paths
+            paths.push(
+              { path: '/about', type: 'about', icon: 'fa-solid fa-info-circle' },
+              { path: '/contact', type: 'contact', icon: 'fa-solid fa-envelope' },
+              { path: '/help', type: 'help', icon: 'fa-solid fa-question-circle' }
+            );
+          }
+          
+          return paths;
+        }
+        
+        getWebsiteSuggestions(query) {
+          const suggestions = [];
+          const websites = [
+            // Gaming
+            { keywords: ['game', 'games', 'play', 'gaming'], title: 'Y8 Games', url: 'https://www.y8.com/games', icon: 'fa-solid fa-gamepad' },
+            { keywords: ['math', 'cool', 'coolmath'], title: 'Cool Math Games', url: 'https://www.coolmathgames.com', icon: 'fa-solid fa-calculator' },
+            { keywords: ['scratch', 'programming'], title: 'Scratch', url: 'https://scratch.mit.edu', icon: 'fa-solid fa-code' },
+            
+            // Social/Entertainment
+            { keywords: ['video', 'youtube', 'watch'], title: 'YouTube', url: 'https://www.youtube.com', icon: 'fa-brands fa-youtube' },
+            { keywords: ['reddit', 'forum'], title: 'Reddit', url: 'https://www.reddit.com', icon: 'fa-brands fa-reddit' },
+            { keywords: ['twitter', 'tweet'], title: 'Twitter', url: 'https://www.twitter.com', icon: 'fa-brands fa-twitter' },
+            
+            // Development
+            { keywords: ['github', 'git', 'code', 'repository'], title: 'GitHub', url: 'https://www.github.com', icon: 'fa-brands fa-github' },
+            { keywords: ['stack', 'overflow', 'programming'], title: 'Stack Overflow', url: 'https://stackoverflow.com', icon: 'fa-brands fa-stack-overflow' },
+            
+            // Education
+            { keywords: ['wiki', 'wikipedia', 'encyclopedia'], title: 'Wikipedia', url: 'https://www.wikipedia.org', icon: 'fa-brands fa-wikipedia-w' },
+            { keywords: ['khan', 'academy', 'learn'], title: 'Khan Academy', url: 'https://www.khanacademy.org', icon: 'fa-solid fa-graduation-cap' }
+          ];
+          
+          websites.forEach(site => {
+            if (site.keywords.some(keyword => query.includes(keyword))) {
+              suggestions.push({
+                title: site.title,
+                url: site.url,
+                type: 'website',
+                icon: site.icon
+              });
+            }
+          });
+          
+          return suggestions;
+        }
+        
+        showSuggestions(suggestions) {
+          this.suggestions = suggestions;
+          this.selectedIndex = -1;
+          
+          if (suggestions.length === 0) {
+            this.hideSuggestions();
+            return;
+          }
+          
+          this.container.innerHTML = '';
+          
+          suggestions.forEach((suggestion, index) => {
+            const item = document.createElement('div');
+            item.className = 'suggestion-item';
+            item.innerHTML = `
+              <i class="suggestion-icon ${suggestion.icon}"></i>
+              <div class="suggestion-content">
+                <div class="suggestion-title">${this.escapeHtml(suggestion.title)}</div>
+                <div class="suggestion-url">${this.escapeHtml(suggestion.url)}</div>
+              </div>
+              <div class="suggestion-type">${suggestion.type}</div>
+            `;
+            
+            item.addEventListener('click', () => {
+              this.selectSuggestion(suggestion);
+            });
+            
+            this.container.appendChild(item);
+          });
+          
+          this.container.style.display = 'block';
+          this.isVisible = true;
+        }
+        
+        hideSuggestions() {
+          this.container.style.display = 'none';
+          this.isVisible = false;
+          this.selectedIndex = -1;
+        }
+        
+        updateSelection() {
+          const items = this.container.querySelectorAll('.suggestion-item');
+          items.forEach((item, index) => {
+            item.classList.toggle('selected', index === this.selectedIndex);
+          });
+          
+          // Update input value with selected suggestion
+          if (this.selectedIndex >= 0) {
+            const selectedSuggestion = this.suggestions[this.selectedIndex];
+            // Don't update input value to avoid interfering with typing
+          }
+        }
+        
+        selectSuggestion(suggestion) {
+          this.input.value = suggestion.url;
+          this.hideSuggestions();
+          
+          // Store the URL and navigate
+          localStorage.setItem('lastUvUrl', suggestion.url);
+          
+          // Show loading line before navigation
+          const loadingLine = document.getElementById('loadingLine');
+          if (loadingLine) {
+            loadingLine.style.display = 'block';
+            loadingLine.classList.remove('hide');
+            const progressBar = loadingLine.querySelector('.progress-bar');
+            if (progressBar) {
+              progressBar.style.width = '0%';
+              progressBar.style.animation = 'loadingProgress 3s ease-out forwards, shimmer 1.1s ease-in-out infinite';
+            }
+          }
+          
+          // Navigate to the selected URL
+          window.location.href = '/active/search.html?url=' + encodeURIComponent(suggestion.url);
+        }
+        
+        escapeHtml(text) {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+        }
+      }
+
       // small search bar (top navbar) behavior
       const searchInput = document.getElementById('searchInputt');
       if (searchInput) {
         const lastUvUrl = localStorage.getItem('lastUvUrl');
         if (lastUvUrl) searchInput.value = lastUvUrl;
+        
+        // Initialize search suggestions
+        const suggestionsContainer = document.getElementById('suggestions-container');
+        if (suggestionsContainer) {
+          new SearchSuggestions(searchInput, suggestionsContainer);
+        }
 
         searchInput.addEventListener('keydown', function(e) {
-          if (e.key === "Enter") {
+          // Let the suggestions system handle Enter key if suggestions are visible
+          const suggestionsContainer = document.getElementById('suggestions-container');
+          const suggestionsVisible = suggestionsContainer && suggestionsContainer.style.display === 'block';
+          
+          if (e.key === "Enter" && !suggestionsVisible) {
             e.preventDefault();
             const newVal = searchInput.value.trim();
             if (!newVal) return;

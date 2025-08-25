@@ -33,13 +33,325 @@
     .setting-label { display:block; font-weight:700; margin-bottom:0.35rem; }
     .setting-desc { color:#dfdfdf; font-size:0.95rem; margin-bottom:0.6rem; }
     .setting-actions { display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap; }
-    .input-short { padding:0.45em 0.7em; border-radius:0.6em; border:none; background:#434c5e; color:#eceff4; }
+    .input-short { padding:0.6em 1em; border-radius:0.6em; border:none; background:#434c5e; color:#eceff4; font-size:1rem; }
     .btn { background:#000000b2; color:#fff; border:none; border-radius:0.7em; padding:0.45em 0.9em; cursor:pointer; }
     .btn.secondary { background:#070707af; }
     .proxy-list { background:#2e3440; border-radius:0.6em; padding:0.8em; margin-top:0.6em; color:#bfc9db; font-size:0.95rem; }
     .row { display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap; }
     label.switch { display:flex; align-items:center; gap:0.6rem; cursor:pointer; }
-    select.input-short { height:36px; }
+    select.input-short { 
+      height: auto; 
+      padding: 0.6em 1em;
+      font-size: 1rem;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23eceff4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.7em center;
+      background-size: 1em;
+      padding-right: 2.5em;
+    }
+
+    /* Toast Notification Styles */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      pointer-events: none;
+    }
+
+    .toast {
+      position: relative;
+      background: rgba(20, 20, 20, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      min-width: 280px;
+      max-width: 400px;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 500;
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transform: translateX(100%) scale(0.9);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      overflow: hidden;
+      pointer-events: auto;
+    }
+
+    .toast.show {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+
+    .toast.hide {
+      transform: translateX(100%) scale(0.9);
+      opacity: 0;
+    }
+
+    .toast-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toast-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    .toast-text {
+      flex: 1;
+      line-height: 1.4;
+    }
+
+    .toast-setting {
+      font-weight: 600;
+      color: #4ade80;
+    }
+
+    .toast-value {
+      color: #a1a1aa;
+      font-size: 13px;
+      margin-top: 2px;
+    }
+
+    /* Light Animation */
+    .toast::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.1) 50%,
+        transparent
+      );
+      transition: left 0.6s ease;
+      z-index: 1;
+    }
+
+    .toast.show::before {
+      left: 100%;
+    }
+
+    /* Pulsing light effect */
+    .toast::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(
+        circle,
+        rgba(142, 145, 143, 0.1) 0%,
+        rgba(74, 222, 128, 0.05) 30%,
+        transparent 70%
+      );
+      transform: translate(-50%, -50%) scale(0);
+      border-radius: 50%;
+      animation: toastPulse 2s ease-out;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    @keyframes toastPulse {
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* Floating light particles */
+    .toast-light {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #4ade80(12, 12, 12, 0.6);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .toast-light:nth-child(1) {
+      top: 20%;
+      left: 10%;
+      animation: floatLight 3s ease-in-out infinite;
+      animation-delay: 0s;
+    }
+
+    .toast-light:nth-child(2) {
+      top: 60%;
+      right: 15%;
+      animation: floatLight 3s ease-in-out infinite;
+      animation-delay: 1s;
+    }
+
+    .toast-light:nth-child(3) {
+      bottom: 25%;
+      left: 20%;
+      animation: floatLight 3s ease-in-out infinite;
+      animation-delay: 2s;
+    }
+
+    @keyframes floatLight {
+      0%, 100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.6;
+      }
+      50% {
+        transform: translateY(-10px) scale(1.2);
+        opacity: 1;
+      }
+    }
+
+    /* Success variant */
+    .toast.success .toast-icon {
+      background: linear-gradient(135deg, #4ade80, #22c55e);
+    }
+
+    .toast.success::after {
+      background: radial-gradient(
+        circle,
+        rgba(74, 222, 128, 0.1) 0%,
+        rgba(74, 222, 128, 0.05) 30%,
+        transparent 70%
+      );
+    }
+
+    /* Light Effects for Form Elements */
+    .btn, .input-wrapper {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .input-wrapper {
+      display: inline-block;
+      border-radius: 0.6em;
+      min-width: 200px; /* Make inputs wider by default */
+    }
+
+    .btn-light-border, .input-light-border {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 400ms ease;
+      z-index: 1;
+      background-image: radial-gradient(circle at center, rgba(209, 209, 209, 0.6), rgba(247, 247, 247, 0.089) 60%);
+      background-position: var(--element-bg-x) var(--element-bg-y);
+      background-repeat: no-repeat;
+      background-size: 200px 200px;
+    }
+
+    .btn-light, .input-light {
+      pointer-events: none;
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      opacity: 0;
+      transition: opacity 400ms ease;
+      z-index: 2;
+      background-image: radial-gradient(circle at center, rgba(187, 185, 185, 0.301), rgba(37, 37, 37, 0) 60%);
+      background-position: var(--element-bg-x) var(--element-bg-y);
+      background-repeat: no-repeat;
+      background-size: 200px 200px;
+    }
+
+    .btn-light-inset-bg {
+      position: absolute;
+      inset: 1px;
+      border-radius: calc(0.7em - 1px);
+      background-color: #000000b2;
+      transition: background-color 0.15s ease;
+      z-index: 3;
+    }
+
+    .btn.secondary .btn-light-inset-bg {
+      background-color: #070707af;
+    }
+
+    .btn:hover .btn-light-inset-bg {
+      background-color: #131313;
+    }
+
+    .btn.secondary:hover .btn-light-inset-bg {
+      background-color: #0f0f0f;
+    }
+
+    .input-light-inset-bg {
+      position: absolute;
+      inset: 1px;
+      border-radius: calc(0.6em - 1px);
+      background-color: #181818a9;
+      transition: background-color 0.15s ease;
+      z-index: 3;
+    }
+
+    .input-wrapper:hover .input-light-inset-bg,
+    .input-wrapper:focus-within .input-light-inset-bg {
+      background-color: #1f1e1eb7;
+    }
+
+    /* Ensure form element content stays on top */
+    .btn > span,
+    .input-short {
+      position: relative;
+      z-index: 10;
+      background: transparent;
+      border: none;
+      color: inherit;
+      font: inherit;
+      padding: 0;
+      margin: 0;
+      outline: none;
+    }
+
+    /* Special handling for select elements */
+    select.input-short {
+      background: transparent;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23eceff4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.7em center;
+      background-size: 1em;
+      padding-right: 2.5em;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .input-short {
+      display: block;
+      width: 100%;
+      padding: 0.6em 1em; /* Ensure consistent padding */
+      font-size: 1rem; /* Ensure consistent font size */
+    }
   </style>
 </head>
 <body>
@@ -73,9 +385,19 @@
       <span class="setting-label">Panic Key</span>
       <div class="setting-desc">Quickly hide the site by pressing this key (opens about:blank in same tab).</div>
       <div class="setting-actions">
-        <input id="panicKey" class="input-short" maxlength="1" placeholder="Key" autocomplete="off">
-        <button class="btn" id="setPanicBtn">Set</button>
-        <span id="panicKeyStatus" style="color:#a3be8c;"></span>
+        <div class="input-wrapper">
+          <div class="input-light-border"></div>
+          <div class="input-light"></div>
+          <div class="input-light-inset-bg"></div>
+          <input id="panicKey" class="input-short" maxlength="1" placeholder="Key" autocomplete="off">
+        </div>
+        <button class="btn" id="setPanicBtn">
+          <div class="btn-light-border"></div>
+          <div class="btn-light"></div>
+          <div class="btn-light-inset-bg"></div>
+          <span>Set</span>
+        </button>
+        <span id="panicKeyStatus" style="color:#000000;"></span>
       </div>
     </div>
 
@@ -84,12 +406,22 @@
       <span class="setting-label">Default Search Engine</span>
       <div class="setting-desc">Choose the engine used for plain searches (domains still open directly).</div>
       <div class="setting-actions">
-        <select id="defaultEngine" class="input-short">
-          <option value="https://duckduckgo.com">DuckDuckGo [Recommended]</option>
-          <option value="https://www.google.com">Google</option>
-          <option value="https://www.bing.com">Bing</option>
-        </select>
-        <button class="btn" id="setEngineBtn">Save</button>
+        <div class="input-wrapper">
+          <div class="input-light-border"></div>
+          <div class="input-light"></div>
+          <div class="input-light-inset-bg"></div>
+          <select id="defaultEngine" class="input-short">
+            <option value="https://duckduckgo.com">DuckDuckGo [Recommended]</option>
+            <option value="https://www.google.com">Google</option>
+            <option value="https://www.bing.com">Bing</option>
+          </select>
+        </div>
+        <button class="btn" id="setEngineBtn">
+          <div class="btn-light-border"></div>
+          <div class="btn-light"></div>
+          <div class="btn-light-inset-bg"></div>
+          <span>Save</span>
+        </button>
         <span id="engineStatus" style="color:#a3be8c;"></span>
       </div>
     </div>
@@ -99,8 +431,18 @@
       <span class="setting-label">about:blank Cloak</span>
       <div class="setting-desc">Open the site in a new about:blank tab (site content loaded inside an iframe).</div>
       <div class="setting-actions">
-        <button class="btn" id="aboutBlankBtn">Open in about:blank</button>
-        <button class="btn secondary" id="testCloakBtn">Test</button>
+        <button class="btn" id="aboutBlankBtn">
+          <div class="btn-light-border"></div>
+          <div class="btn-light"></div>
+          <div class="btn-light-inset-bg"></div>
+          <span>Open in about:blank</span>
+        </button>
+        <button class="btn secondary" id="testCloakBtn">
+          <div class="btn-light-border"></div>
+          <div class="btn-light"></div>
+          <div class="btn-light-inset-bg"></div>
+          <span>Test</span>
+        </button>
       </div>
     </div>
 
@@ -109,9 +451,24 @@
       <span class="setting-label">Proxy Features</span>
       <div class="setting-desc">Change the proxy prefix or bare server used by the Ultraviolet frontend (advanced).</div>
       <div class="setting-actions row">
-        <input id="proxyPrefix" class="input-short" placeholder="/service/" autocomplete="off">
-        <input id="proxyBare" class="input-short" placeholder="https://mybare.example/bare/" autocomplete="off" style="min-width:220px;">
-        <button class="btn" id="setProxyBtn">Set</button>
+        <div class="input-wrapper">
+          <div class="input-light-border"></div>
+          <div class="input-light"></div>
+          <div class="input-light-inset-bg"></div>
+          <input id="proxyPrefix" class="input-short" placeholder="/service/" autocomplete="off">
+        </div>
+        <div class="input-wrapper" style="min-width:220px;">
+          <div class="input-light-border"></div>
+          <div class="input-light"></div>
+          <div class="input-light-inset-bg"></div>
+          <input id="proxyBare" class="input-short" placeholder="https://mybare.example/bare/" autocomplete="off">
+        </div>
+        <button class="btn" id="setProxyBtn">
+          <div class="btn-light-border"></div>
+          <div class="btn-light"></div>
+          <div class="btn-light-inset-bg"></div>
+          <span>Set</span>
+        </button>
         <span id="proxyPrefixStatus" style="color:#a3be8c;"></span>
       </div>
       <div class="proxy-list">
@@ -132,11 +489,61 @@
 
   </div>
 
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <script src="settings.js"></script>
   <script>
     // Persistence helpers
     function setLocal(key, value){ localStorage.setItem(key, value); }
     function getLocal(key, def){ const v = localStorage.getItem(key); return v === null ? def : v; }
+
+    // Toast notification system
+    function showToast(settingName, settingValue, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      
+      // Create floating light particles
+      const lights = Array.from({length: 3}, () => {
+        const light = document.createElement('div');
+        light.className = 'toast-light';
+        return light;
+      });
+      
+      toast.innerHTML = `
+        <div class="toast-content">
+          <div class="toast-icon">✓</div>
+          <div class="toast-text">
+            <div class="toast-setting">${settingName}</div>
+            <div class="toast-value">${settingValue}</div>
+          </div>
+        </div>
+      `;
+      
+      // Add light particles
+      lights.forEach(light => toast.appendChild(light));
+      
+      // Add to container
+      container.appendChild(toast);
+      
+      // Trigger show animation
+      requestAnimationFrame(() => {
+        toast.classList.add('show');
+      });
+      
+      // Auto remove after 4 seconds
+      setTimeout(() => {
+        toast.classList.add('hide');
+        setTimeout(() => {
+          if (toast.parentNode) {
+            container.removeChild(toast);
+          }
+        }, 400);
+      }, 4000);
+    }
 
     // Panic key
     (function(){
@@ -147,9 +554,14 @@
       status.textContent = panicInput.value ? `Set to "${panicInput.value.toUpperCase()}"` : '';
       btn.addEventListener('click', () => {
         const k = panicInput.value.trim().toLowerCase();
-        if(!k){ status.textContent = ''; localStorage.removeItem('panicKey'); return; }
+        if(!k){ 
+          status.textContent = ''; 
+          localStorage.removeItem('panicKey'); 
+          showToast('Panic Key', 'Removed');
+          return; 
+        }
         setLocal('panicKey', k);
-        status.textContent = `Set to "${k.toUpperCase()}"`;
+        showToast('Panic Key', `Set to "${k.toUpperCase()}"`);
       });
       document.addEventListener('keydown', function(e){
         const pk = getLocal('panicKey','');
@@ -163,10 +575,13 @@
       const btn = document.getElementById('setEngineBtn');
       const status = document.getElementById('engineStatus');
       sel.value = getLocal('defaultEngine','https://duckduckgo.com');
-      status.textContent = 'Saved';
       btn.addEventListener('click', () => {
         setLocal('defaultEngine', sel.value);
-        status.textContent = 'Saved';
+        
+        // Get the display name for the engine
+        const engineName = sel.options[sel.selectedIndex].text.split(' [')[0];
+        showToast('Default Search Engine', `Set to ${engineName}`);
+        
         setTimeout(()=> status.textContent = '', 1800);
       });
     })();
@@ -215,6 +630,20 @@
         if(b) setLocal('uvBare', b); else localStorage.removeItem('uvBare');
         status.textContent = 'Saved';
         updateProxyInfo();
+        
+        // Show toast with proxy settings
+        let toastValue = '';
+        if(p && b) {
+          toastValue = `Prefix: ${p}, Bare: ${b}`;
+        } else if(p) {
+          toastValue = `Prefix: ${p}`;
+        } else if(b) {
+          toastValue = `Bare: ${b}`;
+        } else {
+          toastValue = 'Reset to defaults';
+        }
+        showToast('Proxy Settings', toastValue);
+        
         setTimeout(()=> status.textContent = '', 1800);
       });
     })();
@@ -229,6 +658,7 @@
       chk.addEventListener('change', function(){
         setLocal('hideNavbarOnSearch', chk.checked ? 'true' : 'false');
         stat.textContent = chk.checked ? 'Enabled' : 'Disabled';
+        showToast('Hide Navbar When Searching', chk.checked ? 'Enabled' : 'Disabled');
       });
     })();
 
@@ -404,6 +834,98 @@ document.addEventListener('DOMContentLoaded', function() {
     const glowStrength = Math.min(1.2, 0.8 + navbarTargetX / rect.width * 0.4);
     navbarLightBg.style.transform = `scale(${glowStrength})`;
   });
+
+  // Form Elements Light Effects
+  function initFormElementLights() {
+    const buttons = document.querySelectorAll('.btn');
+    const inputWrappers = document.querySelectorAll('.input-wrapper');
+    const allElements = [...buttons, ...inputWrappers];
+
+    allElements.forEach(element => {
+      const lightBorder = element.querySelector('.btn-light-border, .input-light-border');
+      const light = element.querySelector('.btn-light, .input-light');
+      
+      if (!lightBorder || !light) return;
+
+      const lightSize = 200;
+      let targetX = 0, targetY = 0;
+      let currentX = 0, currentY = 0;
+      let lastX = 0, lastY = 0;
+      let velocityX = 0, velocityY = 0;
+      let raf;
+
+      function animate() {
+        currentX += (targetX - currentX) * 0.15;
+        currentY += (targetY - currentY) * 0.15;
+
+        const elasticX = Math.min(Math.max(velocityX * 0.5, -15), 15);
+        const elasticY = Math.min(Math.max(velocityY * 0.5, -15), 15);
+
+        const bgX = `${currentX - lightSize / 2 + elasticX}px`;
+        const bgY = `${currentY - lightSize / 2 + elasticY}px`;
+
+        lightBorder.style.setProperty('--element-bg-x', bgX);
+        lightBorder.style.setProperty('--element-bg-y', bgY);
+        light.style.setProperty('--element-bg-x', bgX);
+        light.style.setProperty('--element-bg-y', bgY);
+
+        raf = requestAnimationFrame(animate);
+      }
+
+      element.addEventListener('mouseenter', () => {
+        cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(animate);
+
+        lightBorder.style.opacity = 1;
+        light.style.opacity = 1;
+        lightBorder.style.transition = "opacity 0.4s ease, transform 0.4s ease, filter 0.6s ease";
+        light.style.transition = "opacity 0.4s ease, transform 0.4s ease, filter 0.6s ease";
+
+        lightBorder.style.transform = "scale(1.1)";
+        lightBorder.style.filter = "blur(6px)";
+        light.style.transform = "scale(1.05)";
+        light.style.filter = "blur(12px)";
+
+        setTimeout(() => {
+          lightBorder.style.transform = "scale(1)";
+          lightBorder.style.filter = "blur(4px)";
+          light.style.transform = "scale(1)";
+          light.style.filter = "blur(8px)";
+        }, 200);
+      });
+
+      element.addEventListener('mouseleave', () => {
+        cancelAnimationFrame(raf);
+
+        lightBorder.style.transition = "opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease";
+        light.style.transition = "opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease";
+
+        lightBorder.style.opacity = 0;
+        light.style.opacity = 0;
+        lightBorder.style.transform = "scale(0.95)";
+        light.style.transform = "scale(0.95)";
+        lightBorder.style.filter = "blur(12px)";
+        light.style.filter = "blur(20px)";
+      });
+
+      element.addEventListener('mousemove', (e) => {
+        const rect = element.getBoundingClientRect();
+        targetX = e.clientX - rect.left;
+        targetY = e.clientY - rect.top;
+
+        velocityX = targetX - lastX;
+        velocityY = targetY - lastY;
+        lastX = targetX;
+        lastY = targetY;
+
+        const glowStrength = Math.min(1.1, 0.9 + targetX / rect.width * 0.2);
+        light.style.transform = `scale(${glowStrength})`;
+      });
+    });
+  }
+
+  // Initialize form element lights
+  initFormElementLights();
 });
 </script>
 

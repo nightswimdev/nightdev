@@ -59,6 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const searchInput = document.getElementById("searchInputt");
   const uvaddress = document.getElementById("uv-address");
   const iframe = document.getElementById("cool-iframe");
+  
   // Don't cache defaultEngine - always get fresh values
 
   // helper to set iframe using UV encode if available, otherwise navigate directly
@@ -73,8 +74,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (window.__uv$config && typeof window.__uv$config.encodeUrl === "function") {
       try {
         const prefix = window.__uv$config.prefix || "";
+        const encodedUrl = window.__uv$config.encodeUrl(dest);
+        const finalUrl = prefix + encodedUrl;
+        
         if (iframe) {
-          iframe.src = prefix + window.__uv$config.encodeUrl(dest);
+          iframe.src = finalUrl;
           return;
         }
       } catch (e) {
@@ -83,8 +87,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // fallback: navigate to destination directly in current page or iframe if present
-    if (iframe) iframe.src = dest;
-    else window.location.href = dest;
+    if (iframe) {
+      iframe.src = dest;
+    } else {
+      window.location.href = dest;
+    }
   }
 
   // Enter handler for the search field (try both possible IDs)

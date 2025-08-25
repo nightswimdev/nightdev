@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta
       name="viewport"
-      content="width=device-width, initial-scale=1.13, shrink-to-fit=no"
+      content="width=device-width, initial-scale=1.13, shrink-to-fit=yes"
     />
     <title>nightdev | Home </title>
     <meta
@@ -160,11 +160,20 @@
           autocomplete="off"
           style="padding-left: 2.5em;"
         />
+        <div id="index-suggestions-container" class="suggestions-container"></div>
       </form>
       <div class="desc left-margin">
         <p id="uv-error"></p>
         <pre id="uv-error-code"></pre>
       </div>
+      
+      <!-- History Section -->
+      <div id="history-section" class="history-section" style="display: none;">
+        <div class="history-title">Recent</div>
+        <ul id="history-list" class="history-list"></ul>
+        <button id="clear-history" class="clear-history">Clear History</button>
+      </div>
+      
       <!-- Toast container (top right) -->
 <div id="toast-container" style="position:fixed;top:30px;right:30px;z-index:10000;"></div>
 <!-- Greeting placeholder (will be filled by JS) -->

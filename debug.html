@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug - nightdev</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        .log {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            margin: 10px 0;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        input {
+            padding: 10px;
+            width: 300px;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>nightdev Debug Tool</h1>
+        
+        <h3>Service Worker Status</h3>
+        <button onclick="checkServiceWorker()">Check Service Worker</button>
+        <button onclick="registerServiceWorker()">Register Service Worker</button>
+        <button onclick="clearServiceWorkers()">Clear Service Workers</button>
+        
+        <h3>UV Configuration</h3>
+        <button onclick="checkUVConfig()">Check UV Config</button>
+        <button onclick="testEncoding()">Test URL Encoding</button>
+        
+        <h3>Test Proxy</h3>
+        <input type="text" id="testUrl" placeholder="Enter URL to test (e.g., google.com)" value="google.com">
+        <button onclick="testProxy()">Test Proxy</button>
+        <button onclick="testDirectFetch()">Test Direct Fetch</button>
+        
+        <div id="log" class="log"></div>
+    </div>
+
+    <!-- Load UV scripts -->
+    <script src="/active/uv/uv.bundle.js"></script>
+    <script src="/active/uv/uv.config.js"></script>
+    <script src="/settings.js"></script>
+
+    <script>
+        const log = document.getElementById('log');
+        
+        function addLog(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            log.textContent += `[${timestamp}] ${message}\n`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        async function checkServiceWorker() {
+            addLog('=== Checking Service Worker Status ===');
+            
+            if (!navigator.serviceWorker) {
+                addLog('❌ Service Worker not supported');
+                return;
+            }
+            
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                addLog(`Found ${registrations.length} service worker(s)`);
+                
+                registrations.forEach((reg, index) => {
+                    addLog(`SW ${index + 1}:`);
+                    addLog(`  Scope: ${reg.scope}`);
+                    addLog(`  State: ${reg.active ? reg.active.state : 'inactive'}`);
+                    addLog(`  Script URL: ${reg.active ? reg.active.scriptURL : 'none'}`);
+                });
+                
+                if (navigator.serviceWorker.controller) {
+                    addLog(`✓ Active controller: ${navigator.serviceWorker.controller.scriptURL}`);
+                } else {
+                    addLog('❌ No active service worker controller');
+                }
+            } catch (error) {
+                addLog(`❌ Error checking service workers: ${error.message}`);
+            }
+        }
+
+        async function registerServiceWorker() {
+            addLog('=== Registering Service Worker ===');
+            
+            try {
+                // Clear existing first
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    await registration.unregister();
+                    addLog('Unregistered existing service worker');
+                }
+                
+                // Register new one
+                const registration = await navigator.serviceWorker.register('/sw.js', {
+                    scope: '/active/go/',
+                    updateViaCache: 'none'
+                });
+                
+                addLog(`✓ Service worker registered with scope: ${registration.scope}`);
+                
+                // Wait for it to become active
+                if (registration.installing) {
+                    addLog('Service worker installing...');
+                    registration.installing.addEventListener('statechange', (e) => {
+                        addLog(`Service worker state: ${e.target.state}`);
+                    });
+                }
+                
+                // Force activation
+                if (registration.waiting) {
+                    registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+                }
+                
+            } catch (error) {
+                addLog(`❌ Error registering service worker: ${error.message}`);
+            }
+        }
+
+        async function clearServiceWorkers() {
+            addLog('=== Clearing Service Workers ===');
+            
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (let registration of registrations) {
+                    await registration.unregister();
+                }
+                addLog(`✓ Cleared ${registrations.length} service worker(s)`);
+            } catch (error) {
+                addLog(`❌ Error clearing service workers: ${error.message}`);
+            }
+        }
+
+        function checkUVConfig() {
+            addLog('=== Checking UV Configuration ===');
+            
+            if (typeof window.__uv$config === 'undefined') {
+                addLog('❌ __uv$config not found');
+                return;
+            }
+            
+            const config = window.__uv$config;
+            addLog('✓ UV Config found:');
+            addLog(`  Prefix: ${config.prefix}`);
+            addLog(`  Bare servers: ${JSON.stringify(config.bare, null, 2)}`);
+            addLog(`  Encode function: ${typeof config.encodeUrl}`);
+            addLog(`  Decode function: ${typeof config.decodeUrl}`);
+            
+            if (typeof Ultraviolet !== 'undefined') {
+                addLog('✓ Ultraviolet object available');
+            } else {
+                addLog('❌ Ultraviolet object not found');
+            }
+        }
+
+        function testEncoding() {
+            addLog('=== Testing URL Encoding ===');
+            
+            if (!window.__uv$config || typeof window.__uv$config.encodeUrl !== 'function') {
+                addLog('❌ UV config or encodeUrl function not available');
+                return;
+            }
+            
+            const testUrl = 'https://google.com/';
+            try {
+                const encoded = window.__uv$config.encodeUrl(testUrl);
+                const fullUrl = window.__uv$config.prefix + encoded;
+                
+                addLog(`Test URL: ${testUrl}`);
+                addLog(`Encoded: ${encoded}`);
+                addLog(`Full proxy URL: ${fullUrl}`);
+            } catch (error) {
+                addLog(`❌ Encoding failed: ${error.message}`);
+            }
+        }
+
+        async function testProxy() {
+            addLog('=== Testing Proxy Request ===');
+            
+            const testUrl = document.getElementById('testUrl').value || 'google.com';
+            let finalUrl = testUrl;
+            
+            // Add protocol if missing
+            if (!finalUrl.startsWith('http')) {
+                finalUrl = 'https://' + finalUrl;
+            }
+            
+            if (!window.__uv$config || typeof window.__uv$config.encodeUrl !== 'function') {
+                addLog('❌ UV config not available');
+                return;
+            }
+            
+            try {
+                const encoded = window.__uv$config.encodeUrl(finalUrl);
+                const proxyUrl = window.__uv$config.prefix + encoded;
+                
+                addLog(`Original URL: ${finalUrl}`);
+                addLog(`Proxy URL: ${proxyUrl}`);
+                addLog('Attempting fetch...');
+                
+                const response = await fetch(proxyUrl);
+                addLog(`✓ Response status: ${response.status} ${response.statusText}`);
+                addLog(`Response headers: ${JSON.stringify([...response.headers.entries()])}`);
+                
+                if (response.ok) {
+                    const text = await response.text();
+                    addLog(`Response length: ${text.length} characters`);
+                    addLog(`First 200 chars: ${text.substring(0, 200)}...`);
+                }
+                
+            } catch (error) {
+                addLog(`❌ Proxy test failed: ${error.message}`);
+            }
+        }
+
+        async function testDirectFetch() {
+            addLog('=== Testing Direct Fetch ===');
+            
+            const testUrl = document.getElementById('testUrl').value || 'google.com';
+            let finalUrl = testUrl;
+            
+            // Add protocol if missing
+            if (!finalUrl.startsWith('http')) {
+                finalUrl = 'https://' + finalUrl;
+            }
+            
+            try {
+                addLog(`Testing direct fetch to: ${finalUrl}`);
+                const response = await fetch(finalUrl, { mode: 'no-cors' });
+                addLog(`✓ Direct fetch status: ${response.status} ${response.statusText}`);
+            } catch (error) {
+                addLog(`❌ Direct fetch failed (expected due to CORS): ${error.message}`);
+            }
+        }
+
+        // Auto-check on load
+        window.addEventListener('load', () => {
+            addLog('=== Debug Tool Loaded ===');
+            checkUVConfig();
+            checkServiceWorker();
+        });
+    </script>
+</body>
+</html>
