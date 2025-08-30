@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nightdev - Access Restricted</title>
+    <link rel="icon" type="image/x-icon" href="/assets/js/icon/Untitled design (14)-Picsart-BackgroundRemover.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000000;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Logo and title container */
+        .logo-wrapper {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 1.5rem;
+            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #cccccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: #888888;
+            font-weight: 300;
+        }
+
+        /* Red X */
+        .red-x {
+            font-size: 8rem;
+            color: #ff4444;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 68, 68, 0.6);
+            filter: drop-shadow(0 0 15px rgba(255, 68, 68, 0.4));
+            margin-bottom: 2rem;
+            user-select: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .red-x:hover {
+            color: #a50b0b;
+            text-shadow: 0 0 30px rgba(194, 15, 15, 0.8);
+            transform: scale(1.1);
+        }
+
+        /* Message */
+        .message {
+            font-size: 1.1rem;
+            color: #cccccc;
+            text-align: center;
+            line-height: 1.6;
+            max-width: 500px;
+            margin-bottom: 2rem;
+        }
+
+        /* Contact info */
+        .contact-info {
+            text-align: center;
+            color: #888888;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .contact-info a {
+            color: #ff0000;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .contact-info a:hover {
+            color: #c50f0f;
+        }
+
+        /* Desktop blocking */
+        @media (min-width: 769px) {
+            body {
+                display: none !important;
+            }
+            
+            body::before {
+                content: 'This page is only accessible on mobile devices.';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: #000000;
+                color: #ff4444;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                z-index: 9999;
+            }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+                justify-content: flex-start;
+                padding-top: 15vh;
+            }
+
+            .logo-wrapper {
+                margin-bottom: 2rem;
+            }
+
+            .logo {
+                width: 90px;
+                height: 90px;
+                margin-bottom: 1rem;
+            }
+
+            h1 {
+                font-size: 2.2rem;
+                line-height: 1.1;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .red-x {
+                font-size: 5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .message {
+                font-size: 0.95rem;
+                padding: 0 1rem;
+                max-width: 90%;
+                margin-bottom: 1.5rem;
+                line-height: 1.5;
+            }
+
+            .contact-info {
+                font-size: 0.85rem;
+                padding: 0 1rem;
+            }
+        }
+
+        /* Small mobile phones */
+        @media (max-width: 480px) {
+            body {
+                padding-top: 12vh;
+            }
+
+            .logo {
+                width: 75px;
+                height: 75px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .red-x {
+                font-size: 4rem;
+                margin-bottom: 1rem;
+            }
+
+            .message {
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+
+            .contact-info {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Very small screens */
+        @media (max-width: 360px) {
+            body {
+                padding-top: 10vh;
+            }
+
+            .logo {
+                width: 65px;
+                height: 65px;
+            }
+
+            h1 {
+                font-size: 1.6rem;
+            }
+
+            .red-x {
+                font-size: 3.5rem;
+            }
+
+            .message {
+                font-size: 0.85rem;
+                padding: 0 0.5rem;
+            }
+
+            .contact-info {
+                font-size: 0.75rem;
+                padding: 0 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Logo and title -->
+    <div class="logo-wrapper">
+        <img class="logo" src="assets/js/icon/Untitled design (14)-Picsart-BackgroundRemover.png" alt="nightdev" />
+        <h1>nightdev</h1>
+        <div class="subtitle">nightswim</div>
+    </div>
+
+    <!-- Red X -->
+    <div class="red-x">✕</div>
+
+    <!-- Message -->
+    <div class="message">
+        We're experiencing some technical difficulties with nightdev on mobile platforms. 
+        Please try accessing from a desktop device for the best experience.
+    </div>
+
+    <!-- Contact info -->
+    <div class="contact-info">
+        Need help? Contact us:<br>
+        <a href="mailto:sebuda.dev@null.net">sebuda.dev@null.net</a> | 
+        <a href="#">@nightswim</a>
+    </div>
+
+    <script>
+        // Prevent right-click context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // Prevent common keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'C') ||
+                (e.ctrlKey && e.key === 'u')) {
+                e.preventDefault();
+            }
+        });
+
+        // Add click effect to red X
+        document.addEventListener('DOMContentLoaded', function() {
+            const redX = document.querySelector('.red-x');
+            
+            redX.addEventListener('click', function() {
+                this.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+
+        // Enhanced mobile-only access control
+        function checkDevice() {
+            const userAgent = navigator.userAgent.toLowerCase();
+            const isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(userAgent);
+            const screenWidth = window.innerWidth || screen.width;
+            const isSmallScreen = screenWidth <= 768;
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            // If not mobile, block access
+            if (!isMobile && !isSmallScreen && !isTouchDevice) {
+                document.body.style.display = 'none';
+                document.documentElement.innerHTML = `
+                    <style>
+                        body { 
+                            background: #000; 
+                            color: #ff4444; 
+                            font-family: 'Segoe UI', sans-serif; 
+                            display: flex; 
+                            align-items: center; 
+                            justify-content: center; 
+                            height: 100vh; 
+                            margin: 0; 
+                            text-align: center;
+                            font-size: 1.2rem;
+                        }
+                    </style>
+                    <body>This page is only accessible on mobile devices.</body>
+                `;
+                return;
+            }
+            
+            // Optimize for mobile viewing
+            if (isMobile || isSmallScreen) {
+                // Prevent zoom
+                const viewport = document.querySelector('meta[name="viewport"]');
+                if (viewport) {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                }
+                
+                // Ensure proper mobile layout
+                document.body.style.visibility = 'visible';
+            }
+        }
+
+        // Run immediately and on resize
+        checkDevice();
+        window.addEventListener('resize', checkDevice);
+        window.addEventListener('orientationchange', checkDevice);
+    </script>
+</body>
+</html>
