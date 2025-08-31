@@ -78,6 +78,40 @@
       </div>
     </div>
 
+    <!-- Security Warning Overlay -->
+    <div id="security-warning-overlay" class="security-warning-overlay">
+      <div class="security-warning-backdrop"></div>
+      <div class="security-warning-modal">
+        <div class="security-warning-header">
+          <i class="fa-solid fa-shield-exclamation"></i>
+          <h2>SECURITY NOTICE</h2>
+        </div>
+        <div class="security-warning-content">
+          <p><strong>⚠️ WARNING: PRIVATE & SECURE ENVIRONMENT ⚠️</strong></p>
+          <p>This is a private and secure proxy service. You are entering a monitored environment where:</p>
+          <ul>
+            <li>🚫 <strong>Fraudulent activities</strong> are strictly prohibited</li>
+            <li>🚫 <strong>Illegal activities</strong> of any kind are not tolerated</li>
+            <li>📊 <strong>All traffic</strong> may be logged and monitored for security purposes</li>
+            <li>⚖️ <strong>Legal consequences</strong> may apply for misuse</li>
+            <li>🔒 <strong>Your IP address</strong> and activity can be traced</li>
+            <li>🔒 <strong>If you try and replicate this proxy without credit </strong> can be traced</li>
+          </ul>
+          <p class="security-warning-disclaimer">
+            By continuing, you acknowledge that you understand these terms and agree to use this service responsibly and legally.
+          </p>
+        </div>
+        <div class="security-warning-actions">
+          <button id="security-warning-accept" class="security-warning-btn accept">
+            <i class="fa-solid fa-check"></i> I Understand & Accept
+          </button>
+          <button id="security-warning-decline" class="security-warning-btn decline">
+            <i class="fa-solid fa-times"></i> Leave Site
+          </button>
+        </div>
+      </div>
+    </div>
+
     <div class="background-container">
       <div class="wave-container">
         <div class="wave"></div>
@@ -428,6 +462,74 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const glowStrength = Math.min(1.2, 0.8 + navbarTargetX / rect.width * 0.4);
     navbarLightBg.style.transform = `scale(${glowStrength})`;
+  });
+});
+</script>
+
+<!-- Security Warning JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const overlay = document.getElementById('security-warning-overlay');
+  const acceptBtn = document.getElementById('security-warning-accept');
+  const declineBtn = document.getElementById('security-warning-decline');
+  
+  // Check if user has already accepted the warning
+  const hasAccepted = localStorage.getItem('security-warning-accepted');
+  
+  if (hasAccepted === 'true') {
+    // Hide the overlay if already accepted
+    overlay.classList.add('hidden');
+  }
+  
+  // Handle accept button
+  acceptBtn.addEventListener('click', function() {
+    // Store acceptance in localStorage
+    localStorage.setItem('security-warning-accepted', 'true');
+    
+    // Add fade out animation
+    overlay.classList.add('hidden');
+    
+    // Optional: Show a brief confirmation
+    setTimeout(() => {
+      console.log('Security warning accepted. Welcome to nightdev.');
+    }, 300);
+  });
+  
+  // Handle decline button
+  declineBtn.addEventListener('click', function() {
+    // Redirect to a safe page or close the window
+    if (confirm('Are you sure you want to leave this site?')) {
+      // Try to close the window/tab
+      try {
+        window.close();
+      } catch(e) {
+        // If can't close, redirect to a safe page
+        window.location.href = 'https://www.google.com';
+      }
+    }
+  });
+  
+  // Prevent closing the overlay by clicking outside (force user to make a choice)
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) {
+      // Don't close - user must click a button
+      const modal = overlay.querySelector('.security-warning-modal');
+      modal.style.animation = 'none';
+      modal.offsetHeight; // Trigger reflow
+      modal.style.animation = 'securityModalSlideIn 0.3s ease-out';
+    }
+  });
+  
+  // Prevent escape key from closing
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && !overlay.classList.contains('hidden')) {
+      e.preventDefault();
+      // Shake animation to indicate it can't be closed
+      const modal = overlay.querySelector('.security-warning-modal');
+      modal.style.animation = 'none';
+      modal.offsetHeight; // Trigger reflow
+      modal.style.animation = 'securityModalSlideIn 0.3s ease-out';
+    }
   });
 });
 </script>

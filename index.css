@@ -1,9 +1,196 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap");
 
+/* Security Warning Overlay Styles */
+.security-warning-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.security-warning-overlay.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.security-warning-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.security-warning-modal {
+  position: relative;
+  background: linear-gradient(135deg, #000000 0%, #000000 100%);
+  border: 2px solid #ff4444;
+  border-radius: 15px;
+  box-shadow: 
+    0 20px 60px rgba(255, 68, 68, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: securityModalSlideIn 0.4s ease-out;
+}
+
+@keyframes securityModalSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.security-warning-header {
+  background: linear-gradient(135deg, #ff0000 0%, #ff0000 100%);
+  color: white;
+  padding: 20px;
+  text-align: center;
+  border-radius: 13px 13px 0 0;
+  border-bottom: 2px solid #ff6666;
+}
+
+.security-warning-header i {
+  font-size: 2.5em;
+  margin-bottom: 10px;
+  display: block;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.security-warning-header h2 {
+  margin: 0;
+  font-size: 1.8em;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.security-warning-content {
+  padding: 25px;
+  color: #e0e0e0;
+  line-height: 1.6;
+}
+
+.security-warning-content p {
+  margin: 0 0 15px 0;
+}
+
+.security-warning-content p:first-child {
+  text-align: center;
+  font-size: 1.2em;
+  color: #ff6666;
+  margin-bottom: 20px;
+}
+
+.security-warning-content ul {
+  margin: 15px 0;
+  padding-left: 0;
+  list-style: none;
+}
+
+.security-warning-content li {
+  margin: 12px 0;
+  padding: 10px 15px;
+  background: rgba(255, 68, 68, 0.1);
+  border-left: 4px solid #ff4444;
+  border-radius: 5px;
+  font-size: 0.95em;
+}
+
+.security-warning-disclaimer {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-style: italic;
+  color: #cccccc;
+  margin-top: 20px !important;
+}
+
+.security-warning-actions {
+  padding: 20px 25px 25px;
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.security-warning-btn {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 160px;
+  justify-content: center;
+}
+
+.security-warning-btn.accept {
+  background: linear-gradient(135deg, #14c93f 0%, #14c93f 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.security-warning-btn.accept:hover {
+  background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.security-warning-btn.decline {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.security-warning-btn.decline:hover {
+  background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
+
+.security-warning-btn:active {
+  transform: translateY(0);
+}
+
+/* Blur the main content when warning is shown */
+body:has(.security-warning-overlay:not(.hidden)) .background-container,
+body:has(.security-warning-overlay:not(.hidden)) .main-navbar,
+body:has(.security-warning-overlay:not(.hidden)) .main-content,
+body:has(.security-warning-overlay:not(.hidden)) footer {
+  filter: blur(5px);
+  pointer-events: none;
+}
+
 html, body {
-  height: 5px;
-  margin: 0.1px;
-  padding: 0px;
+  height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
