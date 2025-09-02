@@ -9,11 +9,11 @@
     <title>nightdev | Home </title>
     <meta
       name="description"
-      content="nightdev is a lightning-fast, secure web proxy designed to give you private and unrestricted access to the internet."
+      content=""
     />
     <meta
       name="keywords"
-      content="nightdev, education, entertainment, apps, nightswim"
+      content="Student Resource, education, entertainment, Learning Portal, nightswim"
     />
     <meta
       name="theme-color"
@@ -126,20 +126,6 @@
       <div class="light-beam" style="left: 70%; animation-delay: 1s;"></div>
       <div class="light-beam" style="left: 85%; animation-delay: 3s;"></div>
       <div class="light-beam" style="left: 95%; animation-delay: 5s;"></div>
-      <!-- Particles (optional, 20 for subtle effect) -->
-      <script>
-        // Generate 20 floating particles
-        for (let i = 0; i < 20; i++) {
-          const p = document.createElement('div');
-          p.className = 'particle';
-          p.style.width = p.style.height = (Math.random() * 8 + 4) + 'px';
-          p.style.left = (Math.random() * 100) + '%';
-          p.style.top = (Math.random() * 100) + '%';
-          p.style.animationDuration = (Math.random() * 8 + 6) + 's';
-          p.style.animationDelay = (-Math.random() * 8) + 's';
-          document.currentScript.parentElement.appendChild(p);
-        }
-      </script>
     </div>
 
   <div class="relative flex flex-col h-[100vh] items-center justify-center bg-black transition-bg">
@@ -254,49 +240,200 @@
 <script async src="https://widget.changelogfy.com/index.js"></script>
 <script>
 (function(){
-  // Replace with your audio URL
-  const AUDIO_URL = 'https://audio.jukehost.co.uk/NWJvD5hPFZAbMhpW1vpWNPG9H7J3xjvY';
+  // Multi-song playlist - Add as many songs as you want here
+  const PLAYLIST = [
+    'https://audio.jukehost.co.uk/R7aCAenvHPhXMyOJt276rcd1UUFmPm8w',
+  ];
 
-  const audio = document.createElement('audio');
-  audio.id = 'bg-audio';
-  audio.src = AUDIO_URL;
-  audio.loop = true;
-  audio.preload = 'auto';
-  audio.crossOrigin = 'anonymous';
-  audio.volume = 0.21; // adjust default volume (0.0 - 1.0)
-  audio.style.display = 'none';
-  document.body.appendChild(audio);
+  const FADE_DURATION = 3000; // 3 seconds fade time
+  const DEFAULT_VOLUME = 0.25; // adjust default volume (0.0 - 1.0)
 
-  // Try autoplay; if blocked, play on first user interaction
-  function tryPlay() {
-    audio.play().catch(() => {/* autoplay blocked; will wait for user gesture */});
+  let currentTrackIndex = 0;
+  let currentAudio = null;
+  let nextAudio = null;
+  let isPlaying = false;
+  let userInteracted = false;
+
+  // Create audio element
+  function createAudioElement(src, id) {
+    const audio = document.createElement('audio');
+    audio.id = id;
+    audio.src = src;
+    audio.preload = 'auto';
+    audio.crossOrigin = 'anonymous';
+    audio.volume = 0;
+    audio.style.display = 'none';
+    document.body.appendChild(audio);
+    return audio;
   }
 
-  // attempt immediate play after small delay
-  setTimeout(tryPlay, 300);
+  // Fade in audio
+  function fadeIn(audio, targetVolume = DEFAULT_VOLUME, duration = FADE_DURATION) {
+    return new Promise((resolve) => {
+      const steps = 50;
+      const stepTime = duration / steps;
+      const volumeStep = targetVolume / steps;
+      let currentStep = 0;
 
-  // ensure a user gesture will start audio if autoplay blocked
-  const startOnGesture = () => {
-    tryPlay();
+      const fadeInterval = setInterval(() => {
+        currentStep++;
+        audio.volume = Math.min(volumeStep * currentStep, targetVolume);
+        
+        if (currentStep >= steps) {
+          clearInterval(fadeInterval);
+          resolve();
+        }
+      }, stepTime);
+    });
+  }
+
+  // Fade out audio
+  function fadeOut(audio, duration = FADE_DURATION) {
+    return new Promise((resolve) => {
+      const startVolume = audio.volume;
+      const steps = 50;
+      const stepTime = duration / steps;
+      const volumeStep = startVolume / steps;
+      let currentStep = 0;
+
+      const fadeInterval = setInterval(() => {
+        currentStep++;
+        audio.volume = Math.max(startVolume - (volumeStep * currentStep), 0);
+        
+        if (currentStep >= steps || audio.volume <= 0) {
+          clearInterval(fadeInterval);
+          audio.volume = 0;
+          resolve();
+        }
+      }, stepTime);
+    });
+  }
+
+  // Load next track
+  function loadNextTrack() {
+    const nextIndex = (currentTrackIndex + 1) % PLAYLIST.length;
+    if (nextAudio) {
+      document.body.removeChild(nextAudio);
+    }
+    nextAudio = createAudioElement(PLAYLIST[nextIndex], `bg-audio-next-${nextIndex}`);
+  }
+
+  // Switch to next track with crossfade
+  async function switchToNextTrack() {
+    if (!nextAudio || PLAYLIST.length <= 1) return;
+
+    const oldAudio = currentAudio;
+    currentAudio = nextAudio;
+    currentTrackIndex = (currentTrackIndex + 1) % PLAYLIST.length;
+
+    // Start playing next track
+    try {
+      await currentAudio.play();
+      
+      // Crossfade: fade out old, fade in new
+      const fadeOutPromise = oldAudio ? fadeOut(oldAudio) : Promise.resolve();
+      const fadeInPromise = fadeIn(currentAudio);
+      
+      await Promise.all([fadeOutPromise, fadeInPromise]);
+      
+      // Clean up old audio
+      if (oldAudio) {
+        oldAudio.pause();
+        document.body.removeChild(oldAudio);
+      }
+      
+      // Load next track for future use
+      loadNextTrack();
+      
+    } catch (error) {
+      console.log('Error switching tracks:', error);
+    }
+  }
+
+  // Initialize first track
+  function initializePlaylist() {
+    if (PLAYLIST.length === 0) return;
+    
+    currentAudio = createAudioElement(PLAYLIST[currentTrackIndex], `bg-audio-${currentTrackIndex}`);
+    
+    // Set up event listener for track end
+    currentAudio.addEventListener('ended', switchToNextTrack);
+    
+    // Load next track if we have more than one song
+    if (PLAYLIST.length > 1) {
+      loadNextTrack();
+    }
+  }
+
+  // Try to play current track
+  async function tryPlay() {
+    if (!currentAudio || isPlaying) return;
+    
+    try {
+      await currentAudio.play();
+      await fadeIn(currentAudio);
+      isPlaying = true;
+    } catch (error) {
+      console.log('Autoplay blocked, waiting for user interaction');
+    }
+  }
+
+  // Handle user interaction to start audio
+  const startOnGesture = async () => {
+    if (userInteracted) return;
+    userInteracted = true;
+    
+    await tryPlay();
+    
+    // Remove event listeners
     window.removeEventListener('click', startOnGesture);
     window.removeEventListener('keydown', startOnGesture);
     window.removeEventListener('touchstart', startOnGesture);
   };
+
+  // Handle page visibility changes
+  document.addEventListener('visibilitychange', async () => {
+    if (!currentAudio) return;
+    
+    if (document.hidden) {
+      try { 
+        await fadeOut(currentAudio, 1000);
+        currentAudio.pause(); 
+        isPlaying = false;
+      } catch(e){}
+    } else {
+      try { 
+        if (userInteracted) {
+          await currentAudio.play();
+          await fadeIn(currentAudio);
+          isPlaying = true;
+        }
+      } catch(e){}
+    }
+  });
+
+  // Initialize the playlist
+  initializePlaylist();
+
+  // Try to start playing after a short delay
+  setTimeout(tryPlay, 300);
+
+  // Set up user interaction listeners
   window.addEventListener('click', startOnGesture, { once: true });
   window.addEventListener('keydown', startOnGesture, { once: true });
   window.addEventListener('touchstart', startOnGesture, { once: true });
 
-  // Pause when page hidden, resume when visible (best-effort)
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      try { audio.pause(); } catch(e){}
-    } else {
-      try { audio.play().catch(()=>{}); } catch(e){}
+  // Expose controls for debugging
+  window.bgAudioPlaylist = {
+    currentAudio: () => currentAudio,
+    nextAudio: () => nextAudio,
+    currentTrack: () => currentTrackIndex,
+    playlist: PLAYLIST,
+    skip: switchToNextTrack,
+    setVolume: (vol) => {
+      if (currentAudio) currentAudio.volume = vol;
     }
-  });
-
-  // Expose control for debugging: window.bgAudio
-  window.bgAudio = audio;
+  };
 })();
 </script>
 
