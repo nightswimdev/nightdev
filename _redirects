@@ -1,1 +1,8 @@
-/uv/*    /index.html   200
+# Cloudflare Pages redirects and rewrites
+
+# API routes go to functions
+/api/analytics /api/analytics 200
+/api/track /api/analytics 200
+
+# SPA fallback - serve index.html for any unmatched routes
+/* /index.html 200

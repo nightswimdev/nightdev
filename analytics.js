@@ -5,7 +5,8 @@
 
 class NightDevAnalytics {
   constructor() {
-    this.serverEndpoint = window.location.origin + '/api/track';
+    // Use Cloudflare Pages Function endpoint
+    this.serverEndpoint = window.location.origin + '/api/analytics';
     this.sessionId = this.generateSessionId();
     this.startTime = Date.now();
     this.pageViews = [];
