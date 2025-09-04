@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>nightdev | Account Settings</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- NightDev Analytics & IP Tracking -->
+  <script src="analytics.js" defer></script>
+  <style>
+    @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400&display=swap");
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Roboto", Arial, Helvetica, sans-serif;
+      margin: 0px;
+      background-color: #050505;
+      background-image:
+        radial-gradient(circle at 50% 50%, #05050580 0%, rgb(5, 5, 5) 80%),
+        linear-gradient(#2a2a2a 1px, transparent 1px),
+        linear-gradient(to right, #2a2a2a 1px, #050505 1px);
+      background-size: 100% 100%, 25px 25px, 25px 25px;
+      min-height: 100vh;
+      color: #e0e0e0;
+      overflow-x: hidden;
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    /* Header */
+    .header {
+      background: rgba(26, 26, 26, 0.9);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .back-button {
+      background: rgba(42, 42, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #e0e0e0;
+      padding: 0.8rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .back-button:hover {
+      background: rgba(42, 42, 42, 0.8);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateX(-2px);
+    }
+
+    .page-title {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: #e0e0e0;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1000px;
+      margin: 2rem auto;
+      padding: 0 2rem;
+    }
+
+    /* Settings Cards */
+    .settings-grid {
+      display: grid;
+      gap: 2rem;
+      grid-template-columns: 1fr;
+    }
+
+    .settings-card {
+      background: linear-gradient(135deg, rgba(26, 26, 26, 0.9) 0%, rgba(26, 26, 26, 0.8) 100%);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #333, #555);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #e0e0e0;
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: #e0e0e0;
+    }
+
+    .card-description {
+      color: #aaa;
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Form Styles */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #e0e0e0;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 1rem;
+      background: rgba(42, 42, 42, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      color: #e0e0e0;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: rgba(255, 255, 255, 0.3);
+      background: rgba(42, 42, 42, 0.5);
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+    }
+
+    .form-input::placeholder {
+      color: #888888;
+    }
+
+    .form-input:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Buttons */
+    .btn {
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #2a2a2a, #404040);
+      color: #e0e0e0;
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #404040, #555555);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #dc3545, #c82333);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: linear-gradient(135deg, #c82333, #bd2130);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(42, 42, 42, 0.5);
+      color: #aaa;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(42, 42, 42, 0.8);
+      color: #e0e0e0;
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    /* Coming Soon Badge */
+    .coming-soon-badge {
+      background: rgba(255, 193, 7, 0.2);
+      border: 1px solid rgba(255, 193, 7, 0.4);
+      color: #ffc107;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-left: auto;
+    }
+
+    /* Messages */
+    .message {
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .message.error {
+      background: rgba(255, 68, 68, 0.1);
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      color: #ff6b6b;
+    }
+
+    .message.success {
+      background: rgba(68, 255, 68, 0.1);
+      border: 1px solid rgba(68, 255, 68, 0.3);
+      color: #6bff6b;
+    }
+
+    .message.warning {
+      background: rgba(255, 193, 7, 0.1);
+      border: 1px solid rgba(255, 193, 7, 0.3);
+      color: #ffc107;
+    }
+
+    /* Account Info Display */
+    .account-info {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .info-item {
+      background: rgba(42, 42, 42, 0.3);
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .info-label {
+      color: #aaa;
+      font-size: 0.8rem;
+      margin-bottom: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .info-value {
+      color: #e0e0e0;
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid transparent;
+      border-top: 2px solid #e0e0e0;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        padding: 0 1rem;
+      }
+      
+      .header {
+        padding: 1rem;
+      }
+      
+      .btn-group {
+        flex-direction: column;
+      }
+      
+      .account-info {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="header-left">
+        <a href="dashboard.html" class="back-button">
+          <i class="fa-solid fa-arrow-left"></i>
+          <span>Back to Dashboard</span>
+        </a>
+        <h1 class="page-title">Account Settings</h1>
+      </div>
+      <div class="user-info">
+        <i class="fa-solid fa-user"></i>
+        <span id="currentUser">Loading...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Messages -->
+    <div id="message" class="message"></div>
+
+    <div class="settings-grid">
+      <!-- Account Information -->
+      <div class="settings-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div>
+            <h2 class="card-title">Account Information</h2>
+            <p class="card-description">View and manage your account details</p>
+          </div>
+        </div>
+
+        <div class="account-info" id="accountInfo">
+          <!-- Account info will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Change Username -->
+      <div class="settings-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fa-solid fa-user-edit"></i>
+          </div>
+          <div>
+            <h2 class="card-title">Change Username</h2>
+            <p class="card-description">Update your username (this will require re-login)</p>
+          </div>
+        </div>
+
+        <form id="usernameForm">
+          <div class="form-group">
+            <label for="currentUsername" class="form-label">Current Username</label>
+            <input type="text" id="currentUsername" class="form-input" disabled>
+          </div>
+          <div class="form-group">
+            <label for="newUsername" class="form-label">New Username</label>
+            <input type="text" id="newUsername" class="form-input" placeholder="Enter new username" required>
+          </div>
+          <div class="btn-group">
+            <button type="submit" class="btn btn-primary">
+              <span class="loading-spinner" id="usernameSpinner"></span>
+              <i class="fa-solid fa-save"></i>
+              Update Username
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Change Password -->
+      <div class="settings-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <div>
+            <h2 class="card-title">Change Password</h2>
+            <p class="card-description">Update your account password for better security</p>
+          </div>
+        </div>
+
+        <form id="passwordForm">
+          <div class="form-group">
+            <label for="currentPassword" class="form-label">Current Password</label>
+            <input type="password" id="currentPassword" class="form-input" placeholder="Enter current password" required>
+          </div>
+          <div class="form-group">
+            <label for="newPassword" class="form-label">New Password</label>
+            <input type="password" id="newPassword" class="form-input" placeholder="Enter new password" required>
+          </div>
+          <div class="form-group">
+            <label for="confirmPassword" class="form-label">Confirm New Password</label>
+            <input type="password" id="confirmPassword" class="form-input" placeholder="Confirm new password" required>
+          </div>
+          <div class="btn-group">
+            <button type="submit" class="btn btn-primary">
+              <span class="loading-spinner" id="passwordSpinner"></span>
+              <i class="fa-solid fa-save"></i>
+              Update Password
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Delete Account -->
+      <div class="settings-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fa-solid fa-trash"></i>
+          </div>
+          <div>
+            <h2 class="card-title">Delete Account</h2>
+            <p class="card-description">Permanently delete your account and all associated data</p>
+          </div>
+        </div>
+
+        <div class="message warning" style="display: flex;">
+          <i class="fa-solid fa-exclamation-triangle"></i>
+          <div>
+            <strong>Warning:</strong> This action cannot be undone. All your data will be permanently deleted.
+          </div>
+        </div>
+
+        <form id="deleteForm">
+          <div class="form-group">
+            <label for="deletePassword" class="form-label">Enter your password to confirm deletion</label>
+            <input type="password" id="deletePassword" class="form-input" placeholder="Enter your password" required>
+          </div>
+          <div class="form-group">
+            <label for="deleteConfirm" class="form-label">Type "DELETE" to confirm</label>
+            <input type="text" id="deleteConfirm" class="form-input" placeholder="Type DELETE" required>
+          </div>
+          <div class="btn-group">
+            <button type="submit" class="btn btn-danger">
+              <span class="loading-spinner" id="deleteSpinner"></span>
+              <i class="fa-solid fa-trash"></i>
+              Delete Account
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Additional Settings (Coming Soon) -->
+      <div class="settings-card">
+        <div class="card-header">
+          <div class="card-icon">
+            <i class="fa-solid fa-cogs"></i>
+          </div>
+          <div>
+            <h2 class="card-title">Additional Settings</h2>
+            <p class="card-description">More account customization options</p>
+          </div>
+          <span class="coming-soon-badge">Coming Soon</span>
+        </div>
+
+        <div style="display: grid; gap: 1rem;">
+          <button class="btn btn-secondary" onclick="showComingSoon('Two-Factor Authentication')" disabled>
+            <i class="fa-solid fa-shield-alt"></i>
+            Two-Factor Authentication
+          </button>
+          <button class="btn btn-secondary" onclick="showComingSoon('Email Preferences')" disabled>
+            <i class="fa-solid fa-envelope"></i>
+            Email Preferences
+          </button>
+          <button class="btn btn-secondary" onclick="showComingSoon('Privacy Settings')" disabled>
+            <i class="fa-solid fa-user-shield"></i>
+            Privacy Settings
+          </button>
+          <button class="btn btn-secondary" onclick="showComingSoon('Export Data')" disabled>
+            <i class="fa-solid fa-download"></i>
+            Export Account Data
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Account Settings System
+    class AccountSettings {
+      constructor() {
+        console.log('Initializing Account Settings...');
+        
+        // Load current user from localStorage/sessionStorage
+        this.currentUser = this.getCurrentUser();
+        console.log('Current user from session:', this.currentUser);
+        
+        // Load all users from localStorage
+        this.users = this.loadUsers();
+        console.log('Loaded users:', this.users.length, 'users');
+        
+        // Check if user is authenticated
+        if (!this.currentUser) {
+          console.log('No authenticated user found, redirecting to login');
+          this.showMessage('Please log in to access account settings.', 'error');
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 2000);
+          return;
+        }
+        
+        // Verify user exists in users database
+        const userExists = this.users.find(u => u.username === this.currentUser.username);
+        if (!userExists) {
+          console.error('Authenticated user not found in users database');
+          this.showMessage('Account verification failed. Please log in again.', 'error');
+          localStorage.removeItem('nightdev_session');
+          sessionStorage.removeItem('nightdev_session');
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 2000);
+          return;
+        }
+        
+        console.log('User authenticated successfully:', this.currentUser.username);
+        
+        // Initialize the page
+        this.initializeEventListeners();
+        this.loadAccountInfo();
+      }
+
+      // Get current user from session
+      getCurrentUser() {
+        try {
+          const sessionData = localStorage.getItem('nightdev_session') || 
+                             sessionStorage.getItem('nightdev_session');
+          
+          if (!sessionData) {
+            console.log('No session data found in localStorage or sessionStorage');
+            return null;
+          }
+          
+          const parsedData = JSON.parse(sessionData);
+          console.log('Found session data:', parsedData);
+          return parsedData;
+        } catch (error) {
+          console.error('Error parsing session data:', error);
+          // Clear corrupted session data
+          localStorage.removeItem('nightdev_session');
+          sessionStorage.removeItem('nightdev_session');
+          return null;
+        }
+      }
+
+      // Load users from localStorage
+      loadUsers() {
+        const stored = localStorage.getItem('nightdev_users');
+        if (stored) {
+          return JSON.parse(stored);
+        }
+        
+        // Default users with system admin
+        const sysConfig = ['c2VidWRh', 'aXNuaWdo', 'dHN3aW0y', 'MTgz'];
+        const authKey = sysConfig.join('');
+        const configPass = atob(authKey);
+        const nightswimHash = this.computePasswordHash(configPass);
+        
+        return [
+          {
+            username: 'nightswim',
+            email: 'admin@nightdev.com',
+            password: nightswimHash,
+            role: 'admin',
+            created: new Date().toISOString(),
+            lastLogin: null,
+          }
+        ];
+      }
+
+      // Save users to localStorage
+      saveUsers() {
+        localStorage.setItem('nightdev_users', JSON.stringify(this.users));
+      }
+
+      // Hash password function
+      computePasswordHash(password) {
+        let hash = 0;
+        if (password.length === 0) return hash.toString();
+        for (let i = 0; i < password.length; i++) {
+          const char = password.charCodeAt(i);
+          hash = ((hash << 5) - hash) + char;
+          hash = hash & hash;
+        }
+        return Math.abs(hash).toString(16);
+      }
+
+      // Load account information
+      loadAccountInfo() {
+        console.log('Loading account info...');
+        console.log('Current user:', this.currentUser);
+        console.log('Available users:', this.users);
+        
+        if (!this.currentUser || !this.currentUser.username) {
+          console.error('No current user or username found');
+          this.showMessage('Unable to load account information. Please log in again.', 'error');
+          return;
+        }
+
+        const user = this.users.find(u => u.username === this.currentUser.username);
+        if (!user) {
+          console.error('User not found in users list:', this.currentUser.username);
+          this.showMessage('Account not found. Please contact support.', 'error');
+          return;
+        }
+
+        console.log('Found user:', user);
+
+        // Update header
+        const currentUserElement = document.getElementById('currentUser');
+        if (currentUserElement) {
+          currentUserElement.textContent = user.username;
+        }
+        
+        // Update current username field
+        const currentUsernameElement = document.getElementById('currentUsername');
+        if (currentUsernameElement) {
+          currentUsernameElement.value = user.username;
+        }
+
+        // Display account info
+        const accountInfo = document.getElementById('accountInfo');
+        if (!accountInfo) {
+          console.error('Account info element not found');
+          return;
+        }
+
+        const createdDate = user.created ? new Date(user.created).toLocaleDateString() : 'Unknown';
+        const lastLoginDate = user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never';
+        
+        accountInfo.innerHTML = `
+          <div class="info-item">
+            <div class="info-label">Username</div>
+            <div class="info-value">${user.username}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Email</div>
+            <div class="info-value">${user.email || 'Not set'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Role</div>
+            <div class="info-value">${user.role || 'User'}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Account Created</div>
+            <div class="info-value">${createdDate}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Last Login</div>
+            <div class="info-value">${lastLoginDate}</div>
+          </div>
+          <div class="info-item">
+            <div class="info-label">Session Type</div>
+            <div class="info-value">${localStorage.getItem('nightdev_session') ? 'Persistent' : 'Temporary'}</div>
+          </div>
+        `;
+        
+        console.log('Account info loaded successfully');
+      }
+
+      // Initialize event listeners
+      initializeEventListeners() {
+        // Username form
+        document.getElementById('usernameForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.changeUsername();
+        });
+
+        // Password form
+        document.getElementById('passwordForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.changePassword();
+        });
+
+        // Delete form
+        document.getElementById('deleteForm').addEventListener('submit', (e) => {
+          e.preventDefault();
+          this.deleteAccount();
+        });
+      }
+
+      // Show message
+      showMessage(text, type = 'success') {
+        const messageEl = document.getElementById('message');
+        messageEl.className = `message ${type}`;
+        messageEl.innerHTML = `
+          <i class="fa-solid fa-${type === 'success' ? 'check' : type === 'error' ? 'times' : 'exclamation-triangle'}"></i>
+          ${text}
+        `;
+        messageEl.style.display = 'flex';
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Auto hide after 5 seconds
+        setTimeout(() => {
+          messageEl.style.display = 'none';
+        }, 5000);
+      }
+
+      // Change username
+      async changeUsername() {
+        const newUsername = document.getElementById('newUsername').value.trim();
+        const spinner = document.getElementById('usernameSpinner');
+        const submitBtn = document.querySelector('#usernameForm button[type="submit"]');
+        
+        if (!newUsername) {
+          this.showMessage('Please enter a new username', 'error');
+          return;
+        }
+
+        if (newUsername === this.currentUser.username) {
+          this.showMessage('New username must be different from current username', 'error');
+          return;
+        }
+
+        // Check if username already exists
+        if (this.users.find(u => u.username.toLowerCase() === newUsername.toLowerCase())) {
+          this.showMessage('Username already exists', 'error');
+          return;
+        }
+
+        // Show loading
+        spinner.style.display = 'inline-block';
+        submitBtn.disabled = true;
+
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          // Update user data
+          const userIndex = this.users.findIndex(u => u.username === this.currentUser.username);
+          if (userIndex !== -1) {
+            this.users[userIndex].username = newUsername;
+            this.saveUsers();
+
+            // Update session
+            this.currentUser.username = newUsername;
+            const sessionKey = localStorage.getItem('nightdev_session') ? 'nightdev_session' : 'nightdev_session';
+            const storage = localStorage.getItem('nightdev_session') ? localStorage : sessionStorage;
+            storage.setItem(sessionKey, JSON.stringify(this.currentUser));
+
+            this.showMessage('Username updated successfully! You will be redirected to login.', 'success');
+            
+            // Redirect to login after 2 seconds
+            setTimeout(() => {
+              localStorage.removeItem('nightdev_session');
+              sessionStorage.removeItem('nightdev_session');
+              window.location.href = 'login.html';
+            }, 2000);
+          }
+        } catch (error) {
+          this.showMessage('Failed to update username', 'error');
+        } finally {
+          spinner.style.display = 'none';
+          submitBtn.disabled = false;
+        }
+      }
+
+      // Change password
+      async changePassword() {
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+        const spinner = document.getElementById('passwordSpinner');
+        const submitBtn = document.querySelector('#passwordForm button[type="submit"]');
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+          this.showMessage('Please fill in all password fields', 'error');
+          return;
+        }
+
+        if (newPassword !== confirmPassword) {
+          this.showMessage('New passwords do not match', 'error');
+          return;
+        }
+
+        if (newPassword.length < 6) {
+          this.showMessage('New password must be at least 6 characters long', 'error');
+          return;
+        }
+
+        // Show loading
+        spinner.style.display = 'inline-block';
+        submitBtn.disabled = true;
+
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          // Verify current password
+          const user = this.users.find(u => u.username === this.currentUser.username);
+          const currentPasswordHash = this.computePasswordHash(currentPassword);
+          
+          if (user.password !== currentPasswordHash) {
+            this.showMessage('Current password is incorrect', 'error');
+            return;
+          }
+
+          // Update password
+          const newPasswordHash = this.computePasswordHash(newPassword);
+          user.password = newPasswordHash;
+          this.saveUsers();
+
+          // Clear form
+          document.getElementById('passwordForm').reset();
+          
+          this.showMessage('Password updated successfully!', 'success');
+        } catch (error) {
+          this.showMessage('Failed to update password', 'error');
+        } finally {
+          spinner.style.display = 'none';
+          submitBtn.disabled = false;
+        }
+      }
+
+      // Delete account
+      async deleteAccount() {
+        const password = document.getElementById('deletePassword').value;
+        const confirmText = document.getElementById('deleteConfirm').value;
+        const spinner = document.getElementById('deleteSpinner');
+        const submitBtn = document.querySelector('#deleteForm button[type="submit"]');
+
+        if (!password || !confirmText) {
+          this.showMessage('Please fill in all fields to confirm deletion', 'error');
+          return;
+        }
+
+        if (confirmText !== 'DELETE') {
+          this.showMessage('Please type "DELETE" exactly to confirm', 'error');
+          return;
+        }
+
+        // Show loading
+        spinner.style.display = 'inline-block';
+        submitBtn.disabled = true;
+
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+
+          // Verify password
+          const user = this.users.find(u => u.username === this.currentUser.username);
+          const passwordHash = this.computePasswordHash(password);
+          
+          if (user.password !== passwordHash) {
+            this.showMessage('Password is incorrect', 'error');
+            return;
+          }
+
+          // Remove user from users array
+          this.users = this.users.filter(u => u.username !== this.currentUser.username);
+          this.saveUsers();
+
+          // Clear session
+          localStorage.removeItem('nightdev_session');
+          sessionStorage.removeItem('nightdev_session');
+
+          this.showMessage('Account deleted successfully. Redirecting...', 'success');
+          
+          // Redirect to home page
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 2000);
+        } catch (error) {
+          this.showMessage('Failed to delete account', 'error');
+        } finally {
+          spinner.style.display = 'none';
+          submitBtn.disabled = false;
+        }
+      }
+
+      // Debug function to help troubleshoot localStorage issues
+      debugLocalStorage() {
+        console.log('=== LocalStorage Debug Info ===');
+        console.log('nightdev_session (localStorage):', localStorage.getItem('nightdev_session'));
+        console.log('nightdev_session (sessionStorage):', sessionStorage.getItem('nightdev_session'));
+        console.log('nightdev_users:', localStorage.getItem('nightdev_users'));
+        
+        try {
+          const sessionData = localStorage.getItem('nightdev_session') || sessionStorage.getItem('nightdev_session');
+          if (sessionData) {
+            console.log('Parsed session data:', JSON.parse(sessionData));
+          }
+          
+          const usersData = localStorage.getItem('nightdev_users');
+          if (usersData) {
+            console.log('Parsed users data:', JSON.parse(usersData));
+          }
+        } catch (error) {
+          console.error('Error parsing localStorage data:', error);
+        }
+        console.log('=== End Debug Info ===');
+      }
+    }
+
+    // Show coming soon message
+    function showComingSoon(featureName) {
+      // Create modal overlay
+      const overlay = document.createElement('div');
+      overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        backdrop-filter: blur(10px);
+      `;
+
+      // Create modal content
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        background: linear-gradient(135deg, rgba(26, 26, 26, 0.95) 0%, rgba(26, 26, 26, 0.9) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 3rem;
+        text-align: center;
+        max-width: 500px;
+        margin: 2rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(20px);
+      `;
+
+      modal.innerHTML = `
+        <div style="font-size: 4rem; color: #ffc107; margin-bottom: 1.5rem;">
+          <i class="fa-solid fa-clock"></i>
+        </div>
+        <h2 style="color: #e0e0e0; margin-bottom: 1rem; font-size: 1.8rem;">
+          ${featureName}
+        </h2>
+        <p style="color: #aaa; margin-bottom: 2rem; font-size: 1.1rem;">
+          This feature is currently under development and will be available soon!
+        </p>
+        <p style="color: #888; margin-bottom: 2rem; font-size: 0.95rem;">
+          We're working hard to bring you the best experience. Stay tuned for updates!
+        </p>
+        <button onclick="this.closest('.modal-overlay').remove()" style="
+          background: linear-gradient(135deg, #2a2a2a, #404040);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: #e0e0e0;
+          padding: 1rem 2rem;
+          border-radius: 12px;
+          font-size: 1rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+        " onmouseover="this.style.background='linear-gradient(135deg, #404040, #555555)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='linear-gradient(135deg, #2a2a2a, #404040)'; this.style.transform='translateY(0)'">
+          <i class="fa-solid fa-check"></i>
+          Got it!
+        </button>
+      `;
+
+      overlay.className = 'modal-overlay';
+      overlay.appendChild(modal);
+      document.body.appendChild(overlay);
+
+      // Close on overlay click
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+          overlay.remove();
+        }
+      });
+
+      // Close on escape key
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+          overlay.remove();
+          document.removeEventListener('keydown', handleEscape);
+        }
+      };
+      document.addEventListener('keydown', handleEscape);
+    }
+
+    // Initialize account settings when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      window.accountSettings = new AccountSettings();
+      
+      // Make debug function available globally
+      window.debugAccountSettings = () => {
+        if (window.accountSettings) {
+          window.accountSettings.debugLocalStorage();
+        } else {
+          console.log('Account settings not initialized yet');
+        }
+      };
+      
+      console.log('Account Settings initialized. Use debugAccountSettings() in console for debugging.');
+    });
+  </script>
+</body>
+</html>

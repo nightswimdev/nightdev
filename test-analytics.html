@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics Test - NightDev</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #050505;
+      color: #e0e0e0;
+      padding: 2rem;
+      text-align: center;
+    }
+    .test-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.05);
+      padding: 2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .test-section {
+      margin: 2rem 0;
+      padding: 1rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+    }
+    button {
+      background: #333;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      padding: 1rem 2rem;
+      margin: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #555;
+    }
+    .result {
+      margin: 1rem 0;
+      padding: 1rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      text-align: left;
+      font-family: monospace;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+    }
+    .success { border-left: 4px solid #4CAF50; }
+    .error { border-left: 4px solid #f44336; }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>🧪 Analytics Server Test</h1>
+    <p>This page tests the server-side analytics API endpoints</p>
+
+    <div class="test-section">
+      <h3>📊 Analytics Summary Test</h3>
+      <button onclick="testAnalyticsSummary()">Test Analytics Summary API</button>
+      <div id="analytics-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>🌐 Detailed Analytics Test</h3>
+      <button onclick="testDetailedAnalytics()">Test Detailed Analytics API</button>
+      <div id="detailed-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>📡 Track Visit Test</h3>
+      <button onclick="testTrackVisit()">Test Track Visit API</button>
+      <div id="track-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>🔗 Quick Links</h3>
+      <button onclick="window.open('/dashboard.html', '_blank')">Open Dashboard</button>
+      <button onclick="window.open('/api/analytics/summary', '_blank')">View Raw Summary</button>
+      <button onclick="window.open('/api/analytics/detailed', '_blank')">View Raw Detailed</button>
+    </div>
+  </div>
+
+  <!-- Include analytics script -->
+  <script src="analytics.js"></script>
+
+  <script>
+    async function testAnalyticsSummary() {
+      const resultDiv = document.getElementById('analytics-result');
+      resultDiv.style.display = 'block';
+      resultDiv.textContent = 'Loading...';
+      resultDiv.className = 'result';
+
+      try {
+        const response = await fetch('/api/analytics/summary');
+        const data = await response.json();
+        
+        resultDiv.className = 'result success';
+        resultDiv.textContent = `✅ Analytics Summary API Test - SUCCESS
+
+Response Status: ${response.status}
+Response Data:
+${JSON.stringify(data, null, 2)}
+
+Key Metrics:
+- Total Page Views: ${data.totalPageViews || 0}
+- Unique Visitors: ${data.totalUniqueVisitors || 0}
+- Today's Views: ${data.todayPageViews || 0}
+- Today's Visitors: ${data.todayUniqueVisitors || 0}
+- Total IP Records: ${data.totalIPEntries || 0}
+- Total Sessions: ${data.totalSessions || 0}`;
+
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = `❌ Analytics Summary API Test - FAILED
+
+Error: ${error.message}
+
+This usually means:
+1. Server is not running (run 'npm start')
+2. Server is running on different port
+3. Network connectivity issue`;
+      }
+    }
+
+    async function testDetailedAnalytics() {
+      const resultDiv = document.getElementById('detailed-result');
+      resultDiv.style.display = 'block';
+      resultDiv.textContent = 'Loading...';
+      resultDiv.className = 'result';
+
+      try {
+        const response = await fetch('/api/analytics/detailed');
+        const data = await response.json();
+        
+        const ipDataCount = data.ipData ? data.ipData.length : 0;
+        const sessionsCount = data.sessions ? data.sessions.length : 0;
+        const browserDataCount = data.browserData ? data.browserData.length : 0;
+        
+        // Get recent IP data sample
+        const recentIPs = data.ipData ? data.ipData.slice(-3) : [];
+        
+        resultDiv.className = 'result success';
+        resultDiv.textContent = `✅ Detailed Analytics API Test - SUCCESS
+
+Response Status: ${response.status}
+
+Data Counts:
+- IP Data Records: ${ipDataCount}
+- Session Records: ${sessionsCount}
+- Browser Data Records: ${browserDataCount}
+
+Recent IP Data Sample (last 3):
+${recentIPs.map(ip => `
+  IP: ${ip.ip || 'Unknown'}
+  Location: ${ip.city || 'Unknown'}, ${ip.country || 'Unknown'}
+  ISP: ${ip.isp || 'Unknown'}
+  Timestamp: ${ip.timestamp || 'Unknown'}
+`).join('\n')}
+
+Total Stats:
+${JSON.stringify(data.totalStats || {}, null, 2)}`;
+
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = `❌ Detailed Analytics API Test - FAILED
+
+Error: ${error.message}
+
+This usually means:
+1. Server is not running (run 'npm start')
+2. Server is running on different port
+3. Network connectivity issue`;
+      }
+    }
+
+    async function testTrackVisit() {
+      const resultDiv = document.getElementById('track-result');
+      resultDiv.style.display = 'block';
+      resultDiv.textContent = 'Sending tracking data...';
+      resultDiv.className = 'result';
+
+      try {
+        const testData = {
+          sessionId: 'test-session-' + Date.now(),
+          browserData: {
+            browser: 'Test Browser',
+            os: 'Test OS',
+            screenWidth: window.screen.width,
+            screenHeight: window.screen.height,
+            language: navigator.language,
+            userAgent: navigator.userAgent.substring(0, 100) + '...'
+          },
+          pageData: {
+            url: window.location.href,
+            pathname: window.location.pathname,
+            title: document.title,
+            referrer: document.referrer,
+            timestamp: new Date().toISOString(),
+            loadTime: 1000
+          }
+        };
+
+        const response = await fetch('/api/track', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(testData)
+        });
+
+        const result = await response.json();
+        
+        resultDiv.className = 'result success';
+        resultDiv.textContent = `✅ Track Visit API Test - SUCCESS
+
+Response Status: ${response.status}
+
+Server Response:
+${JSON.stringify(result, null, 2)}
+
+Sent Data:
+${JSON.stringify(testData, null, 2)}`;
+
+      } catch (error) {
+        resultDiv.className = 'result error';
+        resultDiv.textContent = `❌ Track Visit API Test - FAILED
+
+Error: ${error.message}
+
+This usually means:
+1. Server is not running (run 'npm start')
+2. Server is running on different port
+3. Network connectivity issue
+4. Server API endpoint issue`;
+      }
+    }
+
+    // Auto-run analytics summary test on page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        console.log('Auto-running analytics summary test...');
+        testAnalyticsSummary();
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

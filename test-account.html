@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Settings Test - NightDev</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #050505;
+      color: #e0e0e0;
+      padding: 2rem;
+      text-align: center;
+    }
+    .test-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.05);
+      padding: 2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .test-section {
+      margin: 2rem 0;
+      padding: 1rem;
+      background: rgba(255,255,255,0.03);
+      border-radius: 8px;
+      text-align: left;
+    }
+    button {
+      background: #333;
+      color: #e0e0e0;
+      border: 1px solid #555;
+      padding: 1rem 2rem;
+      margin: 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #555;
+    }
+    .result {
+      margin: 1rem 0;
+      padding: 1rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      white-space: pre-wrap;
+    }
+    .success { border-left: 4px solid #4CAF50; }
+    .error { border-left: 4px solid #f44336; }
+    .info { border-left: 4px solid #2196F3; }
+  </style>
+</head>
+<body>
+  <div class="test-container">
+    <h1>🔧 Account Settings Test</h1>
+    <p>This page tests the localStorage functionality for account settings</p>
+
+    <div class="test-section">
+      <h3>📊 Current localStorage Status</h3>
+      <button onclick="checkLocalStorage()">Check localStorage</button>
+      <div id="storage-result" class="result info" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>👤 Create Test Session</h3>
+      <button onclick="createTestSession()">Create Test User Session</button>
+      <button onclick="clearSession()">Clear Session</button>
+      <div id="session-result" class="result" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+      <h3>🔗 Navigation Tests</h3>
+      <button onclick="window.open('/account-settings.html', '_blank')">Open Account Settings</button>
+      <button onclick="window.open('/dashboard.html', '_blank')">Open Dashboard</button>
+      <button onclick="window.open('/index.html', '_blank')">Open Login Page</button>
+    </div>
+
+    <div class="test-section">
+      <h3>🧪 Test Scenarios</h3>
+      <button onclick="testScenario1()">Test: Valid User Session</button>
+      <button onclick="testScenario2()">Test: Invalid User Session</button>
+      <button onclick="testScenario3()">Test: No Session</button>
+      <div id="scenario-result" class="result" style="display: none;"></div>
+    </div>
+  </div>
+
+  <script>
+    function checkLocalStorage() {
+      const resultDiv = document.getElementById('storage-result');
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'result info';
+
+      const sessionData = localStorage.getItem('nightdev_session') || sessionStorage.getItem('nightdev_session');
+      const usersData = localStorage.getItem('nightdev_users');
+      
+      let result = '=== Current localStorage Status ===\n\n';
+      
+      result += 'Session Data:\n';
+      if (sessionData) {
+        try {
+          const parsed = JSON.parse(sessionData);
+          result += `✅ Found session for user: ${parsed.username}\n`;
+          result += `   Storage type: ${localStorage.getItem('nightdev_session') ? 'localStorage' : 'sessionStorage'}\n`;
+          result += `   Session data: ${JSON.stringify(parsed, null, 2)}\n\n`;
+        } catch (error) {
+          result += `❌ Invalid session data: ${error.message}\n\n`;
+        }
+      } else {
+        result += '❌ No session data found\n\n';
+      }
+      
+      result += 'Users Database:\n';
+      if (usersData) {
+        try {
+          const users = JSON.parse(usersData);
+          result += `✅ Found ${users.length} users in database\n`;
+          users.forEach((user, index) => {
+            result += `   ${index + 1}. ${user.username} (${user.role || 'user'})\n`;
+          });
+        } catch (error) {
+          result += `❌ Invalid users data: ${error.message}\n`;
+        }
+      } else {
+        result += '❌ No users database found\n';
+      }
+      
+      resultDiv.textContent = result;
+    }
+
+    function createTestSession() {
+      const resultDiv = document.getElementById('session-result');
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'result success';
+
+      // Create a test user
+      const testUser = {
+        username: 'testuser',
+        email: 'test@nightdev.com',
+        password: 'hashedpassword123',
+        role: 'user',
+        created: new Date().toISOString(),
+        lastLogin: new Date().toISOString()
+      };
+
+      // Create session data
+      const sessionData = {
+        username: testUser.username,
+        role: testUser.role,
+        loginTime: new Date().toISOString()
+      };
+
+      // Save to localStorage
+      let users = [];
+      try {
+        const existingUsers = localStorage.getItem('nightdev_users');
+        if (existingUsers) {
+          users = JSON.parse(existingUsers);
+        }
+      } catch (error) {
+        console.error('Error loading existing users:', error);
+      }
+
+      // Add test user if not exists
+      const existingUser = users.find(u => u.username === testUser.username);
+      if (!existingUser) {
+        users.push(testUser);
+        localStorage.setItem('nightdev_users', JSON.stringify(users));
+      }
+
+      // Create session
+      localStorage.setItem('nightdev_session', JSON.stringify(sessionData));
+
+      resultDiv.textContent = `✅ Test session created successfully!
+
+User: ${testUser.username}
+Email: ${testUser.email}
+Role: ${testUser.role}
+
+Session Data:
+${JSON.stringify(sessionData, null, 2)}
+
+You can now test the account settings page.`;
+    }
+
+    function clearSession() {
+      const resultDiv = document.getElementById('session-result');
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'result info';
+
+      localStorage.removeItem('nightdev_session');
+      sessionStorage.removeItem('nightdev_session');
+
+      resultDiv.textContent = '🧹 Session cleared successfully!\n\nBoth localStorage and sessionStorage sessions have been removed.';
+    }
+
+    function testScenario1() {
+      const resultDiv = document.getElementById('scenario-result');
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'result success';
+
+      // Create valid session
+      createTestSession();
+      
+      resultDiv.textContent = `✅ Scenario 1: Valid User Session
+
+Created a valid test user session.
+Now open account-settings.html - it should:
+1. Load successfully
+2. Display user information
+3. Show account details
+4. Allow password/username changes
+
+Test this by clicking "Open Account Settings" above.`;
+    }
+
+    function testScenario2() {
+      const resultDiv = document.getElementById('scenario-result');
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'result error';
+
+      // Create invalid session (user exists in session but not in users database)
+      const invalidSession = {
+        username: 'nonexistentuser',
+        role: 'user',
+        loginTime: new Date().toISOString()
+      };
+
+      localStorage.setItem('nightdev_session', JSON.stringify(invalidSession));
+
+      resultDiv.textContent = `❌ Scenario 2: Invalid User Session
+
+Created a session for a user that doesn't exist in the users database.
+Now open account-settings.html - it should:
+1. Detect the invalid session
+2. Show an error message
+3. Clear the invalid session
+4. Redirect to login page
+
+Test this by clicking "Open Account Settings" above.`;
+    }
+
+    function testScenario3() {
+      const resultDiv = document.getElementById('scenario-result');
+      resultDiv.style.display = 'block';
+      resultDiv.className = 'result info';
+
+      // Clear all sessions
+      clearSession();
+
+      resultDiv.textContent = `🚫 Scenario 3: No Session
+
+Cleared all session data.
+Now open account-settings.html - it should:
+1. Detect no session
+2. Show "Please log in" message
+3. Redirect to login page
+
+Test this by clicking "Open Account Settings" above.`;
+    }
+
+    // Auto-check localStorage on page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        checkLocalStorage();
+      }, 500);
+    });
+  </script>
+</body>
+</html>

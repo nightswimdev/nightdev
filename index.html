@@ -31,6 +31,8 @@
     <script src="mobile-redirect.js"></script>
     <script src="assets/js/index.js" defer></script>
      <script src="assets/js/indexd.js" defer></script>
+    <!-- NightDev Analytics & IP Tracking -->
+    <script src="analytics.js" defer></script>
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -153,6 +155,15 @@
           </a>
         </li>
       </ul>
+      <div class="login-button-container">
+        <button class="login-button" title="Login">
+          <div class="login-light-border"></div>
+          <div class="login-light-inset-bg"></div>
+          <div class="login-light"></div>
+          <i class="fa-solid fa-user"></i>
+          <span>Login</span>
+        </button>
+      </div>
     </div>
 
     <div class="main-content">
@@ -243,6 +254,7 @@
   // Multi-song playlist - Add as many songs as you want here
   const PLAYLIST = [
     'https://audio.jukehost.co.uk/R7aCAenvHPhXMyOJt276rcd1UUFmPm8w',
+    'https://audio.jukehost.co.uk/R4bdxdyaKo3cjbH1g02DnsUR65YICrXF',
   ];
 
   const FADE_DURATION = 3000; // 3 seconds fade time
@@ -263,7 +275,49 @@
     audio.crossOrigin = 'anonymous';
     audio.volume = 0;
     audio.style.display = 'none';
+    audio.loop = false;
     document.body.appendChild(audio);
+    
+    // Add error handling
+    audio.addEventListener('error', (e) => {
+      console.log('Audio error:', e);
+      // Try to recover by switching to next track
+      setTimeout(() => {
+        if (PLAYLIST.length > 1) {
+          switchToNextTrack();
+        } else {
+          // For single track, try to reload and restart
+          audio.load();
+          setTimeout(() => {
+            audio.play().catch(err => console.log('Recovery play failed:', err));
+          }, 1000);
+        }
+      }, 2000);
+    });
+
+    // Add stalled event handling
+    audio.addEventListener('stalled', () => {
+      console.log('Audio stalled, attempting recovery...');
+      setTimeout(() => {
+        if (audio.readyState < 3) { // HAVE_FUTURE_DATA
+          audio.load();
+        }
+      }, 1000);
+    });
+
+    // Add waiting event handling
+    audio.addEventListener('waiting', () => {
+      console.log('Audio waiting for data...');
+    });
+
+    // Add canplaythrough event
+    audio.addEventListener('canplaythrough', () => {
+      console.log('Audio can play through');
+    });
+    
+    // Set up interruption handling for this audio element
+    setupAudioInterruptionHandling(audio);
+    
     return audio;
   }
 
@@ -320,11 +374,27 @@
 
   // Switch to next track with crossfade
   async function switchToNextTrack() {
-    if (!nextAudio || PLAYLIST.length <= 1) return;
+    // Handle single track playlist - just restart the same track
+    if (PLAYLIST.length === 1) {
+      try {
+        currentAudio.currentTime = 0;
+        await currentAudio.play();
+        await fadeIn(currentAudio);
+      } catch (error) {
+        console.log('Error restarting single track:', error);
+      }
+      return;
+    }
+
+    // Handle multi-track playlist
+    if (!nextAudio) return;
 
     const oldAudio = currentAudio;
     currentAudio = nextAudio;
     currentTrackIndex = (currentTrackIndex + 1) % PLAYLIST.length;
+
+    // Set up event listener for track end on the new current audio
+    currentAudio.addEventListener('ended', switchToNextTrack);
 
     // Start playing next track
     try {
@@ -370,11 +440,37 @@
     if (!currentAudio || isPlaying) return;
     
     try {
+      // Ensure audio is loaded before playing
+      if (currentAudio.readyState < 2) { // HAVE_CURRENT_DATA
+        await new Promise((resolve) => {
+          const onCanPlay = () => {
+            currentAudio.removeEventListener('canplay', onCanPlay);
+            currentAudio.removeEventListener('error', onError);
+            resolve();
+          };
+          const onError = () => {
+            currentAudio.removeEventListener('canplay', onCanPlay);
+            currentAudio.removeEventListener('error', onError);
+            resolve(); // Continue anyway
+          };
+          currentAudio.addEventListener('canplay', onCanPlay);
+          currentAudio.addEventListener('error', onError);
+          
+          // Timeout after 5 seconds
+          setTimeout(() => {
+            currentAudio.removeEventListener('canplay', onCanPlay);
+            currentAudio.removeEventListener('error', onError);
+            resolve();
+          }, 5000);
+        });
+      }
+      
       await currentAudio.play();
       await fadeIn(currentAudio);
       isPlaying = true;
+      console.log('Audio started successfully');
     } catch (error) {
-      console.log('Autoplay blocked, waiting for user interaction');
+      console.log('Autoplay blocked, waiting for user interaction:', error);
     }
   }
 
@@ -393,24 +489,64 @@
 
   // Handle page visibility changes
   document.addEventListener('visibilitychange', async () => {
-    if (!currentAudio) return;
+    if (!currentAudio || !userInteracted) return;
     
-    if (document.hidden) {
-      try { 
-        await fadeOut(currentAudio, 1000);
-        currentAudio.pause(); 
-        isPlaying = false;
-      } catch(e){}
-    } else {
-      try { 
-        if (userInteracted) {
+    if (!document.hidden) {
+      // Tab became visible again - check if audio is still playing
+      if (currentAudio.paused && isPlaying) {
+        try {
           await currentAudio.play();
           await fadeIn(currentAudio);
-          isPlaying = true;
+        } catch (error) {
+          console.log('Could not resume audio:', error);
         }
-      } catch(e){}
+      }
     }
   });
+
+  // Handle audio interruptions (when browser pauses audio)
+  function setupAudioInterruptionHandling(audio) {
+    audio.addEventListener('pause', async () => {
+      if (isPlaying && userInteracted && !document.hidden && audio === currentAudio) {
+        // Audio was paused unexpectedly, try to resume
+        console.log('Audio paused unexpectedly, attempting to resume...');
+        setTimeout(async () => {
+          try {
+            if (audio.paused && isPlaying && audio === currentAudio) {
+              await audio.play();
+              console.log('Successfully resumed audio');
+            }
+          } catch (error) {
+            console.log('Could not resume paused audio:', error);
+            // If we can't resume, try switching to next track
+            if (PLAYLIST.length > 1) {
+              setTimeout(switchToNextTrack, 1000);
+            }
+          }
+        }, 500);
+      }
+    });
+
+    // Handle ended event more robustly
+    audio.addEventListener('ended', () => {
+      console.log('Track ended, switching to next...');
+      if (audio === currentAudio) {
+        switchToNextTrack();
+      }
+    });
+  }
+
+  // Periodic check to ensure audio is still playing
+  setInterval(() => {
+    if (currentAudio && isPlaying && userInteracted && !document.hidden) {
+      if (currentAudio.paused) {
+        // Audio got paused somehow, try to resume
+        currentAudio.play().catch(error => {
+          console.log('Periodic check: Could not resume audio:', error);
+        });
+      }
+    }
+  }, 5000); // Check every 5 seconds
 
   // Initialize the playlist
   initializePlaylist();
@@ -600,6 +736,259 @@ document.addEventListener('DOMContentLoaded', function() {
     const glowStrength = Math.min(1.2, 0.8 + navbarTargetX / rect.width * 0.4);
     navbarLightBg.style.transform = `scale(${glowStrength})`;
   });
+});
+
+// Light following effect for login button
+document.addEventListener('DOMContentLoaded', function() {
+  const loginButton = document.querySelector('.login-button');
+  const loginLightBg = loginButton.querySelector('.login-light');
+  const loginLightBorder = loginButton.querySelector('.login-light-border');
+  const lightSize = 200;
+
+  let loginTargetX = 0, loginTargetY = 0;
+  let loginCurrentX = 0, loginCurrentY = 0;
+  let loginLastX = 0, loginLastY = 0;
+  let loginVelocityX = 0, loginVelocityY = 0;
+  let loginRaf;
+
+  function loginAnimate() {
+    loginCurrentX += (loginTargetX - loginCurrentX) * 0.15;
+    loginCurrentY += (loginTargetY - loginCurrentY) * 0.15;
+
+    const elasticX = Math.min(Math.max(loginVelocityX * 0.5, -15), 15);
+    const elasticY = Math.min(Math.max(loginVelocityY * 0.5, -15), 15);
+
+    const bgX = `${loginCurrentX - lightSize / 2 + elasticX}px`;
+    const bgY = `${loginCurrentY - lightSize / 2 + elasticY}px`;
+
+    loginLightBg.style.setProperty('--login-bg-x', bgX);
+    loginLightBg.style.setProperty('--login-bg-y', bgY);
+    loginLightBorder.style.setProperty('--login-bg-x', bgX);
+    loginLightBorder.style.setProperty('--login-bg-y', bgY);
+
+    loginRaf = requestAnimationFrame(loginAnimate);
+  }
+
+  loginButton.addEventListener('mouseenter', () => {
+    cancelAnimationFrame(loginRaf);
+    loginRaf = requestAnimationFrame(loginAnimate);
+
+    loginLightBg.style.opacity = 1;
+    loginLightBorder.style.opacity = 1;
+    loginLightBg.style.transition = "opacity 0.4s ease, transform 0.4s ease, filter 0.6s ease";
+    loginLightBorder.style.transition = "opacity 0.4s ease, transform 0.4s ease, filter 0.6s ease";
+
+    loginLightBg.style.transform = "scale(1.15)";
+    loginLightBg.style.filter = "blur(20px)";
+    loginLightBorder.style.transform = "scale(1.1)";
+    loginLightBorder.style.filter = "blur(6px)";
+
+    setTimeout(() => {
+      loginLightBg.style.transform = "scale(1)";
+      loginLightBg.style.filter = "blur(12px)";
+      loginLightBorder.style.transform = "scale(1)";
+      loginLightBorder.style.filter = "blur(4px)";
+    }, 300);
+  });
+
+  loginButton.addEventListener('mouseleave', () => {
+    cancelAnimationFrame(loginRaf);
+
+    loginLightBg.style.transition = "opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease";
+    loginLightBorder.style.transition = "opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease";
+
+    loginLightBg.style.opacity = 0;
+    loginLightBorder.style.opacity = 0;
+    loginLightBg.style.transform = "scale(0.95)";
+    loginLightBorder.style.transform = "scale(0.95)";
+    loginLightBg.style.filter = "blur(30px)";
+    loginLightBorder.style.filter = "blur(12px)";
+  });
+
+  loginButton.addEventListener('mousemove', (e) => {
+    const rect = loginButton.getBoundingClientRect();
+    loginTargetX = e.clientX - rect.left;
+    loginTargetY = e.clientY - rect.top;
+
+    loginVelocityX = loginTargetX - loginLastX;
+    loginVelocityY = loginTargetY - loginLastY;
+    loginLastX = loginTargetX;
+    loginLastY = loginTargetY;
+
+    const glowStrength = Math.min(1.2, 0.8 + loginTargetX / rect.width * 0.4);
+    loginLightBg.style.transform = `scale(${glowStrength})`;
+  });
+
+  // Add click handler for login functionality
+  loginButton.addEventListener('click', () => {
+    window.location.href = 'login.html';
+  });
+});
+
+// Toast Notification System
+class ToastManager {
+  constructor() {
+    this.toasts = [];
+  }
+
+  show(message, type = 'error', duration = 5000) {
+    const toast = this.createToast(message, type);
+    document.body.appendChild(toast);
+    this.toasts.push(toast);
+
+    // Show toast
+    setTimeout(() => {
+      toast.classList.add('show');
+    }, 100);
+
+    // Auto-hide toast
+    setTimeout(() => {
+      this.hide(toast);
+    }, duration);
+
+    return toast;
+  }
+
+  createToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+
+    const iconMap = {
+      error: 'fa-exclamation-circle',
+      warning: 'fa-exclamation-triangle',
+      success: 'fa-check-circle',
+      info: 'fa-info-circle'
+    };
+
+    toast.innerHTML = `
+      <div class="toast-content">
+        <i class="fa-solid ${iconMap[type]} toast-icon"></i>
+        <div class="toast-message">${message}</div>
+        <button class="toast-close" onclick="toastManager.hide(this.parentElement.parentElement)">
+          <i class="fa-solid fa-times"></i>
+        </button>
+      </div>
+    `;
+
+    return toast;
+  }
+
+  hide(toast) {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      if (toast.parentElement) {
+        toast.parentElement.removeChild(toast);
+      }
+      this.toasts = this.toasts.filter(t => t !== toast);
+    }, 400);
+  }
+}
+
+// Initialize toast manager
+const toastManager = new ToastManager();
+
+// Authentication System for Index Page
+class IndexAuth {
+  constructor() {
+    this.currentUser = this.getCurrentUser();
+    this.init();
+  }
+
+  getCurrentUser() {
+    const localSession = localStorage.getItem('nightdev_session');
+    const sessionSession = sessionStorage.getItem('nightdev_session');
+    
+    if (localSession || sessionSession) {
+      try {
+        return JSON.parse(localSession || sessionSession);
+      } catch (e) {
+        localStorage.removeItem('nightdev_session');
+        sessionStorage.removeItem('nightdev_session');
+        return null;
+      }
+    }
+    return null;
+  }
+
+  init() {
+    // Check URL parameters for authentication warnings
+    const urlParams = new URLSearchParams(window.location.search);
+    const authWarning = urlParams.get('auth');
+    
+    if (authWarning === 'required') {
+      toastManager.show(
+        'Authentication required! Please log in to access developer features.',
+        'warning',
+        6000
+      );
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // Update login button if user is logged in
+    this.updateLoginButton();
+    
+    // Add dashboard access protection
+    this.protectDashboardAccess();
+  }
+
+  updateLoginButton() {
+    const loginButton = document.querySelector('.login-button');
+    if (this.currentUser && loginButton) {
+      const buttonSpan = loginButton.querySelector('span');
+      const buttonIcon = loginButton.querySelector('i');
+      
+      if (buttonSpan && buttonIcon) {
+        buttonIcon.className = 'fa-solid fa-tachometer-alt';
+        buttonSpan.textContent = 'Dashboard';
+        
+        // Update click handler
+        loginButton.onclick = () => {
+          window.location.href = 'dashboard.html';
+        };
+      }
+    }
+  }
+
+  protectDashboardAccess() {
+    // Add click handlers to any dashboard/dev links
+    const devLinks = document.querySelectorAll('a[href*="dashboard"], a[href*="admin"], .dev-link');
+    
+    devLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        if (!this.currentUser) {
+          e.preventDefault();
+          toastManager.show(
+            'Access denied! This is a developer page. Please log in first.',
+            'error',
+            5000
+          );
+          
+          setTimeout(() => {
+            window.location.href = 'login.html';
+          }, 2000);
+        }
+      });
+    });
+  }
+
+  logout() {
+    localStorage.removeItem('nightdev_session');
+    sessionStorage.removeItem('nightdev_session');
+    this.currentUser = null;
+    
+    toastManager.show('Logged out successfully!', 'success', 3000);
+    
+    // Reset login button
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }
+}
+
+// Initialize authentication system
+document.addEventListener('DOMContentLoaded', () => {
+  window.indexAuth = new IndexAuth();
 });
 </script>
 

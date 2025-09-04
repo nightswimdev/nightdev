@@ -915,9 +915,166 @@ footer span {
 
 /* Ensure navbar content stays on top */
 .main-navbar-title,
-.nav-buttons {
+.nav-buttons,
+.login-button-container {
   position: relative;
   z-index: 20;
+}
+
+/* Login Button Styles */
+.login-button-container {
+  margin-left: auto;
+}
+
+.login-button {
+  position: relative;
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  padding: 0.5em 1.2em;
+  border-radius: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.95em;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  font-family: inherit;
+  z-index: 20;
+}
+
+.login-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+}
+
+.login-button i {
+  font-size: 1em;
+  position: relative;
+  z-index: 25;
+  color: #ffffff !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.login-button span {
+  font-weight: 500;
+  position: relative;
+  z-index: 25;
+  color: #ffffff !important;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Toast Notification */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #ff4444, #cc0000);
+  color: #ffffff;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(255, 68, 68, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 10000;
+  transform: translateX(400px);
+  opacity: 0;
+  transition: all 0.4s ease;
+  max-width: 350px;
+  backdrop-filter: blur(10px);
+}
+
+.toast.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+.toast.warning {
+  background: linear-gradient(135deg, #ff9500, #e67e00);
+}
+
+.toast.success {
+  background: linear-gradient(135deg, #14c93f, #0f9930);
+}
+
+.toast.info {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.toast-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.toast-message {
+  flex: 1;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.toast-close {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 1.1rem;
+  padding: 0;
+  margin-left: 0.5rem;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.toast-close:hover {
+  opacity: 1;
+}
+
+/* Login Button Light Effects */
+.login-light-border {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 25px; 
+  opacity: 0;
+  transition: opacity 400ms ease;
+  z-index: 1;
+  background-image: radial-gradient(circle at center, rgba(211 211 211 / 0.8), rgba(211 211 211 / 0) 60%);
+  background-position: var(--login-bg-x) var(--login-bg-y);
+  background-repeat: no-repeat;
+  background-size: 200px 200px;
+}
+
+.login-light {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: 25px; 
+  opacity: 0; 
+  transition: opacity 400ms ease;
+  z-index: 5;
+  background-image: radial-gradient(circle at center, rgba(211, 211, 211, 0.13), rgba(211 211 211 / 0) 60%);
+  background-position: var(--login-bg-x) var(--login-bg-y);
+  background-repeat: no-repeat;
+  background-size: 200px 200px;
+}
+
+.login-light-inset-bg {
+  position: absolute;
+  inset: 0.8px; 
+  border-radius: 24px; 
+  background-color: rgba(14, 14, 14, 0.8);
+  transition: background-color 0.15s ease;
+  z-index: 2;
+}
+
+.login-button:hover .login-light-inset-bg {
+  background-color: #161616;
 }
 
 @keyframes fadeIn {
@@ -952,7 +1109,7 @@ footer span {
   width: 200%;
   height: 100px;
   background: linear-gradient(90deg, 
-    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.247) 0%, 
     rgba(255, 255, 255, 0.1) 50%, 
     rgba(255, 255, 255, 0.1) 100%);
   border-radius: 50%;
