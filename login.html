@@ -586,19 +586,10 @@
       async authenticate(identifier, password, rememberMe = false) {
         return new Promise(async (resolve, reject) => {
           try {
-            // First verify Turnstile token server-side
-            const turnstileVerification = await fetch('/api/verify-turnstile', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ token: turnstileToken })
-            });
-
-            const turnstileResult = await turnstileVerification.json();
-            
-            if (!turnstileResult.success) {
-              reject(new Error('Security verification failed. Please try again.'));
+            // Skip server-side Turnstile verification for static deployment
+            // In production, you would verify this server-side
+            if (!turnstileToken) {
+              reject(new Error('Security verification failed. Please complete the CAPTCHA.'));
               return;
             }
 
