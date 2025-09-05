@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>nightdev | Login</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Cloudflare Turnstile -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   <!-- NightDev Analytics & IP Tracking -->
   <script src="analytics.js" defer></script>
   <style>
@@ -273,6 +275,8 @@
       opacity: 0.6;
       cursor: not-allowed;
       transform: none;
+      background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+      border-color: rgba(255, 255, 255, 0.05);
     }
 
     /* Loading Spinner */
@@ -334,6 +338,18 @@
       transform: translateX(-2px);
     }
 
+    /* Turnstile Widget Styling */
+    .turnstile-container {
+      display: flex;
+      justify-content: center;
+      margin: 1.5rem 0;
+    }
+
+    .cf-turnstile {
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
     /* Responsive */
     @media (max-width: 480px) {
       .login-container {
@@ -344,6 +360,10 @@
       .back-button {
         top: 1rem;
         left: 1rem;
+      }
+      
+      .turnstile-container {
+        margin: 1rem 0;
       }
     }
   </style>
@@ -421,13 +441,69 @@
         <a href="#" class="forgot-password">Forgot password?</a>
       </div>
 
-      <button type="submit" class="login-button" id="loginButton">
+      <!-- Cloudflare Turnstile -->
+      <div class="turnstile-container">
+        <div class="cf-turnstile" 
+             data-sitekey="0x4AAAAAAByuMh7yznUYie-D" 
+             data-callback="onTurnstileSuccess"
+             data-error-callback="onTurnstileError"
+             data-expired-callback="onTurnstileExpired"
+             data-theme="dark">
+        </div>
+      </div>
+
+      <button type="submit" class="login-button" id="loginButton" disabled>
         <span class="loading-spinner" id="loadingSpinner"></span>
         <span id="buttonText">Sign In</span>
       </button>
     </form>
 
   <script>
+    // Turnstile global variables
+    let turnstileToken = null;
+    let isTurnstileVerified = false;
+
+    // Turnstile callback functions
+    function onTurnstileSuccess(token) {
+      turnstileToken = token;
+      isTurnstileVerified = true;
+      
+      // Enable the login button
+      const loginButton = document.getElementById('loginButton');
+      loginButton.disabled = false;
+      loginButton.style.opacity = '1';
+      
+      console.log('Turnstile verification successful');
+    }
+
+    function onTurnstileError(error) {
+      turnstileToken = null;
+      isTurnstileVerified = false;
+      
+      // Disable the login button
+      const loginButton = document.getElementById('loginButton');
+      loginButton.disabled = true;
+      loginButton.style.opacity = '0.6';
+      
+      // Show error message
+      showMessage('Verification failed. Please try again.', 'error');
+      console.error('Turnstile error:', error);
+    }
+
+    function onTurnstileExpired() {
+      turnstileToken = null;
+      isTurnstileVerified = false;
+      
+      // Disable the login button
+      const loginButton = document.getElementById('loginButton');
+      loginButton.disabled = true;
+      loginButton.style.opacity = '0.6';
+      
+      // Show warning message
+      showMessage('Verification expired. Please complete the challenge again.', 'error');
+      console.log('Turnstile token expired');
+    }
+
     // Authentication System
     class AuthSystem {
       constructor() {
@@ -507,57 +583,79 @@
       }
 
       // Authenticate user
-      authenticate(identifier, password, rememberMe = false) {
-        return new Promise((resolve, reject) => {
-          // Simulate network delay
-          setTimeout(() => {
-            // Find user by username or email
-            const user = Object.values(this.users).find(u => 
-              u.username.toLowerCase() === identifier.toLowerCase() || 
-              u.email.toLowerCase() === identifier.toLowerCase()
-            );
+      async authenticate(identifier, password, rememberMe = false) {
+        return new Promise(async (resolve, reject) => {
+          try {
+            // First verify Turnstile token server-side
+            const turnstileVerification = await fetch('/api/verify-turnstile', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ token: turnstileToken })
+            });
 
-            if (!user) {
-              reject(new Error('User not found'));
-              return;
-            }
+            const turnstileResult = await turnstileVerification.json();
             
-            // Check password by hashing input and comparing
-            const hashedInputPassword = this.hashPassword(password);
-            if (user.password !== hashedInputPassword) {
-              reject(new Error('Invalid password'));
+            if (!turnstileResult.success) {
+              reject(new Error('Security verification failed. Please try again.'));
               return;
             }
 
-            // Update last login
-            user.lastLogin = new Date().toISOString();
+            // Simulate network delay
+            setTimeout(() => {
+              // Find user by username or email
+              const user = Object.values(this.users).find(u => 
+                u.username.toLowerCase() === identifier.toLowerCase() || 
+                u.email.toLowerCase() === identifier.toLowerCase()
+              );
+
+              if (!user) {
+                reject(new Error('User not found'));
+                return;
+              }
+              
+              // Check password by hashing input and comparing
+              const hashedInputPassword = this.hashPassword(password);
+              if (user.password !== hashedInputPassword) {
+                reject(new Error('Invalid password'));
+                return;
+              }
+
+              // Update last login
+              user.lastLogin = new Date().toISOString();
+              
+              // Ensure account has creation date
+              if (!user.created) {
+                user.created = new Date().toISOString();
+              }
+              
+              this.saveUsers();
+
+              // Create session
+              const sessionData = {
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                loginTime: new Date().toISOString(),
+                rememberMe: rememberMe,
+                turnstileVerified: true
+              };
+
+              // Store session
+              if (rememberMe) {
+                localStorage.setItem('nightdev_session', JSON.stringify(sessionData));
+              } else {
+                sessionStorage.setItem('nightdev_session', JSON.stringify(sessionData));
+              }
+
+              this.currentUser = sessionData;
+              resolve(sessionData);
+            }, 1000); // 1 second delay to simulate server response
             
-            // Ensure account has creation date
-            if (!user.created) {
-              user.created = new Date().toISOString();
-            }
-            
-            this.saveUsers();
-
-            // Create session
-            const sessionData = {
-              username: user.username,
-              email: user.email,
-              role: user.role,
-              loginTime: new Date().toISOString(),
-              rememberMe: rememberMe
-            };
-
-            // Store session
-            if (rememberMe) {
-              localStorage.setItem('nightdev_session', JSON.stringify(sessionData));
-            } else {
-              sessionStorage.setItem('nightdev_session', JSON.stringify(sessionData));
-            }
-
-            this.currentUser = sessionData;
-            resolve(sessionData);
-          }, 1000); // 1 second delay to simulate server response
+          } catch (error) {
+            reject(new Error('Authentication failed: ' + error.message));
+          }
         });
       }
 
@@ -614,6 +712,12 @@
         // Validation
         if (!username || !password) {
           this.showMessage('Please fill in all fields', 'error');
+          return;
+        }
+
+        // Check Turnstile verification
+        if (!isTurnstileVerified || !turnstileToken) {
+          this.showMessage('Please complete the security verification', 'error');
           return;
         }
 

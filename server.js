@@ -58,14 +58,48 @@ async function writeAnalyticsData(data) {
   }
 }
 
-// Get client IP address
+// Get client IP address with Cloudflare support
 function getClientIP(req) {
-  return req.headers['x-forwarded-for'] || 
-         req.headers['x-real-ip'] || 
-         req.connection.remoteAddress || 
-         req.socket.remoteAddress ||
-         (req.connection.socket ? req.connection.socket.remoteAddress : null) ||
-         req.ip;
+  // Cloudflare headers (most reliable for Cloudflare Pages)
+  const cfConnectingIP = req.headers['cf-connecting-ip'];
+  const cfRealIP = req.headers['cf-real-ip'];
+  
+  // Standard proxy headers
+  const xForwardedFor = req.headers['x-forwarded-for'];
+  const xRealIP = req.headers['x-real-ip'];
+  
+  // Direct connection
+  const directIP = req.connection?.remoteAddress || 
+                   req.socket?.remoteAddress ||
+                   (req.connection?.socket ? req.connection.socket.remoteAddress : null) ||
+                   req.ip;
+
+  // Priority order: Cloudflare headers first, then standard headers, then direct
+  return cfConnectingIP || 
+         cfRealIP || 
+         (xForwardedFor ? xForwardedFor.split(',')[0].trim() : null) ||
+         xRealIP || 
+         directIP;
+}
+
+// Extract Cloudflare-specific data
+function getCloudflareData(req) {
+  return {
+    cfRay: req.headers['cf-ray'],
+    cfConnectingIP: req.headers['cf-connecting-ip'],
+    cfIPCountry: req.headers['cf-ipcountry'],
+    cfVisitor: req.headers['cf-visitor'],
+    cfCloudflareUID: req.headers['cf-cloudflare-uid'],
+    cfWorker: req.headers['cf-worker'],
+    cfCacheStatus: req.headers['cf-cache-status'],
+    cfRequestID: req.headers['cf-request-id'],
+    cfEdgeRequestKeepAlive: req.headers['cf-edge-request-keep-alive'],
+    cfWarpTagline: req.headers['cf-warp-tagline'],
+    cfAccessClientID: req.headers['cf-access-client-id'],
+    cfAccessClientName: req.headers['cf-access-client-name'],
+    cfAccessClientEmail: req.headers['cf-access-client-email'],
+    timestamp: new Date().toISOString()
+  };
 }
 
 // Get detailed IP information
@@ -180,10 +214,13 @@ async function getIPDetails(ip) {
 app.post('/api/track', async (req, res) => {
   try {
     const clientIP = getClientIP(req);
-    const { sessionId, browserData, pageData } = req.body;
+    const { sessionId, browserData, pageData, ddosProtected, ipData } = req.body;
 
     // Get detailed IP information
     const ipDetails = await getIPDetails(clientIP);
+    
+    // Get Cloudflare-specific data
+    const cloudflareData = getCloudflareData(req);
 
     // Read current analytics data
     const analytics = await readAnalyticsData();
@@ -191,27 +228,40 @@ app.post('/api/track', async (req, res) => {
       return res.status(500).json({ error: 'Failed to read analytics data' });
     }
 
-    // Create session entry
+    // Create enhanced session entry
     const sessionEntry = {
       sessionId,
       ip: clientIP,
       ipDetails,
+      cloudflareData,
       browserData,
       pageData,
+      clientIPData: ipData, // Client-side collected data
+      ddosProtected: ddosProtected || false,
       timestamp: new Date().toISOString(),
-      userAgent: req.headers['user-agent']
+      userAgent: req.headers['user-agent'],
+      referer: req.headers['referer'],
+      acceptLanguage: req.headers['accept-language'],
+      acceptEncoding: req.headers['accept-encoding']
     };
 
     // Add to sessions
     analytics.sessions.push(sessionEntry);
 
-    // Update IP data
+    // Update IP data with Cloudflare information
     const ipEntry = {
       ...ipDetails,
       sessionId,
+      cloudflareData,
+      clientIPData: ipData,
+      ddosProtected: ddosProtected || false,
       timestamp: new Date().toISOString(),
       page: pageData?.url || 'Unknown',
-      userAgent: req.headers['user-agent']
+      userAgent: req.headers['user-agent'],
+      referer: req.headers['referer'],
+      acceptLanguage: req.headers['accept-language'],
+      cfCountry: cloudflareData.cfIPCountry || 'Unknown',
+      cfRay: cloudflareData.cfRay || 'Unknown'
     };
     analytics.ipData.push(ipEntry);
 
@@ -327,6 +377,270 @@ app.get('/api/analytics/detailed', async (req, res) => {
   } catch (error) {
     console.error('Error getting detailed analytics:', error);
     res.status(500).json({ error: 'Failed to get detailed analytics' });
+  }
+});
+
+// Verify Cloudflare Turnstile token
+app.post('/api/verify-turnstile', async (req, res) => {
+  try {
+    const { token, ipData } = req.body;
+    const secretKey = '0x4AAAAAAByuMp3amBtzLFTqD_00DbRzj0o';
+    const clientIP = getClientIP(req);
+    const cloudflareData = getCloudflareData(req);
+    
+    if (!token) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Missing Turnstile token' 
+      });
+    }
+
+    // Verify token with Cloudflare
+    const verificationResponse = await axios.post('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      secret: secretKey,
+      response: token,
+      remoteip: clientIP
+    }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    const verificationData = verificationResponse.data;
+
+    if (verificationData.success) {
+      // Log successful verification with enhanced data
+      const verificationLog = {
+        success: true,
+        timestamp: new Date().toISOString(),
+        clientIP,
+        cloudflareData,
+        clientIPData: ipData,
+        challenge_ts: verificationData['challenge_ts'],
+        hostname: verificationData.hostname,
+        userAgent: req.headers['user-agent'],
+        referer: req.headers['referer']
+      };
+
+      // Store verification log (optional - for security monitoring)
+      console.log('Turnstile verification successful:', verificationLog);
+
+      res.json({
+        success: true,
+        message: 'Turnstile verification successful',
+        challenge_ts: verificationData['challenge_ts'],
+        hostname: verificationData.hostname,
+        cfRay: cloudflareData.cfRay,
+        cfCountry: cloudflareData.cfIPCountry
+      });
+    } else {
+      // Log failed verification
+      const failureLog = {
+        success: false,
+        timestamp: new Date().toISOString(),
+        clientIP,
+        cloudflareData,
+        clientIPData: ipData,
+        errorCodes: verificationData['error-codes'],
+        userAgent: req.headers['user-agent'],
+        referer: req.headers['referer']
+      };
+
+      console.warn('Turnstile verification failed:', failureLog);
+
+      res.status(400).json({
+        success: false,
+        error: 'Turnstile verification failed',
+        'error-codes': verificationData['error-codes']
+      });
+    }
+
+  } catch (error) {
+    console.error('Error verifying Turnstile token:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Internal server error during verification' 
+    });
+  }
+});
+
+// Cloudflare Pages specific tracking endpoint
+app.post('/api/cf-track', async (req, res) => {
+  try {
+    const clientIP = getClientIP(req);
+    const { type, sessionId, data, browserData, cloudflareData, ddosProtected } = req.body;
+
+    // Get detailed IP information
+    const ipDetails = await getIPDetails(clientIP);
+    
+    // Get Cloudflare-specific data from headers
+    const serverCloudflareData = getCloudflareData(req);
+
+    // Read current analytics data
+    const analytics = await readAnalyticsData();
+    if (!analytics) {
+      return res.status(500).json({ error: 'Failed to read analytics data' });
+    }
+
+    // Create enhanced entry for Cloudflare Pages
+    const cfEntry = {
+      type,
+      sessionId,
+      ip: clientIP,
+      ipDetails,
+      serverCloudflareData,
+      clientCloudflareData: cloudflareData,
+      browserData,
+      data,
+      ddosProtected: ddosProtected || false,
+      timestamp: new Date().toISOString(),
+      userAgent: req.headers['user-agent'],
+      referer: req.headers['referer'],
+      acceptLanguage: req.headers['accept-language'],
+      acceptEncoding: req.headers['accept-encoding'],
+      cfRay: serverCloudflareData.cfRay || 'Unknown',
+      cfCountry: serverCloudflareData.cfIPCountry || 'Unknown',
+      cfCacheStatus: serverCloudflareData.cfCacheStatus || 'Unknown'
+    };
+
+    // Add to appropriate collection based on type
+    if (type === 'pageview') {
+      if (!analytics.cloudflarePageViews) {
+        analytics.cloudflarePageViews = [];
+      }
+      analytics.cloudflarePageViews.push(cfEntry);
+    } else if (type === 'event') {
+      if (!analytics.cloudflareEvents) {
+        analytics.cloudflareEvents = [];
+      }
+      analytics.cloudflareEvents.push(cfEntry);
+    }
+
+    // Also add to regular collections for compatibility
+    analytics.sessions.push(cfEntry);
+
+    // Update IP data with enhanced Cloudflare information
+    const cfIpEntry = {
+      ...ipDetails,
+      sessionId,
+      serverCloudflareData,
+      clientCloudflareData: cloudflareData,
+      ddosProtected: ddosProtected || false,
+      timestamp: new Date().toISOString(),
+      page: data?.url || 'Unknown',
+      userAgent: req.headers['user-agent'],
+      referer: req.headers['referer'],
+      cfCountry: serverCloudflareData.cfIPCountry || 'Unknown',
+      cfRay: serverCloudflareData.cfRay || 'Unknown',
+      cfColo: serverCloudflareData.cfColo || 'Unknown',
+      cfCacheStatus: serverCloudflareData.cfCacheStatus || 'Unknown'
+    };
+    analytics.ipData.push(cfIpEntry);
+
+    // Update browser data
+    if (browserData) {
+      const cfBrowserEntry = {
+        ...browserData,
+        sessionId,
+        ip: clientIP,
+        cloudflareData: serverCloudflareData,
+        ddosProtected: ddosProtected || false,
+        timestamp: new Date().toISOString()
+      };
+      analytics.browserData.push(cfBrowserEntry);
+    }
+
+    // Update daily stats
+    const today = new Date().toDateString();
+    if (!analytics.dailyStats[today]) {
+      analytics.dailyStats[today] = {
+        pageViews: 0,
+        uniqueVisitors: [],
+        pages: {},
+        timeOnSite: 0,
+        cloudflareStats: {
+          ddosProtectedSessions: 0,
+          countries: {},
+          rays: []
+        }
+      };
+    }
+
+    if (type === 'pageview') {
+      analytics.dailyStats[today].pageViews++;
+      if (!analytics.dailyStats[today].uniqueVisitors.includes(sessionId)) {
+        analytics.dailyStats[today].uniqueVisitors.push(sessionId);
+      }
+
+      const currentPage = data?.pathname || '/';
+      if (!analytics.dailyStats[today].pages[currentPage]) {
+        analytics.dailyStats[today].pages[currentPage] = 0;
+      }
+      analytics.dailyStats[today].pages[currentPage]++;
+    }
+
+    // Update Cloudflare-specific stats
+    if (ddosProtected) {
+      analytics.dailyStats[today].cloudflareStats.ddosProtectedSessions++;
+    }
+    
+    const cfCountry = serverCloudflareData.cfIPCountry;
+    if (cfCountry) {
+      if (!analytics.dailyStats[today].cloudflareStats.countries[cfCountry]) {
+        analytics.dailyStats[today].cloudflareStats.countries[cfCountry] = 0;
+      }
+      analytics.dailyStats[today].cloudflareStats.countries[cfCountry]++;
+    }
+
+    const cfRay = serverCloudflareData.cfRay;
+    if (cfRay && !analytics.dailyStats[today].cloudflareStats.rays.includes(cfRay)) {
+      analytics.dailyStats[today].cloudflareStats.rays.push(cfRay);
+    }
+
+    // Update total stats
+    if (type === 'pageview') {
+      analytics.totalStats.pageViews++;
+      if (!analytics.totalStats.uniqueVisitors.includes(sessionId)) {
+        analytics.totalStats.uniqueVisitors.push(sessionId);
+      }
+    }
+
+    // Limit stored data
+    const maxEntries = 10000;
+    const keepEntries = 5000;
+
+    if (analytics.sessions.length > maxEntries) {
+      analytics.sessions = analytics.sessions.slice(-keepEntries);
+    }
+    if (analytics.ipData.length > maxEntries) {
+      analytics.ipData = analytics.ipData.slice(-keepEntries);
+    }
+    if (analytics.browserData.length > maxEntries) {
+      analytics.browserData = analytics.browserData.slice(-keepEntries);
+    }
+    if (analytics.cloudflarePageViews && analytics.cloudflarePageViews.length > maxEntries) {
+      analytics.cloudflarePageViews = analytics.cloudflarePageViews.slice(-keepEntries);
+    }
+    if (analytics.cloudflareEvents && analytics.cloudflareEvents.length > maxEntries) {
+      analytics.cloudflareEvents = analytics.cloudflareEvents.slice(-keepEntries);
+    }
+
+    // Save updated analytics
+    await writeAnalyticsData(analytics);
+
+    res.json({
+      success: true,
+      sessionId,
+      type,
+      cfRay: serverCloudflareData.cfRay,
+      cfCountry: serverCloudflareData.cfIPCountry,
+      ddosProtected: ddosProtected || false,
+      message: 'Cloudflare tracking data recorded successfully'
+    });
+
+  } catch (error) {
+    console.error('Error tracking Cloudflare data:', error);
+    res.status(500).json({ error: 'Failed to track Cloudflare data' });
   }
 });
 

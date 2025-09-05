@@ -1,0 +1,78 @@
+# Cloudflare Pages Headers Configuration
+# This file configures security headers and DDoS protection for nightdev
+
+/*
+  # Security Headers
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  
+  # Content Security Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdnjs.cloudflare.com https://widget.changelogfy.com https://audio.jukehost.co.uk; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; connect-src 'self' https://challenges.cloudflare.com https://api.ipgeolocation.io https://ipapi.co http://ip-api.com; media-src 'self' https://audio.jukehost.co.uk; frame-src 'none'; object-src 'none'; base-uri 'self';
+  
+  # HSTS (HTTP Strict Transport Security)
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  
+  # Custom headers for analytics
+  CF-Analytics-Enabled: true
+  CF-DDoS-Protection: enabled
+  CF-Security-Level: high
+
+/api/*
+  # API-specific headers
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With
+  Access-Control-Max-Age: 86400
+  
+  # Rate limiting headers
+  CF-Rate-Limit: 100
+  CF-Rate-Limit-Window: 60
+
+/auth.html
+  # Enhanced security for auth page
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  CF-Security-Level: high
+  CF-Challenge-Mode: managed
+
+/login.html
+  # Enhanced security for login page
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Cache-Control: no-cache, no-store, must-revalidate
+  Pragma: no-cache
+  Expires: 0
+  CF-Security-Level: high
+  CF-Challenge-Mode: managed
+
+/*.js
+  # JavaScript files caching
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: application/javascript
+
+/*.css
+  # CSS files caching
+  Cache-Control: public, max-age=31536000, immutable
+  Content-Type: text/css
+
+/*.png
+/*.jpg
+/*.jpeg
+/*.gif
+/*.webp
+/*.svg
+  # Image files caching
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.woff
+/*.woff2
+/*.ttf
+/*.eot
+  # Font files caching
+  Cache-Control: public, max-age=31536000, immutable

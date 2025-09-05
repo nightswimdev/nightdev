@@ -1,8 +1,61 @@
-# Cloudflare Pages redirects and rewrites
+# Cloudflare Pages Redirects Configuration
+# This file configures URL redirects and routing for nightdev
 
-# API routes go to functions
-/api/analytics /api/analytics 200
-/api/track /api/analytics 200
+# Security redirects - block common attack patterns
+/wp-admin/* /404.html 404
+/wp-login.php /404.html 404
+/wp-content/* /404.html 404
+/admin/* /auth.html 302
+/administrator/* /auth.html 302
+/.env /404.html 404
+/.git/* /404.html 404
+/config/* /404.html 404
+/backup/* /404.html 404
+/phpmyadmin/* /404.html 404
+/mysql/* /404.html 404
+/database/* /404.html 404
 
-# SPA fallback - serve index.html for any unmatched routes
-/* /index.html 200
+# Authentication redirects
+/signin /auth.html 302
+/signup /auth.html 302
+/register /auth.html 302
+/account /auth.html 302
+
+# API redirects for better organization
+/api/v1/* /api/:splat 301
+/analytics/* /api/analytics/:splat 301
+
+# Legacy redirects
+/home /index.html 301
+/main /index.html 301
+/proxy /index.html 301
+
+# Mobile redirects (if needed)
+/m/* /:splat 301
+/mobile/* /:splat 301
+
+# Error page redirects
+/error /404.html 302
+/not-found /404.html 302
+
+# SPA fallback for client-side routing
+/dashboard/* /dashboard.html 200
+/settings/* /settings.html 200
+/apps/* /apps.html 200
+
+# Security headers for specific paths
+/api/* /api/:splat 200
+  CF-Security-Level: high
+  CF-Challenge-Mode: managed
+
+# DDoS protection for auth pages
+/auth.html /auth.html 200
+  CF-Security-Level: under_attack
+  CF-Challenge-Mode: js_challenge
+
+/login.html /login.html 200
+  CF-Security-Level: high
+  CF-Challenge-Mode: managed
+
+# Catch-all for unknown routes
+/* /404.html 404
