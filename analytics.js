@@ -27,20 +27,36 @@ class NightDevAnalytics {
       // Collect browser and device data
       this.collectBrowserData();
       
-      // Track page view and send to server
-      await this.trackPageViewToServer();
+      // For static deployment, skip server tracking and use local storage directly
+      if (this.isStaticDeployment()) {
+        console.log('Static deployment detected, using local analytics storage');
+        await this.fallbackToLocalStorage();
+      } else {
+        // Track page view and send to server
+        await this.trackPageViewToServer();
+        
+        // Also store locally as backup
+        this.storeAnalyticsDataLocally();
+      }
       
       // Set up event listeners
       this.setupEventListeners();
-      
-      // Also store locally as backup
-      this.storeAnalyticsDataLocally();
       
     } catch (error) {
       console.warn('Analytics initialization failed:', error);
       // Fallback to local storage if server fails
       this.fallbackToLocalStorage();
     }
+  }
+
+  // Check if this is a static deployment (no backend server)
+  isStaticDeployment() {
+    // Check if we're on Cloudflare Pages or other static hosting
+    return window.location.hostname.includes('.pages.dev') || 
+           window.location.hostname.includes('github.io') ||
+           window.location.hostname.includes('netlify.app') ||
+           window.location.hostname.includes('vercel.app') ||
+           !window.location.hostname.includes('localhost');
   }
 
   // Send tracking data to server
@@ -88,6 +104,7 @@ class NightDevAnalytics {
       await this.collectIPDataFallback();
       this.trackPageView();
       this.storeAnalyticsDataLocally();
+      console.log('Analytics initialized with local storage');
     } catch (error) {
       console.warn('Fallback analytics also failed:', error);
     }

@@ -982,9 +982,27 @@
         `;
 
         try {
-          // Fetch detailed analytics data from server
-          const response = await fetch('/api/analytics/detailed');
-          const data = await response.json();
+          // Check if this is a static deployment
+          const isStatic = window.location.hostname.includes('.pages.dev') || 
+                          window.location.hostname.includes('github.io') ||
+                          window.location.hostname.includes('netlify.app') ||
+                          window.location.hostname.includes('vercel.app') ||
+                          !window.location.hostname.includes('localhost');
+
+          let data = { ipData: [], sessions: [] };
+
+          if (!isStatic) {
+            // Fetch detailed analytics data from server (only for non-static deployments)
+            const response = await fetch('/api/analytics/detailed');
+            data = await response.json();
+          } else {
+            // For static deployments, use local analytics data
+            const analytics = JSON.parse(localStorage.getItem('nightdev_analytics') || '{}');
+            data = {
+              ipData: analytics.ipData || [],
+              sessions: analytics.browserData || []
+            };
+          }
           
           const ipData = data.ipData || [];
           const sessions = data.sessions || [];
@@ -1152,23 +1170,36 @@
           console.error('Failed to load IP data:', error);
           
           // Fallback to local IP data
-          const localIPData = window.NightDevAnalytics?.getIPData() || [];
+          const analytics = JSON.parse(localStorage.getItem('nightdev_analytics') || '{}');
+          const localIPData = analytics.ipData || [];
+          
+          // Check if this is a static deployment
+          const isStatic = window.location.hostname.includes('.pages.dev') || 
+                          window.location.hostname.includes('github.io') ||
+                          window.location.hostname.includes('netlify.app') ||
+                          window.location.hostname.includes('vercel.app') ||
+                          !window.location.hostname.includes('localhost');
           
           container.innerHTML = `
             <div class="dashboard-card" style="grid-column: 1 / -1;">
               <div class="card-icon">
-                <i class="fa-solid fa-exclamation-triangle"></i>
+                <i class="fa-solid fa-${isStatic ? 'info-circle' : 'exclamation-triangle'}"></i>
               </div>
-              <h3 class="card-title">Server IP Data Unavailable</h3>
-              <p class="card-description" style="color: #ff6b6b; margin-bottom: 1rem;">
-                Unable to connect to analytics server. Showing local IP data as fallback.
+              <h3 class="card-title">${isStatic ? 'Static Deployment Analytics' : 'Server IP Data Unavailable'}</h3>
+              <p class="card-description" style="color: ${isStatic ? '#4CAF50' : '#ff6b6b'}; margin-bottom: 1rem;">
+                ${isStatic ? 
+                  'Running on static hosting. Analytics data is stored locally in your browser.' : 
+                  'Unable to connect to analytics server. Showing local IP data as fallback.'
+                }
               </p>
               <div style="text-align: left;">
                 <p><strong>Local IP Records:</strong> ${localIPData.length}</p>
-                <p><strong>Error:</strong> ${error.message}</p>
+                ${!isStatic ? `<p><strong>Error:</strong> ${error.message}</p>` : ''}
                 <p style="color: #aaa; font-size: 0.9rem; margin-top: 1rem;">
-                  Note: Local IP data may not include real IP addresses or detailed geolocation information.
-                  Start the server with <code>npm start</code> to get accurate server-side IP tracking.
+                  ${isStatic ? 
+                    'Note: Static deployments use client-side analytics. Data is stored in localStorage and may vary between browsers/devices.' :
+                    'Note: Local IP data may not include real IP addresses or detailed geolocation information. Start the server with <code>npm start</code> to get accurate server-side IP tracking.'
+                  }
                 </p>
               </div>
             </div>
