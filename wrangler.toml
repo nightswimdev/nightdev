@@ -10,6 +10,23 @@ name = "nightdev-preview"
 # Pages configuration
 pages_build_output_dir = "."
 
-# Environment variables (set these in Cloudflare dashboard)
-# [vars]
-# ANALYTICS_ENABLED = "true"
+# KV Namespaces for analytics data storage
+[[kv_namespaces]]
+binding = "ANALYTICS_KV"
+id = "your-kv-namespace-id-here"
+preview_id = "your-preview-kv-namespace-id-here"
+
+# Environment variables
+[vars]
+ANALYTICS_ENABLED = "true"
+TURNSTILE_SECRET_KEY = "0x4AAAAAAByuMp3amBtzLFTqD_00DbRzj0o"
+
+# Production environment variables
+[env.production.vars]
+ANALYTICS_ENABLED = "true"
+TURNSTILE_SECRET_KEY = "0x4AAAAAAByuMp3amBtzLFTqD_00DbRzj0o"
+
+# Preview environment variables  
+[env.preview.vars]
+ANALYTICS_ENABLED = "true"
+TURNSTILE_SECRET_KEY = "0x4AAAAAAByuMp3amBtzLFTqD_00DbRzj0o"

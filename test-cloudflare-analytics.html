@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloudflare Analytics Test - NightDev</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        h1, h2 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.success { background: #4CAF50; }
+        .status.error { background: #f44336; }
+        .status.warning { background: #ff9800; }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid #4CAF50;
+        }
+        .test-button {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s ease;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .test-button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .results {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .info-card {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .metric:last-child {
+            border-bottom: none;
+        }
+        .metric-value {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #4CAF50;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Cloudflare Analytics Test Dashboard</h1>
+        
+        <div class="test-section">
+            <h2>Environment Detection</h2>
+            <div id="environment-info">
+                <div class="metric">
+                    <span>Environment:</span>
+                    <span class="metric-value" id="environment">Detecting...</span>
+                </div>
+                <div class="metric">
+                    <span>Analytics Endpoint:</span>
+                    <span class="metric-value" id="endpoint">Loading...</span>
+                </div>
+                <div class="metric">
+                    <span>Session ID:</span>
+                    <span class="metric-value" id="session-id">Generating...</span>
+                </div>
+                <div class="metric">
+                    <span>Cloudflare Pages:</span>
+                    <span class="metric-value" id="cf-pages">Checking...</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>API Endpoint Tests</h2>
+            <button class="test-button" onclick="testTrackingAPI()">Test Tracking API</button>
+            <button class="test-button" onclick="testAnalyticsSummary()">Test Analytics Summary</button>
+            <button class="test-button" onclick="testDetailedAnalytics()">Test Detailed Analytics</button>
+            <button class="test-button" onclick="testTurnstileAPI()">Test Turnstile API</button>
+            <div id="api-results" class="results" style="display: none;"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Analytics Data</h2>
+            <button class="test-button" onclick="loadAnalyticsData()">Load Current Analytics</button>
+            <div class="info-grid" id="analytics-grid" style="display: none;">
+                <div class="info-card">
+                    <h3>📊 Page Views</h3>
+                    <div class="metric">
+                        <span>Total:</span>
+                        <span class="metric-value" id="total-views">-</span>
+                    </div>
+                    <div class="metric">
+                        <span>Today:</span>
+                        <span class="metric-value" id="today-views">-</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h3>👥 Visitors</h3>
+                    <div class="metric">
+                        <span>Total Unique:</span>
+                        <span class="metric-value" id="total-visitors">-</span>
+                    </div>
+                    <div class="metric">
+                        <span>Today Unique:</span>
+                        <span class="metric-value" id="today-visitors">-</span>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <h3>🌍 Geographic</h3>
+                    <div id="countries-list">Loading...</div>
+                </div>
+                <div class="info-card">
+                    <h3>🖥️ Browsers</h3>
+                    <div id="browsers-list">Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>Real-time Events</h2>
+            <button class="test-button" onclick="triggerTestEvent('button_click')">Test Button Click</button>
+            <button class="test-button" onclick="triggerTestEvent('page_interaction')">Test Page Interaction</button>
+            <button class="test-button" onclick="triggerTestEvent('custom_event')">Test Custom Event</button>
+            <div id="events-log" class="results" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Include analytics scripts -->
+    <script src="cloudflare-analytics.js"></script>
+    <script src="analytics.js"></script>
+
+    <script>
+        // Test dashboard functionality
+        let testResults = [];
+
+        // Initialize environment detection
+        document.addEventListener('DOMContentLoaded', function() {
+            detectEnvironment();
+            
+            // Auto-load analytics data after 2 seconds
+            setTimeout(() => {
+                loadAnalyticsData();
+            }, 2000);
+        });
+
+        function detectEnvironment() {
+            const isCloudflare = detectCloudflarePages();
+            const endpoint = isCloudflare ? '/api/cf-track' : '/api/track';
+            const sessionId = window.cfAnalytics ? window.cfAnalytics.sessionId : 'Not available';
+            
+            document.getElementById('environment').textContent = isCloudflare ? 'Cloudflare Pages' : 'Local Development';
+            document.getElementById('endpoint').textContent = endpoint;
+            document.getElementById('session-id').textContent = sessionId;
+            document.getElementById('cf-pages').textContent = isCloudflare ? 'Yes' : 'No';
+            
+            // Add status indicators
+            const envElement = document.getElementById('environment');
+            const statusClass = isCloudflare ? 'success' : 'warning';
+            envElement.innerHTML += `<span class="status ${statusClass}">${isCloudflare ? 'PRODUCTION' : 'DEVELOPMENT'}</span>`;
+        }
+
+        function detectCloudflarePages() {
+            const cfHeaders = document.querySelector('meta[name="cf-ray"]');
+            const cfWorker = window.cfWorker;
+            const cfPages = window.CF_PAGES;
+            
+            return !!(cfHeaders || cfWorker || cfPages || 
+                      window.location.hostname.includes('.pages.dev') ||
+                      document.cookie.includes('__cf'));
+        }
+
+        async function testTrackingAPI() {
+            showLoading('api-results');
+            const isCloudflare = detectCloudflarePages();
+            const endpoint = isCloudflare ? '/api/cf-track' : '/api/track';
+            
+            try {
+                const testData = {
+                    type: 'test',
+                    sessionId: 'test_' + Date.now(),
+                    data: {
+                        event: 'api_test',
+                        timestamp: new Date().toISOString(),
+                        testData: true
+                    },
+                    browserData: {
+                        browser: 'Test Browser',
+                        version: '1.0.0',
+                        userAgent: navigator.userAgent
+                    },
+                    cloudflareData: {
+                        testMode: true
+                    }
+                };
+
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+
+                const result = await response.json();
+                displayResult('api-results', `Tracking API Test (${endpoint})`, result, response.ok);
+                
+            } catch (error) {
+                displayResult('api-results', `Tracking API Test (${endpoint})`, { error: error.message }, false);
+            }
+        }
+
+        async function testAnalyticsSummary() {
+            showLoading('api-results');
+            
+            try {
+                const response = await fetch('/api/analytics/summary');
+                const result = await response.json();
+                displayResult('api-results', 'Analytics Summary API', result, response.ok);
+                
+            } catch (error) {
+                displayResult('api-results', 'Analytics Summary API', { error: error.message }, false);
+            }
+        }
+
+        async function testDetailedAnalytics() {
+            showLoading('api-results');
+            
+            try {
+                const response = await fetch('/api/analytics/detailed?limit=5');
+                const result = await response.json();
+                displayResult('api-results', 'Detailed Analytics API', result, response.ok);
+                
+            } catch (error) {
+                displayResult('api-results', 'Detailed Analytics API', { error: error.message }, false);
+            }
+        }
+
+        async function testTurnstileAPI() {
+            showLoading('api-results');
+            
+            try {
+                // This is a test call - in real usage, you'd have a valid Turnstile token
+                const response = await fetch('/api/verify-turnstile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        token: 'test_token_' + Date.now(),
+                        ipData: { test: true }
+                    })
+                });
+
+                const result = await response.json();
+                displayResult('api-results', 'Turnstile Verification API', result, response.status !== 500);
+                
+            } catch (error) {
+                displayResult('api-results', 'Turnstile Verification API', { error: error.message }, false);
+            }
+        }
+
+        async function loadAnalyticsData() {
+            try {
+                const response = await fetch('/api/analytics/summary');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('total-views').textContent = data.totalPageViews || 0;
+                    document.getElementById('today-views').textContent = data.todayPageViews || 0;
+                    document.getElementById('total-visitors').textContent = data.totalUniqueVisitors || 0;
+                    document.getElementById('today-visitors').textContent = data.todayUniqueVisitors || 0;
+                    
+                    // Display countries
+                    const countriesList = document.getElementById('countries-list');
+                    if (data.recentCountries && data.recentCountries.length > 0) {
+                        countriesList.innerHTML = data.recentCountries.slice(0, 5).map(c => 
+                            `<div class="metric"><span>${c.country}:</span><span class="metric-value">${c.count}</span></div>`
+                        ).join('');
+                    } else {
+                        countriesList.innerHTML = '<div class="metric"><span>No data yet</span></div>';
+                    }
+                    
+                    // Display browsers
+                    const browsersList = document.getElementById('browsers-list');
+                    if (data.browserStats && data.browserStats.length > 0) {
+                        browsersList.innerHTML = data.browserStats.slice(0, 5).map(b => 
+                            `<div class="metric"><span>${b.browser}:</span><span class="metric-value">${b.count}</span></div>`
+                        ).join('');
+                    } else {
+                        browsersList.innerHTML = '<div class="metric"><span>No data yet</span></div>';
+                    }
+                    
+                    document.getElementById('analytics-grid').style.display = 'grid';
+                } else {
+                    console.error('Failed to load analytics data:', data);
+                }
+                
+            } catch (error) {
+                console.error('Error loading analytics data:', error);
+            }
+        }
+
+        function triggerTestEvent(eventType) {
+            showLoading('events-log');
+            
+            // Use the global analytics functions if available
+            if (window.trackEvent) {
+                window.trackEvent('test', eventType, 'dashboard_test', 1, {
+                    testMode: true,
+                    timestamp: new Date().toISOString()
+                });
+                
+                displayResult('events-log', `Event Triggered: ${eventType}`, {
+                    success: true,
+                    event: eventType,
+                    timestamp: new Date().toISOString()
+                }, true);
+            } else {
+                displayResult('events-log', `Event Trigger Failed: ${eventType}`, {
+                    error: 'Analytics not loaded'
+                }, false);
+            }
+        }
+
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            element.innerHTML = '<div class="loading"></div> Loading...';
+        }
+
+        function displayResult(elementId, title, data, success) {
+            const element = document.getElementById(elementId);
+            element.style.display = 'block';
+            
+            const statusClass = success ? 'success' : 'error';
+            const statusText = success ? 'SUCCESS' : 'ERROR';
+            
+            element.innerHTML = `
+                <div style="margin-bottom: 10px;">
+                    <strong>${title}</strong>
+                    <span class="status ${statusClass}">${statusText}</span>
+                </div>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+        }
+
+        // Add some test interactions
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('test-button')) {
+                // Track button clicks
+                if (window.trackEvent) {
+                    window.trackEvent('interaction', 'button_click', e.target.textContent, null, {
+                        buttonText: e.target.textContent,
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            }
+        });
+
+        // Track page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (window.trackEvent) {
+                window.trackEvent('engagement', 'visibility_change', document.visibilityState);
+            }
+        });
+    </script>
+</body>
+</html>

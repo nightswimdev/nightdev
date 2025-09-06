@@ -5,8 +5,9 @@
 
 class NightDevAnalytics {
   constructor() {
-    // Use Cloudflare Pages Function endpoint
-    this.serverEndpoint = window.location.origin + '/api/analytics';
+    // Detect environment and set appropriate endpoint
+    this.isCloudflarePages = this.detectCloudflarePages();
+    this.serverEndpoint = this.getServerEndpoint();
     this.sessionId = this.generateSessionId();
     this.startTime = Date.now();
     this.pageViews = [];
@@ -16,9 +17,31 @@ class NightDevAnalytics {
     this.init();
   }
 
+  // Detect if running on Cloudflare Pages
+  detectCloudflarePages() {
+    // Check for Cloudflare-specific indicators
+    const cfHeaders = document.querySelector('meta[name="cf-ray"]');
+    const cfWorker = window.cfWorker;
+    const cfPages = window.CF_PAGES;
+    
+    return !!(cfHeaders || cfWorker || cfPages || 
+              window.location.hostname.includes('.pages.dev') ||
+              document.cookie.includes('__cf'));
+  }
+
+  // Get appropriate server endpoint based on environment
+  getServerEndpoint() {
+    if (this.isCloudflarePages) {
+      return '/api/cf-track'; // Use Cloudflare-specific endpoint
+    } else {
+      return '/api/track'; // Use local server endpoint
+    }
+  }
+
   // Generate unique session ID
   generateSessionId() {
-    return 'nd_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    const prefix = this.isCloudflarePages ? 'cf_' : 'nd_';
+    return prefix + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
   }
 
   // Initialize tracking
