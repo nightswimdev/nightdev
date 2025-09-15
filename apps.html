@@ -235,45 +235,6 @@
 
       searchInput.addEventListener('input', filterApps);
     </script>
-      <script>
-  // Toast function (copy from your main JS)
-  function showToast(message, type = 'info', iconType = 'game') {
-    const toast = document.createElement('div');
-    toast.className = `toast show ${type}`;
-    const icons = {
-      success: '<i class="fa-solid fa-check-circle" style="margin-right: 8px;"></i>',
-      error:   '<i class="fa-solid fa-times-circle" style="margin-right: 8px;"></i>',
-      info:    '<i class="fa-solid fa-info-circle" style="margin-right: 8px;"></i>',
-      warning: '<i class="fa-solid fa-exclamation-triangle" style="margin-right: 8px;"></i>',
-      game:    '<i class="fa-solid fa-gamepad" style="margin-right: 8px;"></i>',
-      apps:    '<i class="fa-solid fa-th-large" style="margin-right: 8px;"></i>',
-      robot:   '<i class="fa-solid fa-robot" style="margin-right: 8px;"></i>',
-      wave:    '<i class="fa-solid fa-hand-peace" style="margin-right: 8px;"></i>',
-    };
-    toast.innerHTML = `${icons[iconType] || icons.game}${message}`;
-    const progressBar = document.createElement('div');
-    progressBar.className = 'progress-bar';
-    toast.appendChild(progressBar);
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'toast-close';
-    closeBtn.innerHTML = '<i class="fa-solid fa-xmark" style="margin-left: 8px; font-size: 0.8em;"></i>';
-    closeBtn.addEventListener('click', () => {
-      toast.classList.add('hide');
-      setTimeout(() => toast.remove(), 500);
-    });
-    toast.appendChild(closeBtn);
-    document.body.appendChild(toast);
-    setTimeout(() => {
-      toast.classList.add('hide');
-      setTimeout(() => toast.remove(), 500);
-    }, 3000);
-  }
-
-  // Show a toast when the games page loads
-  window.addEventListener('DOMContentLoaded', function() {
-    showToast("Welcome to the apps page!", "info", "apps");
-  });
-</script>
 <script>
 // Map site keys to real URLs
 const appUrls = {

@@ -1307,6 +1307,87 @@
         });
       }
 
+      // Navbar shrink on iframe scroll (supports Ultraviolet proxied pages)
+      document.addEventListener('DOMContentLoaded', () => {
+        const iframeEl = document.getElementById('cool-iframe');
+        const navbar = document.querySelector('.navbar');
+        if (!iframeEl || !navbar) return;
+
+        // Add CSS for compact, URL-only rounded mode
+        const styleEl = document.createElement('style');
+        styleEl.textContent = `
+          .navbar { transition: padding 0.2s ease, height 0.2s ease, transform 0.2s ease, top 0.2s ease, background-color 0.2s ease; }
+          .navbar.navbar-collapsed { background: transparent !important; padding: 6px 0 !important; height: auto; top: 8px !important; }
+          .navbar.navbar-collapsed .navbar-light,
+          .navbar.navbar-collapsed .navbar-light-border,
+          .navbar.navbar-collapsed .navbar-light-inset-bg { display: none !important; }
+          .navbar.navbar-collapsed .nav-buttons > li { display: none !important; }
+          .navbar.navbar-collapsed .nav-buttons > li.url-item { display: flex !important; }
+          .navbar .nav-buttons { justify-content: center; }
+          .navbar.navbar-collapsed .small-searchbar { 
+            width: 560px; max-width: 90vw;
+            background-color: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 999px; padding: 6px 12px; position: relative;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+          }
+          .navbar.navbar-collapsed .small-searchbar input[type=text] {
+            width: 100%; background: transparent; border: none; color: #e5e5e5;
+            padding: 10px 16px 10px 40px; /* leave space for lock icon */
+          }
+          .navbar.navbar-collapsed #lockIcon { left: 18px; color: #b9b9b9; }
+          .navbar.navbar-collapsed .shortcut-indicator,
+          .navbar.navbar-collapsed .shortcut-indicator-2,
+          .navbar.navbar-collapsed .shortcut-indicator-3 { display: none !important; }
+        `;
+        document.head.appendChild(styleEl);
+
+        // Mark the URL bar's list item for targeting in collapsed mode
+        const urlBarLi = document.querySelector('.small-searchbar')?.closest('li');
+        if (urlBarLi) urlBarLi.classList.add('url-item');
+
+        let isShrunk = false;
+        function setShrink(shrink) {
+          if (shrink === isShrunk) return;
+          isShrunk = shrink;
+          navbar.classList.toggle('navbar-collapsed', shrink);
+        }
+
+        function attachIframeScrollHandlers() {
+          try {
+            const cw = iframeEl.contentWindow;
+            if (!cw) return;
+
+            // Track scroll direction inside the iframe's document
+            let lastY = cw.scrollY || 0;
+            cw.addEventListener('scroll', () => {
+              const y = cw.scrollY || 0;
+              if (y > lastY + 1) setShrink(true);
+              else if (y < lastY - 1) setShrink(false);
+              lastY = y;
+            }, { passive: true });
+
+            // Also handle wheel direction for immediate feedback
+            cw.addEventListener('wheel', (e) => {
+              if (e.deltaY > 0) setShrink(true);
+              else if (e.deltaY < 0) setShrink(false);
+            }, { passive: true });
+          } catch (e) {
+            // If cross-origin blocks access, fallback to wheel over the iframe element (limited)
+            iframeEl.addEventListener('wheel', (e) => {
+              if (e.deltaY > 0) setShrink(true);
+              else if (e.deltaY < 0) setShrink(false);
+            }, { passive: true });
+          }
+        }
+
+        // Attach now if already loaded; otherwise on load
+        if (iframeEl.complete) {
+          attachIframeScrollHandlers();
+        }
+        iframeEl.addEventListener('load', attachIframeScrollHandlers);
+      });
+
       // eruda init (do not attach to iframe)
       if (typeof eruda !== 'undefined') {
         try { eruda.init(); } catch (e) { /* ignore eruda attach errors */ }

@@ -33,38 +33,6 @@
      <script src="assets/js/indexd.js" defer></script>
     <!-- NightDev Analytics & IP Tracking -->
     <script src="analytics.js" defer></script>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "What is nightdev (Web Proxy)?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "nightdev is a web proxy that allows you to access blocked websites and content by routing your requests through a different server. It helps you bypass restrictions and surf the web freely."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "How do I unblock sites using nightdev?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Simply head to an official site featuring nightdev such as Holy Unblocker or Incognito!
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "What if nightdev is blocked or not working?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "please email me @ sebuda.dev@null.net or contact me on Discord @nightswim. we will try to fix it as soon as possible."
-            }
-          }
-        ]
-      }
-    </script>
     <!-- Add this in your <head> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   </head>
@@ -79,6 +47,21 @@
         <div class="spinner-icon"></div>
       </div>
     </div>
+    <div class="version-display" id="version-display" style="
+        position: fixed;
+        top: 10px;
+        left: 7px;
+        color: #bfc9db;
+        font-size: 0.85em;
+        opacity: 0.7;
+        z-index: 9999;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 2px 8px;
+        border-radius: 10px;
+        backdrop-filter: blur(5px);
+      ">v1.0.0</div>
+  
 
     <!-- Security Warning Overlay -->
     <div id="security-warning-overlay" class="security-warning-overlay">
@@ -139,6 +122,7 @@
     <!-- Main Navbar (bigger, centered, with brand) -->
     <div class="navbar main-navbar">
       <div class="navbar-light-border"></div>
+    
       <div class="navbar-light-inset-bg"></div>
       <div class="navbar-light"></div>
       <div class="main-navbar-title">
@@ -193,6 +177,38 @@
         />
         <div id="index-suggestions-container" class="suggestions-container"></div>
       </form>
+
+      <!-- Quick Links row -->
+      <div id="quick-links" class="quick-links" aria-label="Quick links"></div>
+
+      <!-- Quick Link Modal -->
+      <div id="ql-modal" class="ql-modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="ql-modal-title">
+        <div class="ql-modal-card">
+          <div class="ql-modal-header">
+            <h3 id="ql-modal-title">Add quick link</h3>
+            <button id="ql-modal-close" class="ql-close-btn" aria-label="Close">&times;</button>
+          </div>
+          <div class="ql-modal-body">
+            <label for="ql-input-url">Site URL</label>
+            <input id="ql-input-url" type="url" placeholder="https://nightdev.pages.dev" required />
+            <label for="ql-input-title">Title</label>
+            <input id="ql-input-title" type="text" placeholder="nightdev" />
+            <label for="ql-input-icon">Icon URL</label>
+            <input id="ql-input-icon" type="url" placeholder="https://.../favicon.ico" />
+            <div class="ql-preview">
+              <div class="ql-icon"><img id="ql-preview-icon" alt="" /></div>
+              <div class="ql-preview-title" id="ql-preview-title">Preview</div>
+            </div>
+          </div>
+          <div class="ql-actions">
+            <button id="ql-delete" class="danger" style="display:none">Delete</button>
+            <div class="spacer"></div>
+            <button id="ql-cancel">Cancel</button>
+            <button id="ql-save" class="primary">Save</button>
+          </div>
+        </div>
+      </div>
+
       <div class="desc left-margin">
         <p id="uv-error"></p>
         <pre id="uv-error-code"></pre>
@@ -231,24 +247,7 @@
       <span>nightswim &copy; net 2025</span>
     </footer>
 <script src="settings.js"></script>
-<script>
-    let CLF_config = {
-        app_id: "00e26072-7f96-4735-a0d4-c6b775144a48",
-        showNewUpdates: true, // automatically show new updates
-        data: {
-            user_id: '123456', // required
-            user_email: 'user@email.com', // required
-            user_name: 'nightdevs users', // optional
-            custom_data: {
-                'JobRole': 'CEO', // optional
-                'Plan': 'Pro', // optional
-                'teamMates': '4', // optional
-                'MonthlySpend': '50 USD' // optional
-            }
-        }
-    };
-</script>
-<script async src="https://widget.changelogfy.com/index.js"></script>
+
 <script>
 (function(){
   // Multi-song playlist - Add as many songs as you want here
@@ -511,17 +510,9 @@
         // Audio was paused unexpectedly, try to resume
         console.log('Audio paused unexpectedly, attempting to resume...');
         setTimeout(async () => {
-          try {
-            if (audio.paused && isPlaying && audio === currentAudio) {
-              await audio.play();
-              console.log('Successfully resumed audio');
-            }
-          } catch (error) {
-            console.log('Could not resume paused audio:', error);
-            // If we can't resume, try switching to next track
-            if (PLAYLIST.length > 1) {
-              setTimeout(switchToNextTrack, 1000);
-            }
+          if (audio.paused && isPlaying && audio === currentAudio) {
+            await audio.play();
+            console.log('Successfully resumed audio');
           }
         }, 500);
       }

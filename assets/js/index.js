@@ -535,9 +535,364 @@ if (address) {
       });
     }
   }
+
+  // Render quick links row beneath the search bar
+  try {
+    const quickLinksEl = document.getElementById('quick-links');
+    if (quickLinksEl) {
+      const DEFAULT_LINKS = [
+        { title: 'EasyFun', url: 'https://easyfun.dev', icon: 'https://www.google.com/s2/favicons?domain=easyfun.dev&sz=64' },
+        { title: 'Github',  url: 'https://github.com',  icon: 'https://www.google.com/s2/favicons?domain=github.com&sz=64' },
+        { title: 'TikTok',  url: 'https://www.tiktok.com', icon: 'https://www.google.com/s2/favicons?domain=tiktok.com&sz=64' },
+        { title: 'Discord', url: 'https://discord.com', icon: 'https://www.google.com/s2/favicons?domain=discord.com&sz=64' },
+      ];
+
+      // load user links from storage
+      const stored = JSON.parse(localStorage.getItem('nightdev_quick_links') || 'null');
+      const links = Array.isArray(stored) && stored.length ? stored : DEFAULT_LINKS;
+
+      function saveLinks(list){
+        localStorage.setItem('nightdev_quick_links', JSON.stringify(list));
+      }
+
+      function goThroughProxy(rawUrl){
+        // Keep behavior consistent with search navigation
+        localStorage.setItem('lastUvUrl', rawUrl);
+        window.location.href = 'active/search.html?url=' + encodeURIComponent(rawUrl) + '&search=' + encodeURIComponent(rawUrl);
+      }
+
+      let openMenuCleanup = null; // cleanup fn to close an open menu
+      function closeAnyMenu(){
+        if (typeof openMenuCleanup === 'function') {
+          openMenuCleanup();
+          openMenuCleanup = null;
+        }
+      }
+
+      function render(){
+        quickLinksEl.innerHTML = '';
+        links.forEach((l, idx) => {
+          const card = document.createElement('div');
+          card.className = 'quick-link';
+          card.title = l.url;
+          card.innerHTML = `
+            <div class="ql-icon"><img src="${l.icon}" alt="" loading="lazy"></div>
+            <div class="ql-title">${l.title}</div>
+            <button class="ql-more" aria-haspopup="true" aria-expanded="false" aria-label="Quick link menu">⋯</button>
+            <div class="ql-menu" role="menu">
+              <button class="ql-menu-item edit" role="menuitem">Change site</button>
+              <button class="ql-menu-item remove" role="menuitem">Remove</button>
+            </div>
+          `;
+
+          // Navigate on card click
+          card.addEventListener('click', () => {
+            goThroughProxy(l.url);
+          });
+
+          // Menu controls
+          const moreBtn = card.querySelector('.ql-more');
+          const menu = card.querySelector('.ql-menu');
+          const btnEdit = card.querySelector('.ql-menu-item.edit');
+          const btnRemove = card.querySelector('.ql-menu-item.remove');
+          // Prevent clicks inside the menu from bubbling to the card
+          menu.addEventListener('click', (e) => e.stopPropagation());
+
+          function openMenu(){
+            closeAnyMenu();
+            menu.classList.add('open');
+            moreBtn.setAttribute('aria-expanded', 'true');
+            // Set cleanup
+            openMenuCleanup = () => {
+              menu.classList.remove('open');
+              moreBtn.setAttribute('aria-expanded', 'false');
+            };
+          }
+
+          function toggleMenu(){
+            if (menu.classList.contains('open')) {
+              closeAnyMenu();
+            } else {
+              openMenu();
+            }
+          }
+
+          moreBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu();
+          });
+
+          btnEdit.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAnyMenu();
+            edit(idx);
+          });
+
+          btnRemove.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeAnyMenu();
+            links.splice(idx, 1);
+            saveLinks(links);
+            render();
+          });
+
+          quickLinksEl.appendChild(card);
+        });
+
+        // Close menus when clicking anywhere else
+        document.addEventListener('click', () => closeAnyMenu(), { once: true });
+
+        // Add button
+        const add = document.createElement('div');
+        add.className = 'quick-link add';
+        add.innerHTML = `
+          <div class="ql-icon"><span class="plus">+</span></div>
+          <div class="ql-title">Add</div>
+        `;
+        add.addEventListener('click', (e) => {
+          e.stopPropagation();
+          closeAnyMenu();
+          openModal();
+        });
+        quickLinksEl.appendChild(add);
+      }
+
+      // Modal helpers
+      let editingIndex = null;
+      const modal = document.getElementById('ql-modal');
+      const modalTitle = document.getElementById('ql-modal-title');
+      const inputUrl = document.getElementById('ql-input-url');
+      const inputTitle = document.getElementById('ql-input-title');
+      const inputIcon = document.getElementById('ql-input-icon');
+      const previewIcon = document.getElementById('ql-preview-icon');
+      const previewTitle = document.getElementById('ql-preview-title');
+      const btnClose = document.getElementById('ql-modal-close');
+      const btnSave = document.getElementById('ql-save');
+      const btnCancel = document.getElementById('ql-cancel');
+      const btnDelete = document.getElementById('ql-delete');
+
+      function openModal(index){
+        editingIndex = (typeof index === 'number') ? index : null;
+        const existing = (editingIndex !== null) ? links[editingIndex] : { title: '', url: '', icon: '' };
+        modalTitle.textContent = editingIndex !== null ? 'Edit quick link' : 'Add quick link';
+        inputUrl.value = existing.url || '';
+        inputTitle.value = existing.title || '';
+        inputIcon.value = existing.icon || '';
+        updatePreview();
+        btnDelete.style.display = editingIndex !== null ? 'inline-block' : 'none';
+        modal.classList.remove('hidden');
+        inputUrl.focus();
+      }
+
+      function closeModal(){
+        modal.classList.add('hidden');
+        editingIndex = null;
+      }
+
+      function updatePreview(){
+        const urlVal = inputUrl.value.trim();
+        const titleVal = inputTitle.value.trim() || 'Preview';
+        let iconVal = inputIcon.value.trim();
+        try {
+          if (!iconVal && urlVal) {
+            const host = (new URL(urlVal)).hostname;
+            iconVal = `https://www.google.com/s2/favicons?domain=${host}&sz=64`;
+          }
+        } catch {}
+        previewTitle.textContent = titleVal;
+        previewIcon.src = iconVal || '';
+      }
+
+      [inputUrl, inputTitle, inputIcon].forEach(el => el && el.addEventListener('input', updatePreview));
+
+      btnClose && btnClose.addEventListener('click', closeModal);
+      btnCancel && btnCancel.addEventListener('click', closeModal);
+      modal && modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+      btnDelete && btnDelete.addEventListener('click', () => {
+        if (editingIndex === null) return;
+        links.splice(editingIndex, 1);
+        saveLinks(links);
+        render();
+        closeModal();
+      });
+
+      btnSave && btnSave.addEventListener('click', () => {
+        const url = inputUrl.value.trim();
+        const title = (inputTitle.value || '').trim() || 'Link';
+        let icon = (inputIcon.value || '').trim();
+        if (!/^https?:\/\//i.test(url)) {
+          alert('Please enter a valid URL starting with http(s)://');
+          return;
+        }
+        if (!icon) {
+          try {
+            const host = (new URL(url)).hostname;
+            icon = `https://www.google.com/s2/favicons?domain=${host}&sz=64`;
+          } catch {}
+        }
+        const item = { title, url, icon };
+        if (editingIndex !== null) links[editingIndex] = item; else links.push(item);
+        saveLinks(links);
+        render();
+        closeModal();
+      });
+
+      function edit(index){
+        openModal(index);
+      }
+
+      render();
+    }
+  } catch (e) {
+    console.warn('Quick links init failed', e);
+  }
   
   address.addEventListener("keydown", function(e) {
     // This will be handled by the suggestions system now
     // The suggestions system will call the navigation logic when needed
   });
 }
+
+let currentVersion = '1.0.0'; // Move to top level so it's accessible everywhere
+
+// Update version display
+function updateVersionDisplay() {
+    const versionDisplay = document.getElementById('version-display');
+    if (versionDisplay) {
+        versionDisplay.textContent = `v${currentVersion}`;
+        
+        // Add hover effect
+        versionDisplay.title = 'Click to check for updates';
+        versionDisplay.style.cursor = 'pointer';
+        versionDisplay.style.transition = 'opacity 0.2s';
+        
+        versionDisplay.addEventListener('mouseenter', () => {
+            versionDisplay.style.opacity = '1';
+        });
+        
+        versionDisplay.addEventListener('mouseleave', () => {
+            versionDisplay.style.opacity = '0.7';
+        });
+        
+        // Click to manually check for updates
+        versionDisplay.addEventListener('click', checkForUpdates);
+    }
+}
+
+async function checkForUpdates() {
+    try {
+        // Show checking state
+        const versionDisplay = document.getElementById('version-display');
+        if (versionDisplay) {
+            versionDisplay.textContent = 'Checking...';
+            versionDisplay.style.opacity = '1';
+        }
+        
+        // Fetch latest release from GitHub
+        const response = await fetch('https://api.github.com/repos/nightswimdev/nightdev/releases/latest');
+        if (!response.ok) throw new Error('Failed to fetch release info');
+        
+        const release = await response.json();
+        const latestVersion = release.tag_name.replace(/^v/, ''); // Remove 'v' prefix if present
+        
+        // Update version display back to current version
+        updateVersionDisplay();
+        
+        if (compareVersions(latestVersion, currentVersion) > 0) {
+            // New version available
+            const updateToast = document.createElement('div');
+            updateToast.className = 'toast show info';
+            updateToast.style.cssText = `
+                background: var(--toast-bg, #232a3a);
+                color: var(--toast-color, #fff);
+                padding: 1em 2em;
+                border-radius: 1em;
+                margin-bottom: 10px;
+                min-width: 250px;
+                box-shadow: 0 4px 24px #232a3a44;
+                font-size: 1.1em;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                opacity: 1;
+                transition: opacity 0.5s;
+            `;
+            
+            updateToast.innerHTML = `
+                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                    <i class="fa-solid fa-arrow-up-from-bracket" style="margin-right: 8px;"></i>
+                    <strong>Update Available!</strong>
+                </div>
+                <div style="font-size: 0.9em; margin-bottom: 12px;">
+                    Version ${latestVersion} is now available (you have v${currentVersion})
+                </div>
+                <div style="display: flex; gap: 8px; width: 100%;">
+                    <button id="update-now" style="
+                        background: #4CAF50;
+                        color: white;
+                        border: none;
+                        padding: 6px 12px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        flex: 1;
+                    ">Update Now</button>
+                    <button id="update-later" style="
+                        background: transparent;
+                        color: #bfc9db;
+                        border: 1px solid #bfc9db33;
+                        padding: 6px 12px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                    ">Later</button>
+                </div>
+            `;
+            
+            document.getElementById('toast-container').appendChild(updateToast);
+            
+            // Add event listeners for buttons
+            document.getElementById('update-now').addEventListener('click', () => {
+                window.open(release.html_url, '_blank');
+                updateToast.style.opacity = '0';
+                setTimeout(() => updateToast.remove(), 500);
+            });
+            
+            document.getElementById('update-later').addEventListener('click', () => {
+                updateToast.style.opacity = '0';
+                setTimeout(() => updateToast.remove(), 500);
+            });
+            
+            // Auto-hide after 30 seconds
+            setTimeout(() => {
+                if (updateToast.parentNode) {
+                    updateToast.style.opacity = '0';
+                    setTimeout(() => updateToast.remove(), 500);
+                }
+            }, 30000);
+        } else if (versionDisplay) {
+            // Show up-to-date message briefly
+            versionDisplay.textContent = 'Up to date';
+            setTimeout(updateVersionDisplay, 2000);
+        }
+    } catch (error) {
+        console.error('Error checking for updates:', error);
+        const versionDisplay = document.getElementById('version-display');
+        if (versionDisplay) {
+            versionDisplay.textContent = 'Update check failed';
+            versionDisplay.style.color = '#ff6b6b';
+            setTimeout(updateVersionDisplay, 2000);
+        }
+    }
+}
+
+// Check for updates when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize version display
+    updateVersionDisplay();
+    
+    // Wait a bit before checking for updates to avoid blocking initial page load
+    setTimeout(checkForUpdates, 3000);
+    
+    // Also check for updates every 24 hours
+    setInterval(checkForUpdates, 24 * 60 * 60 * 1000);
+});
