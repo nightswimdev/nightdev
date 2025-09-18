@@ -1,19 +1,30 @@
 const swAllowedHostnames = ["localhost", "127.0.0.1"];
 const dnsResolver = "8.8.8.8";
 
-// Test bare server connectivity
+// Test bare server connectivity with proper headers
 async function testBareServer(bareUrl) {
   try {
     const response = await fetch(bareUrl, {
-      method: 'GET',
+      method: 'OPTIONS',
+      headers: {
+        'Access-Control-Request-Method': 'GET',
+        'Access-Control-Request-Headers': 'x-bare-url,x-bare-headers',
+        'Origin': window.location.origin
+      }
+    });
+    
+    // Also try a HEAD request to verify connectivity
+    const headResponse = await fetch(bareUrl, {
+      method: 'HEAD',
       headers: {
         'x-bare-url': 'https://example.com/',
         'x-bare-headers': JSON.stringify({})
       }
     });
-    return response.ok || response.status === 400; // 400 is expected for test request
+    
+    return response.ok || headResponse.ok || response.status === 400 || headResponse.status === 400;
   } catch (error) {
-    console.warn(`Bare server ${bareUrl} failed test:`, error.message);
+    console.warn(`Bare server ${bareUrl} test failed:`, error.message);
     return false;
   }
 }
